@@ -1,10 +1,9 @@
-const express = require("express");
-const router = express.Router();
-
-router.get("/comments", (req, res) => {
-  res.json({
-    msesage: "comments works"
-  });
-});
-
-module.exports = router;
+module.exports = function(router) {
+  router
+    .route("/comments")
+    .get((req, res) => {
+      res.json({
+        message: "Comments works"
+      });
+    });
+};

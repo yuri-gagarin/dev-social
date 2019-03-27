@@ -1,13 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-const users = require("./routes/users.js");
-const profile = require("./routes/profile.js");
-const posts = require("./routes/posts.js");
-const comments = require("./routes/comments.js");
-
 const app = express();
-
+const router = express.Router();
+const routes = require('./routes/routes.js');
 const PORT = process.env.PORT || 3000;
 const DB = require("./config/keys").mongoURI;
 
@@ -19,11 +15,9 @@ mongoose
 app.get("/", (req, res) => {
   res.send("Hello There Yo");
 });
+routes(router);
 
-app.use(users);
-app.use(profile);
-app.use(posts);
-app.use(comments);
+app.use(router);
 
 app.listen(PORT, () => {
   console.log(`App listening at PORT: ${PORT}`);
