@@ -1,10 +1,10 @@
-const express = require("express");
-const router = express.Router();
+export default function(router) {
 
-router.get("/profile", (req, res) => {
-  res.json({
-    msesage: "profile  works"
-  });
-});
-
-module.exports = router;
+  router
+    .route("/profile")
+    .get((req, res) => {
+      res.json({
+        message: "rendering profile"
+      });
+    });
+};

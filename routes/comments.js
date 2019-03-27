@@ -1,4 +1,4 @@
-module.exports = function(router) {
+export default function(router) {
   router
     .route("/comments")
     .get((req, res) => {

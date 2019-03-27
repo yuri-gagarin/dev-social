@@ -1,11 +1,13 @@
-const express = require("express");
-const mongoose = require("mongoose");
+import express from "express";
+import mongoose from "mongoose";
+
+import routes from "./routes/routes.js";
+import keys from  "./config/keys.js";
 
 const app = express();
 const router = express.Router();
-const routes = require('./routes/routes.js');
 const PORT = process.env.PORT || 3000;
-const DB = require("./config/keys").mongoURI;
+const DB = keys.mongoURI;
 
 mongoose
   .connect(DB, {useNewUrlParser: true})
@@ -15,8 +17,9 @@ mongoose
 app.get("/", (req, res) => {
   res.send("Hello There Yo");
 });
-routes(router);
 
+//initialize routes
+routes(router);
 app.use(router);
 
 app.listen(PORT, () => {

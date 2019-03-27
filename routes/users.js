@@ -1,5 +1,4 @@
-
-module.exports = function(router) {
+export default function(router) {
   // @route GET /users
   // @desc Users test
   // @access Public
