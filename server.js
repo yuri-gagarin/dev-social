@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-
+import bodyParser from "body-parser";
 import routes from "./routes/routes.js";
 import keys from  "./config/keys.js";
 
@@ -18,9 +18,14 @@ app.get("/", (req, res) => {
   res.send("Hello There Yo");
 });
 
+//bodyparser middleware
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
 //initialize routes
 routes(router);
 app.use(router);
+
 
 app.listen(PORT, () => {
   console.log(`App listening at PORT: ${PORT}`);
