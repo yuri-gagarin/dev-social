@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import keys from "../config/keys.js";
+import passport from "passport";
 
 export default function(router) {
   // @route GET /users
@@ -79,7 +80,7 @@ export default function(router) {
                   email: user.email
                 };
 
-                jwt.sign(tokenPayload, keys.tokenKey, {expiresIn: 1800}, (err, token) => {
+                jwt.sign(tokenPayload, keys.secretOrKey, {expiresIn: 1800}, (err, token) => {
                   if (err) {
                     console.log(err);
                   }
@@ -113,5 +114,21 @@ export default function(router) {
       }
       //end if (email && password)
     });
-}
+
+    // @route GET /current_user
+    // @desc Return current user
+    // @access Private
+    router
+      .route("/current_user")
+      .get(passport.authenticate("jwt", { session: false }), (req, res) => {
+        return res.json({
+          message: "Success",
+          user: {
+            id: req.user.id,
+            name: req.user.name,
+            email: req.user.email
+          }
+        });
+      });
+};
 

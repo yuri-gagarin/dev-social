@@ -2,7 +2,9 @@ import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import routes from "./routes/routes.js";
+import passport from "passport";
 import keys from  "./config/keys.js";
+import passportStrategy from "./config/passportConfig.js";
 
 const app = express();
 const router = express.Router();
@@ -21,6 +23,12 @@ app.get("/", (req, res) => {
 //bodyparser middleware
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+
+
+//passport middleware
+app.use(passport.initialize());
+//passport config
+passportStrategy(passport);
 
 //initialize routes
 routes(router);
