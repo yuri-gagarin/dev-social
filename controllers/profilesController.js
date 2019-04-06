@@ -1,7 +1,6 @@
 import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 import mongoose from "mongoose";
-import passport from "passport";
 
 
 export default {
