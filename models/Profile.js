@@ -29,10 +29,6 @@ const ProfileSchema = new Schema({
     type: String,
     required: true
   },
-  skills: {
-    type: [String],
-    required: true
-  },
   bio: {
     type: String,
     required: true
@@ -40,6 +36,10 @@ const ProfileSchema = new Schema({
   githubUserName: {
     type: String,
     required: false
+  },
+  skills: {
+    type: [String],
+    required: true
   },
   experience: [
     {
