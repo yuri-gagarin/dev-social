@@ -2,11 +2,12 @@ import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 import mongoose from "mongoose";
 import profileValidator from "../helpers/profileValidator.js";
+import experienceValidator from "../helpers/experienceValidator.js";
 
 
 
 export default {
-
+  //GET requests for the profiles
   getProfileByHandle: (req, res) => {
     //get handle from params
     const handle = req.params.handle;
@@ -70,8 +71,10 @@ export default {
   },
 
   allProfiles: (req, res) => {
+    //find and display all user progiles
     const allProfiles = [];
     Profile.find({})
+    .populate("user", ["name", "email"])
     .then((profiles) => {
       if (profiles) {
         profiles.forEach((profile) => {
@@ -84,7 +87,7 @@ export default {
           });
         }
         else {
-          return res.json({
+          return res.status(404).json({
             message: "There doesn't seem to be any profiles created"
           })
         }
@@ -130,6 +133,7 @@ export default {
     }
   },
 
+  //POST requests for the profiles
   saveProfile: (req, res) => {
     //validate for bad input first
     //required field
@@ -164,8 +168,6 @@ export default {
       //set the skills
       profileData.skills = skillDataTrimmed;
     }
-    console.log("Line 72");
-    console.log(profileData);
     //social
     if (req.body.youtube) profileData.social.youtube = req.body.youtube;
     if (req.body.facebook) profileData.social.facebook = req.body.facebook;
@@ -215,6 +217,66 @@ export default {
       });
   },
 
+  saveExperienceToProfile: (req, res) => {
+    const user = req.user;
+    //validate input 
+    const { errors, isValid } = experienceValidator(req.body);
+    if (!isValid) {
+      return res.status(400).json({
+        message: "Invalid input",
+        errors: errors
+      });
+    }
+    Profile.findOne({ user: user._id })
+      .then((profile) => {
+       // console.log(profile);
+
+        if (profile) {
+          //collect experience data
+          const newExpData = {
+            title: req.body.title,
+            company: req.body.company,
+            location: req.body.location,
+            from: req.body.from,
+            to: req.body.to,
+            current: req.body.current,
+            description: req.body.description
+          }
+
+          profile.experience.unshift(newExpData);
+          profile.save()
+            .then((profileData) => {
+              return res.json({
+                message: "Profile Successfully Updated",
+                profile: profileData
+              })
+            })
+            .catch((err) => {
+              return res.status(422).json({
+                message: "Save error",
+                erors: err
+              });
+            })
+        }
+        else {
+          return res.status(404).json({
+            message: "No profile found"
+          });
+        }
+      })
+      .catch((err) => {
+        return res.status(400).json({
+          message: "Bad Request. Don't feed the Gremlins after midnight!",
+          errors: err
+        });
+      });
+  },
+
+  saveEducationToProfile: (req, res) => {
+
+  },
+
+  //DELETE requests to profiles
   deleteProfile: (req, res) => {
     //find the user 
     //add later admin user delete privileges

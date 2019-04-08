@@ -2,7 +2,7 @@ import usersController from "../controllers/usersController.js";
 import passport from "passport";
 
 export default function(router) {
-  
+
   // @route GET /users
   // @desc Users test
   // @access Public

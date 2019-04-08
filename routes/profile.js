@@ -31,19 +31,34 @@ export default function(router) {
     .route("/profile")
     .get(passport.authenticate("jwt", {session: false}),profilesController.profile);
 
-  // @route POST /save_profile
+  // @route POST /profile/save_profile
   // @desc Saves user profile
   // @access Private
   router
-    .route("/save_profile")
+    .route("/profile/save_profile")
     .post(passport.authenticate("jwt", {session: false}),
     profilesController.saveProfile);
 
-  // @route DELETE /delete_profile
+  // @route POST /profile/save_experience
+  // @desc Saves user profile experience
+  // @access Private
+  router
+    .route("/profile/save_experience")
+    .post(passport.authenticate("jwt", {session: false}), profilesController.saveExperienceToProfile);
+
+  // @route POST /profile/save_education
+  // @desc Saves user profile education
+  // @access Private
+  router
+    .route("/profile/save_education")
+    .post(passport.authenticate("jwt", {session: false}),
+    profilesController.saveEducationToProfile)
+  
+  // @route DELETE /profile/delete_profile
   // @desc Deletes user profile
   // @access Private
   router
-    .route("/delete_profile")
+    .route("/profile/delete_profile")
     .delete(passport.authenticate("jwt", {session: false}),
     profilesController.deleteProfile);
 };
