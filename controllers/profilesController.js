@@ -6,6 +6,69 @@ import profileValidator from "../helpers/profileValidator.js";
 
 
 export default {
+
+  getProfileByHandle: (req, res) => {
+    //get handle from params
+    const handle = req.params.handle;
+    if (handle) {
+      //if a handle present
+      //attempt to find a profile with that handle
+      Profile.findOne({ handle: handle })
+      .populate("user", ["name", "email"])
+      .then((profile) => {
+        if (profile) {
+          return res.json({
+            message: `Profile for user: ${profile.user.name}`,
+            profile: profile
+          });
+        }
+        else {
+          return res.status(404).json({
+            message: "Not Found",
+            profile: "User has not created a profile"
+          });
+        }
+      })
+      .catch((err) => {
+        return res.status(400).json({
+          message: "Error",
+          errors: err
+        });
+      });
+    }
+  },
+
+  getProfileByID: (req, res) => {
+    //profile by userID
+    const userId = req.params.user_id;
+    if (userId) {
+      //if a userID is sent to params
+      //attempt to find profile by userId
+      Profile.findOne({ user: userId })
+      .populate("user", ["name", "email"])
+      .then((profile) => {
+        if (profile) {
+          return res.json({
+            message: `Profile for user: ${profile.user.name}`,
+            profile: profile
+          });
+        }
+        else {
+          return res.status(404).json({
+            message: "Not Found",
+            profile: "This user doesn't seem to have a profile"
+          });
+        }
+      })
+      .catch((err) => {
+        return res.status(400).json({
+          message: "Error",
+          errors: err
+        });
+      });
+    }
+  },
+
   profile: (req, res) => {
     const currentUser = req.user;
     const errors = {};
@@ -13,6 +76,7 @@ export default {
     if (currentUser) {
       //find the user profile
       Profile.findOne({user: currentUser.id})
+        .populate("user", ["name", "email"])
         .then((profile) => {
           if (profile) {
             return res.status(200).json({
@@ -36,7 +100,8 @@ export default {
       });
     }
   },
-  createProfile: (req, res) => {
+
+  saveProfile: (req, res) => {
     //validate for bad input first
     //required field
     const { errors, isValid } = profileValidator(req.body);
@@ -120,4 +185,5 @@ export default {
         }
       });
   }
+
 };
