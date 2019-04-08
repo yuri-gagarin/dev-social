@@ -30,7 +30,7 @@ export default {
                 email: user.email
               };
 
-              jwt.sign(tokenPayload, keys.secretOrKey, {expiresIn: 1800}, (err, token) => {
+              jwt.sign(tokenPayload, keys.secretOrKey, {expiresIn: 7200}, (err, token) => {
                 if (err) {
                   console.log(err);
                 }

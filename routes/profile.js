@@ -17,6 +17,13 @@ export default function(router) {
     .route("/profile/user/:user_id")
     .get(profilesController.getProfileByID);
 
+  // @route GET /profile/all
+  // @desc Gets all of user profile
+  // @access Public
+  router
+    .route("/profile/all")
+    .get(profilesController.allProfiles);
+
   // @route  GET /profile
   // @desc Gets user profile
   // @access Private
@@ -32,4 +39,11 @@ export default function(router) {
     .post(passport.authenticate("jwt", {session: false}),
     profilesController.saveProfile);
 
+  // @route DELETE /delete_profile
+  // @desc Deletes user profile
+  // @access Private
+  router
+    .route("/delete_profile")
+    .delete(passport.authenticate("jwt", {session: false}),
+    profilesController.deleteProfile);
 };

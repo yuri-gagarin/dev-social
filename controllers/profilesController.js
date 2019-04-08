@@ -69,6 +69,35 @@ export default {
     }
   },
 
+  allProfiles: (req, res) => {
+    const allProfiles = [];
+    Profile.find({})
+    .then((profiles) => {
+      if (profiles) {
+        profiles.forEach((profile) => {
+          allProfiles.push(profile);
+        });
+        if (allProfiles.length > 0) {
+          return res.json({
+            message: "List of profiles",
+            profiles: allProfiles
+          });
+        }
+        else {
+          return res.json({
+            message: "There doesn't seem to be any profiles created"
+          })
+        }
+      }
+    })
+    .catch((err) => {
+       return res.status(400).json({
+        message: "Error",
+        errors: err
+      })
+    });
+  },
+
   profile: (req, res) => {
     const currentUser = req.user;
     const errors = {};
@@ -183,6 +212,36 @@ export default {
               }
             });
         }
+      });
+  },
+
+  deleteProfile: (req, res) => {
+    //find the user 
+    //add later admin user delete privileges
+    const user = req.user;
+    Profile.findOne({ user: user })
+      .then((profile) => {
+        //see if actually found a profile
+        if(profile) {
+          Profile.deleteOne({ user: user })
+          .then((response) => { 
+            return res.json(response);
+          })
+          //catch a delete error
+          .catch((err) => {
+            return res.status(400).json({
+              message: "Error deleting",
+              errors: err
+            });
+          })
+        }
+      })
+      //catch any other database error
+      .catch((err) => {
+        return res.status(400).json({
+          message: "Error Processing Request",
+          errors: err 
+        })
       });
   }
 
