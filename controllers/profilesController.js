@@ -1,6 +1,8 @@
 import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 import mongoose from "mongoose";
+import profileValidator from "../helpers/profileValidator.js";
+
 
 
 export default {
@@ -14,7 +16,8 @@ export default {
         .then((profile) => {
           if (profile) {
             return res.status(200).json({
-              message: "profile found"
+              message: "profile found",
+              profile
             });
           }
           else {
@@ -34,7 +37,14 @@ export default {
     }
   },
   createProfile: (req, res) => {
-    const errors = {};
+    //validate for bad input first
+    //required field
+    const { errors, isValid } = profileValidator(req.body);
+    if (!isValid) {
+      errors.message = "Invalid request";
+      errors.isValid = isValid;
+      return res.status(400).json(errors);
+    }
     const user = req.user._id;
     const profileData = {
       user: user._id,
@@ -60,6 +70,8 @@ export default {
       //set the skills
       profileData.skills = skillDataTrimmed;
     }
+    console.log("Line 72");
+    console.log(profileData);
     //social
     if (req.body.youtube) profileData.social.youtube = req.body.youtube;
     if (req.body.facebook) profileData.social.facebook = req.body.facebook;
@@ -78,6 +90,7 @@ export default {
             { new: true }
           )
           .then((profile) => {
+            console.log("updated");
             return res.json(profile);
           })
           .catch((err) => {
@@ -99,6 +112,9 @@ export default {
                   .then((profile) => {
                     return res.json(profile);
                   })
+                  .catch((err) => {
+                    return res.status(400).json(err);
+                  });
               }
             });
         }
