@@ -2,7 +2,8 @@ import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 import mongoose from "mongoose";
 import profileValidator from "../helpers/profileValidator.js";
-import experienceValidator from "../helpers/experienceValidator.js";
+import experienceValidator from "../helpers/experienceValidator.js"; 
+import educationValidator from "../helpers/educationValidator.js";
 
 
 
@@ -254,7 +255,7 @@ export default {
             .catch((err) => {
               return res.status(422).json({
                 message: "Save error",
-                erors: err
+                errors: err
               });
             })
         }
@@ -273,8 +274,62 @@ export default {
   },
 
   saveEducationToProfile: (req, res) => {
+    const user = req.user;
+    // validate input for education
+    const {errors, isValid} = educationValidator(req.body);
 
-  },
+    if (!isValid) {
+      return res.status(400).json({
+        message: "Invalid Input",
+        errors: errors
+      });
+    }
+    // add education to profile if profile found
+    Profile.findOne({ user: user._id})
+      .then((profile) => {
+        //check for profile
+
+        if (profile) {
+          const educationData = {
+            school: req.body.school,
+            degree: req.body.degree,
+            from: req.body.from,
+            to: req.body.to,
+            current: req.body.current === "true" ? true : false
+          };
+          //insert the most recent entry first
+          profile.education.unshift(educationData);
+          profile.save()
+            .then((updatedProfile) => {
+              return res.json({
+                message: "Profile successfully updated",
+                profile: updatedProfile
+              });
+            })
+            //catch a validation/database error
+            .catch((err) => {
+              return res.status(400).json({
+                message: "Error saving profile",
+                errors: err
+              });
+            });
+          
+        }
+        //if no profile
+        else {
+          res.status(404).json({
+            message: "No profile found"
+          });
+        }
+      })
+      //blanket catch
+      .catch((err) => {
+        res.status(400).json({
+          message: "An error occured",
+          errors: err
+        });
+      });
+  }, 
 
   //DELETE requests to profiles
   deleteProfile: (req, res) => {
@@ -301,7 +356,7 @@ export default {
       //catch any other database error
       .catch((err) => {
         return res.status(400).json({
-          message: "Error Processing Request",
+          message: "One Does Not Simply Walk Into Mordor",
           errors: err 
         })
       });
