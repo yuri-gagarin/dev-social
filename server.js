@@ -20,6 +20,11 @@ app.get("/", (req, res) => {
   res.send("Hello There Yo");
 });
 
+app.use(function(err, req, res, next) {
+  console.log(`This is the invalid field: ${err.field}`);
+  next(err);
+});
+
 //bodyparser middleware
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());

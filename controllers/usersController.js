@@ -109,5 +109,6 @@ export default {
         email: req.user.email
       }
     });
-  }
+  },
+  
 };
