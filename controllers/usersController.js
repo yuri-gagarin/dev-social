@@ -101,14 +101,21 @@ export default {
     }
   },
   currentUser: (req, res) => {
-    return res.json({
-      message: "Success",
-      user: {
-        id: req.user.id,
-        name: req.user.name,
-        email: req.user.email
-      }
-    });
+    User.findOne({_id: req.user.id})
+      .populate("avatar", ["path", "description"])
+      .then((user) => {
+        return res.json({
+          message: "Success",
+          user: user
+        });
+      })
+      .catch((err) => {
+        return res.status(404).json({
+          message: "Nothing seems to be here",
+          eroors: err
+        });
+      });
+    
   },
   
 };

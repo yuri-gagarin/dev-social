@@ -12,13 +12,17 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
+  avatar: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "UserAvatar"
+  },
   password: {
     type: String,
     required: true
   },
   date: {
     type: Date,
-    default: Date.now
+    default: Date.now()
   },
 });
  
