@@ -2,6 +2,9 @@ import UserAvatar from "../models/UserAvatar.js";
 import User from "../models/User.js";
 import deleteFile from "../helpers/deleteFile.js";
 
+//working upload/update/delete avatar routes
+//perhaps refactor later with less nested promises
+
 export default {
   uploadAvatar: (req, res) => {
     if (req.file) {
@@ -11,21 +14,22 @@ export default {
       if (req.body.description) avatarOptions.description = req.body.description;
       if (req.file.path) avatarOptions.path = req.file.path;
       if (req.user._id) avatarOptions.user = req.user._id;
-      const user = req.user;
+
       const userId = req.user._id;
+
+      //get the user first
       User.findOne({_id: userId})
         .populate("avatar", ["path", "description"])
         .then((user) => {
+          //check if user already has an avatar
           if(user.avatar && user.avatar !== null) {
-            console.log("updating avatar");
-            console.log("Deleting at: ", user.avatar.path);
+            //if has avatar,  first delete old avatar from server
             deleteFile(user.avatar.path)
               .then(() =>  {
-                console.log("Updating new avatar")
+                //then update the user avatar with new path and description
                 UserAvatar.findOneAndUpdate({user: user}, {path: avatarOptions.path, description: avatarOptions.description}, {new: true})
                   .then((updatedAvatar) => {
-                    console.log("Updated avatar options:");
-                    console.log(updatedAvatar);
+                    //return the updated user file
                     User.findOne({_id: user})
                       .populate("avatar", ["path", "description"])
                       .then((user) => {
@@ -34,13 +38,12 @@ export default {
                           user: user
                         });
                       })
-                })
+                  })
               })  
               .catch((err) => { return res.status(400).json({message: "Error", errors: err})});
           }
           else {
-            console.log("creating avatar");
-
+            //if no avatar present for user, create the new entry in database
             UserAvatar.create(avatarOptions)
               .then((avatar) => {
                 User.findOneAndUpdate({_id: userId}, {avatar: avatar._id}, {new: true})
@@ -56,6 +59,7 @@ export default {
               .catch((err) => { return res.status(400).json({message: "Error creating avatar", errors: err})});
           }
         })
+        //general error catch if for some reason can retrieve a user
         .catch((err) => {
           return res.status(400).json({
             message: "Error getting a user",
@@ -63,23 +67,28 @@ export default {
           });
         }); 
     }
+    else {
+      // in case no file present
+      res.status(400).json({
+        message: "You probably should upload a picture"
+      });
+    }
   },
   deleteAvatar: (req, res) => {
     const userId = req.user._id;
-    const user = req.user;
+    //const user = req.user;
 
+    //find the user avatar model
     UserAvatar.findOneAndRemove({user: userId})
       .then((avatar) => {
-        console.log("Deleting Avatar")
+        //check for avatar present
         if (avatar) {
-          console.log(avatar);
           deleteFile(avatar.path)
             .then((response) => {
-
+              //update user model
               User.findOneAndUpdate({_id: userId}, {avatar: null}, {new: true})
                 .then((user) => {
-                  console.log("After update");
-                  console.log(user);
+                  //return updated user model
                   return res.json({
                     message: "Successfully deleted avatar",
                     response: response,
