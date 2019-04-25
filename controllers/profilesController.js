@@ -273,42 +273,6 @@ export default {
       });
   },
 
-  deleteExperienceFromProfile: (req, res) => {
-    const expId = req.params.id;
-    const userId = req.user._id;
-
-    //find the user profile
-    Profile.findOne({user: userId})
-      .then((profile) => {
-        let targetIndex = profile.experience.findIndex((exp) => {
-          return exp._id === expId;
-        });
-
-        //remove experience
-        profile.experience.splice(targetIndex, 1);
-        profile.save()
-          .then((profile) => {
-            return res.json({
-              message: "Experience Deleted",
-              profile: profile
-            });
-          })
-          .catch((err) => {
-            return res.status(400).status({
-              message: "Seems we couldn't complete the operation",
-              errors: err
-            });
-          });
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: "Seems we have a problem retrieving the profile",
-          errors: err
-        });
-      });
-
-  },
-
   saveEducationToProfile: (req, res) => {
     const user = req.user;
     // validate input for education
@@ -367,10 +331,6 @@ export default {
       });
   }, 
 
-  deleteEducationFromProfile: (req, res) => {
-
-  },
-
   //DELETE requests to profiles
   deleteProfile: (req, res) => {
     //find the user 
@@ -400,6 +360,77 @@ export default {
           errors: err 
         })
       });
-  }
+  },
 
+  deleteExperienceFromProfile: (req, res) => {
+    const expId = req.params.id;
+    const userId = req.user._id;
+
+    //find the user profile
+    Profile.findOne({user: userId})
+      .then((profile) => {
+        let targetIndex = profile.experience.findIndex((exp) => {
+          return exp._id === expId;
+        });
+
+        //remove experience -- save
+        profile.experience.splice(targetIndex, 1);
+        profile.save()
+          .then((profile) => {
+            return res.json({
+              message: "Experience Deleted",
+              profile: profile
+            });
+          })
+          .catch((err) => {
+            return res.status(400).status({
+              message: "Seems we couldn't complete the operation",
+              errors: err
+            });
+          });
+      })
+      .catch((err) => {
+        return res.status(400).json({
+          message: "Seems we have a problem retrieving the profile",
+          errors: err
+        });
+      });
+
+  },
+
+  deleteEducationFromProfile: (req, res) => {
+    const eduId = req.params.id;
+    const userId = req.user._id;
+
+    //find the user profile
+    Profile.findOne({user: userId})
+      .then((profile) => {
+        let targetIndex = profile.education.findIndex((edu) => {
+          return edu._id === eduId;
+        });
+
+        //remove education -- save
+        profile.education.splice(targetIndex, 1);
+        profile.save()
+          .then((profile) => {
+            return res.json({
+              message: "Education successfully removed",
+              profile: profile
+            });
+          })
+          .catch((err) => {
+            return res.status(400).json({
+              message: "Seems we couldn't complete the operation",
+              errors: err
+            });
+          });
+      })
+      //catch possible Profile error
+      .catch((err) => {
+        return res.status(400).json({
+          message: "Seems a to be a problem retrieving the profile",
+          errors: err
+        });
+      });
+  },
 };

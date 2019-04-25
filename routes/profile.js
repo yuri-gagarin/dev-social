@@ -46,20 +46,27 @@ export default function(router) {
     .route("/profile/save_experience")
     .post(passport.authenticate("jwt", {session: false}), profilesController.saveExperienceToProfile);
 
-  // @route DELETE /profile/delete_experience
-  // @desc Deletes user profile experience
-  // @access Private
-  router  
-    .route("/profile/delete_experience")
-    .delete(passport.authenticate("jwt", {session: false}), profilesController.deleteExperienceFromProfile)
-
   // @route POST /profile/save_education
   // @desc Saves user profile education
   // @access Private
   router
     .route("/profile/save_education")
     .post(passport.authenticate("jwt", {session: false}),
-    profilesController.saveEducationToProfile)
+    profilesController.saveEducationToProfile);
+
+  // @route DELETE /profile/delete_experience
+  // @desc Deletes user profile experience
+  // @access Private
+  router  
+    .route("/profile/delete_experience")
+    .delete(passport.authenticate("jwt", {session: false}), profilesController.deleteExperienceFromProfile);
+  
+  // @route DELETE /profile/delete_education
+  // @desc Deletes user profile education
+  // @access Private
+  router
+    .route("/profile/delete_education")
+    .delete(passport.authenticate("jwt", {session: false}), profilesController.deleteEducationFromProfile);
   
   // @route DELETE /profile/delete_profile
   // @desc Deletes user profile
