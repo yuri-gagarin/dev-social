@@ -19,10 +19,10 @@ export default {
             };
             //push a comment to post, resolve promise
             post.comments.push(newComment);
-            resolve(post.save())
+            resolve(post.save());
           }
           else {
-            reject("no post found")
+            reject("no post found");
           }
         })
       })
@@ -37,6 +37,56 @@ export default {
         //catch any errors
         return res.status(400).json({
           message: "request error",
+          errors: err
+        });
+      });
+  },
+
+  deleteComment: (req, res) => {
+
+    const userId = req.user._id;
+    const postId = req.query.postId;
+    const commentId = req.query.commentId;
+
+    //find post
+    Post.findOne({_id: postId})
+      .then((post) => {
+        return new Promise((resolve, reject) => {
+          //deal with the post if found
+          //find specific comment and it's index
+          if(post) {
+            let comment = post.comments.find((comment) => {
+              return comment._id.equals(commentId);
+            });
+            let commentIindex = post.comments.findIndex((comment) => {
+              return comment._id.equals(commentId);
+            });
+            //check if it is user's comment to delete
+            //add admin privilege later
+            if (comment.user.equals(userId)) {
+              post.comments.splice(commentIindex, 1);
+              resolve(post.save());
+            }
+            else {
+              reject("Not authorized to delete the comment");
+            }
+          }
+          else {
+            //reject if no post
+            reject("No post found");
+          }
+        });
+      })
+      .then((post) => {
+        //assuming success return updated post
+        return res.json({
+          message: "Comment succesfully removed",
+          post: post
+        });
+      })
+      .catch((err) => {
+        return res.status(400).json({
+          message: "An error occurred",
           errors: err
         });
       });
