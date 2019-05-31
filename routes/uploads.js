@@ -11,11 +11,18 @@ export default function(router) {
     .route("/uploads/upload_avatar")
     .post(passport.authenticate("jwt", {session: false}), avatarUploader.single("avatar"), uploadsController.uploadAvatar);
 
-  // @route POST /uploads/delete_avatar
+  // @route PATCH /uploads/modify_avatar
+  // @desc Modifies existing avatar
+  // @access Private
+  router 
+    .route("/uploads/modify_avatar")
+    .patch(passport.authenticate("jwt", {session: false}), avatarUploader.single("avatar"), uploadsController.modifyAvatar);
+
+  // @route DELETE /uploads/delete_avatar
   // @desc Deletes user avatar
   // @access Private
   router  
     .route("/uploads/delete_avatar")
-    .post(passport.authenticate("jwt", {session: false}), uploadsController.deleteAvatar);
+    .delete(passport.authenticate("jwt", {session: false}), uploadsController.deleteAvatar);
 };
 

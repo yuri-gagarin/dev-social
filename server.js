@@ -11,10 +11,12 @@ const router = express.Router();
 const PORT = process.env.PORT || 3000;
 const DB = keys.mongoURI;
 
+
 mongoose
-  .connect(DB, {useNewUrlParser: true})
+  .connect(DB, {useNewUrlParser: true,  useFindAndModify: false})
   .then(() => console.log("Database connected"))
   .catch((err) => console.log(err));
+
 
 app.get("/", (req, res) => {
   res.send("Hello There Yo");
