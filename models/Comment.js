@@ -1,10 +1,14 @@
-import mongoose from "mongoose";
+import mongoose, { MongooseDocument } from "mongoose";
 const Schema = mongoose.Schema;
 
-const PostSchema = new Schema({
+const CommentSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: "User"
+  },
+  post: {
+    type: Schema.Types.ObjectId,
+    ref: "Post"
   },
   text: {
     type: String,
@@ -24,18 +28,10 @@ const PostSchema = new Schema({
       }
     }
   ],
-  comments: [
-    {
-      comment: {
-        type: Schema.Types.ObjectId,
-        ref: "Comment"
-      }
-    }
-  ],
   date: {
     type: Date,
     default: Date.now
   }
 });
 
-export default mongoose.model("Post", PostSchema);
+export default mongoose.model("Comment", CommentSchema);

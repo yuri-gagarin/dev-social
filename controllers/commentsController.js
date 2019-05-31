@@ -6,7 +6,7 @@ export default {
   createComment: (req, res) => {
 
     const userId = req.user._id;
-    const postId = req.query.postId;
+    const postId = req.body.postId;
     //grab a post
     Post.findOne({_id: postId})
       .then((post) => {
