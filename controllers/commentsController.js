@@ -1,5 +1,7 @@
 import Post from "../models/Post.js";
+import Comment from "../models/Comment.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
+import { cpus } from "os";
 
 export default {
 
@@ -7,37 +9,34 @@ export default {
 
     const userId = req.user._id;
     const postId = req.body.postId;
-    //grab a post
-    Post.findOne({_id: postId})
-      .then((post) => {
-        return new Promise((resolve, reject) => {
-          if(post) {
-            //build a comment
-            let newComment = {
-              user: userId,
-              text: req.body.text,
-              name: req.body.name || "anonymous"
-            };
+    let comm;
+    console.log(req.body)
+    let newComment = {
+      post: postId,
+      user: userId,
+      text: req.body.text,
+      name: req.body.name || "anonymous",
+      avatar: req.body.avatar || undefined
+    };
             //push a comment to post, resolve promise
-            post.comments.push(newComment);
-            resolve(post.save());
-          }
-          else {
-            reject("no post found");
-          }
-        })
+    Comment.create(newComment)
+      .then((comment) => {
+        comm = comment;
+        return Post.findOne({_id: postId});
       })
       .then((post) => {
-        //return updated post
+        post.comments.push(comm);
+        return post.save();
+      })
+      .then((post) => {
         return res.json({
-          message: "Comment Saved",
+          message: "Comment added",
           post: post
-        })
+        });
       })
       .catch((err) => {
-        //catch any errors
         return res.status(400).json({
-          message: "request error",
+          message: "An error occured",
           errors: err
         });
       });

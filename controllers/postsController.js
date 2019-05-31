@@ -5,7 +5,7 @@ import User from "../models/User.js";
 
 export default {
   newPosts: (req, res) => {
-    Post.find({}).sort({date: "desc"}).limit(25)
+    Post.find({}).populate("comments")//.sort({date: "desc"}).limit(25)
       .then((posts) => {
         return res.json({
           message: "Newest Posts",
