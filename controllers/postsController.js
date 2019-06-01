@@ -1,11 +1,20 @@
 import Post from "../models/Post.js";
-import postValidator from "../helpers/postValidator";
+import postValidator from "../helpers/postValidator.js";
 import User from "../models/User.js";
-
+import Comment from "../models/Comment.js";
+import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 
 export default {
   newPosts: (req, res) => {
-    Post.find({}).populate("comments")//.sort({date: "desc"}).limit(25)
+
+    let commentOptions = {
+      path: "comments",
+      options: {
+        limit: 5,
+        sort: {date: "desc"}
+      }
+    }
+    Post.find({}).populate(commentOptions).sort({date: "desc"}).limit(25)
       .then((posts) => {
         return res.json({
           message: "Newest Posts",
@@ -36,7 +45,7 @@ export default {
         .then((post) => {
           return res.json({
             message: "New Post!",
-            post: newPost
+            post: post
           });
         })
         .catch((err) => {
@@ -64,9 +73,17 @@ export default {
 
     Post.findByIdAndDelete(postId)
       .then((post) => {
+        if (post) {
+         return Comment.deleteMany({post: postId});
+        }
+        else {
+          return rejectionPromise("No Post found");
+        }
+      })
+      .then((result) => {
+        console.log(result);
         return res.json({
-          message: "Successfully Deleted Post",
-          post: post
+          message: `deleted post and ${result.deletedCount} post comments`
         });
       })
       .catch((err) => {
