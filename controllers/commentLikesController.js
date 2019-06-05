@@ -3,13 +3,14 @@ import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 
 export default {
   createLike: (req, res) => {
-    const postId = req.body.postId;
+    //const postId = req.body.postId;
     const commentId = req.body.commentId;
     const userId = req.user._id;
 
     Comment.findOne({_id: commentId})
       .then((comment) => {
         if (comment) {
+          //check if comment already liked reject if liked
           for (let i = 0; i < comment.likes.length; i++) {
             if (comment.likes[i].user.equals(userId)) {
               return rejectionPromise("Already Liked!");
@@ -18,6 +19,7 @@ export default {
           comment.likes.push({user: userId});
           return comment.save();
         }
+        //in case no comment
         else {
           return rejectionPromise("No comment found");
         }
@@ -48,9 +50,8 @@ export default {
 
           let deleteIndex;
           let likesLength = comment.likes.length;
-
+          //loop through likes break out early if like found
           for (let i = 0; i < likesLength; i++) {
-
             if (comment.likes[i].user.equals(userId)) {
               deleteIndex = i;
               break;

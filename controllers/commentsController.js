@@ -1,6 +1,7 @@
 import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
+import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 import { cpus } from "os";
 
 export default {
@@ -9,7 +10,7 @@ export default {
 
     const userId = req.user._id;
     const postId = req.body.postId;
-    let comm;
+    let createdComment;
     console.log(req.body)
     let newComment = {
       post: postId,
@@ -18,14 +19,15 @@ export default {
       name: req.body.name || "anonymous",
       avatar: req.body.avatar || undefined
     };
-            //push a comment to post, resolve promise
+    //push a comment to post, resolve promise
     Comment.create(newComment)
       .then((comment) => {
-        comm = comment;
+        createdComment = comment;
         return Post.findOne({_id: postId});
       })
+      //push a comment to Post.comments
       .then((post) => {
-        post.comments.push(comm);
+        post.comments.push(createdComment);
         return post.save();
       })
       .then((post) => {
@@ -45,41 +47,37 @@ export default {
   modifyComment: (req, res) => {
 
     const userId = req.user._id;
-    const {postId, commentId} = req.query;
+    const {postId, commentId, text} = req.body
     //find post to modify comment
-    Post.findOne({_id: postId})
-      .then((post) => {
-        return new Promise((resolve, reject) => {
-          if(post) {
-            let commentIindex = post.comments.findIndex((comment) => {
-              return comment._id.equals(commentId);
-            });
-            //ensure the user is the owner of the comment
-            //if correct user append an edit date
-            if (post.comments[commentIindex].user.equals(userId)) {
-              post.comments[commentIindex].text = `EDITED: ${getDateWithTime()} \n ${req.body.text}`;
-              resolve(post.save());
-            }
-            else {
-              reject("Not authorized to modify the comment");
-            }
+    Comment.findOne({_id: commentId})
+      .then((comment) => {
+        if(comment) {
+          console.log(comment);
+          console.log(userId);
+          if (comment.user.equals(userId)) {
+            comment.text = `EDITED: ${getDateWithTime()} 
+                            ${text}`;
+            return comment.save();
           }
           else {
-            reject("Invalid Request");
+            return rejectionPromise("Not authorized to edit comment");
           }
-        });
+        }
+        else {
+          return rejectionPromise("Seems no comment here");
+        }
       })
-      .then((post) => {
+      .then((comment) => {
         return res.json({
-          message: "Comment edited",
-          post: post
+          message: "Edited a comment",
+          comment: comment
         });
       })
       .catch((err) => {
         return res.status(400).json({
-          message: "Error processing request",
+          message: "An error occured",
           errors: err
-        })
+        });
       });
   },
 
