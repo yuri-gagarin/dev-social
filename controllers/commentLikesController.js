@@ -3,15 +3,15 @@ import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 
 export default {
   createLike: (req, res) => {
-    //const postId = req.body.postId;
-    const commentId = req.body.commentId;
+    const commentId = req.query.commentId;
     const userId = req.user._id;
 
     Comment.findOne({_id: commentId})
       .then((comment) => {
         if (comment) {
           //check if comment already liked reject if liked
-          for (let i = 0; i < comment.likes.length; i++) {
+          let likesLength = comment.likes.length;
+          for (let i = 0; i < likesLength; i++) {
             if (comment.likes[i].user.equals(userId)) {
               return rejectionPromise("Already Liked!");
             }
@@ -27,7 +27,7 @@ export default {
       .then((comment) => {
         return res.json({
           message: "Liked Comment",
-          comment: comment
+          likeCount: comment.likes.length
         });
       })
       .catch((err) => {
@@ -37,18 +37,16 @@ export default {
         });
       });
   },
+
   deleteLike: (req, res) => {
-    const commentId = req.body.commentId;
+    const commentId = req.query.commentId;
     const userId = req.user._id;
-    console.log("comment \n" + commentId)
 
     Comment.findOne({_id: commentId})
       .then((comment) => {
-        console.log(comment);
         if(comment) {
-          console.log("comment here");
 
-          let deleteIndex;
+          let deleteIndex = -1;
           let likesLength = comment.likes.length;
           //loop through likes break out early if like found
           for (let i = 0; i < likesLength; i++) {
@@ -57,8 +55,8 @@ export default {
               break;
             }
           }
-
-          if (deleteIndex) {
+          //check for valid delete index
+          if (deleteIndex > -1) {
             comment.likes.splice(deleteIndex, 1);
             return comment.save();
           }
@@ -73,7 +71,7 @@ export default {
       .then((comment) => {
         return res.json({
           message: "Unliked a comment",
-          comment: comment
+          likeCount: comment.likes.length
         });
       })
       .catch((err) => {
