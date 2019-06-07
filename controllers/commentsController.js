@@ -2,39 +2,44 @@ import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
-import { cpus } from "os";
 
 export default {
 
   createComment: (req, res) => {
-
     const userId = req.user._id;
-    const postId = req.body.postId;
-    let createdComment;
-    console.log(req.body)
+    const postId = req.query.postId;
+    let commentedPost;
+
+    //build a comment
     let newComment = {
       post: postId,
       user: userId,
       text: req.body.text,
       name: req.body.name || "anonymous",
-      avatar: req.body.avatar || undefined
+      avatar: req.body.avatar || null
     };
     //push a comment to post, resolve promise
-    Comment.create(newComment)
-      .then((comment) => {
-        createdComment = comment;
-        return Post.findOne({_id: postId});
-      })
-      //push a comment to Post.comments
+    Post.findOne({_id: postId})
       .then((post) => {
-        post.comments.push(createdComment);
-        return post.save();
+        if(post) {
+          commentedPost = post;
+          return Comment.create(newComment);
+        }
+        else {
+          return rejectionPromise("Cant match post to comment");
+        }
+      })
+      //match comment to post
+      .then((comment) => {
+        commentedPost.comments.push(comment);
+        return commentedPost.save();
       })
       .then((post) => {
         return res.json({
           message: "Comment added",
+          postCommentCount: post.comments.length,
           post: post
-        });
+        })
       })
       .catch((err) => {
         return res.status(400).json({
@@ -45,15 +50,14 @@ export default {
   },
 
   modifyComment: (req, res) => {
-
     const userId = req.user._id;
     const {postId, commentId, text} = req.body
     //find post to modify comment
     Comment.findOne({_id: commentId})
       .then((comment) => {
         if(comment) {
-          console.log(comment);
-          console.log(userId);
+          //verify user
+          //add moderator functionality
           if (comment.user.equals(userId)) {
             comment.text = `EDITED: ${getDateWithTime()} 
                             ${text}`;
@@ -83,52 +87,74 @@ export default {
 
   deleteComment: (req, res) => {
 
-    const userId = req.user._id;
-    const postId = req.query.postId;
-    const commentId = req.query.commentId;
+    const commentId= req.query.commentId;
+    const userId = req.user.id;
+    let postId;
 
-    //find post
-    Post.findOne({_id: postId})
-      .then((post) => {
-        return new Promise((resolve, reject) => {
-          //deal with the post if found
-          //find specific comment and it's index
-          if(post) {
-            let comment = post.comments.find((comment) => {
-              return comment._id.equals(commentId);
-            });
-            let commentIindex = post.comments.findIndex((comment) => {
-              return comment._id.equals(commentId);
-            });
-            //check if it is user's comment to delete
-            //add admin privilege later
-            if (comment.user.equals(userId)) {
-              post.comments.splice(commentIindex, 1);
-              resolve(post.save());
-            }
-            else {
-              reject("Not authorized to delete the comment");
-            }
+    Comment.findOne({_id: commentId})
+    //find a comment
+    //verify a comment belongs to the user
+      .then((comment) => {
+        if (comment) {
+          postId = comment.post.toString();
+          if (comment.user.equals(userId)) {
+            return Comment.deleteOne({_id: commentId});
           }
           else {
-            //reject if no post
-            reject("No post found");
+            return rejectionPromise("Not authorized to delete the comment");
           }
-        });
+        }
+        else {
+          return rejectionPromise("Seems to be a problem finding the comment");
+        }
+      })
+      .then((result) => {
+        if (result.ok) {
+          return Post.findOne({_id: postId})
+        }
+        else {
+          return rejectionPromise("Seems to be a problem deleting the comment...");
+        }
       })
       .then((post) => {
-        //assuming success return updated post
+        //find comment to remove
+        if (post) {
+          let postComments = post.comments.length;
+          let deleteIndex = -1;
+          //find the index of the comment
+          //remove the comment from post.comments array
+          for (let i = 0; i < postComments; i++) {
+            if (post.comments[i].equals(commentId)) {
+              deleteIndex = i;
+              break;
+            }
+          }
+          //verify the delete index 
+          if (deleteIndex > -1) {
+            post.comments.splice(deleteIndex, 1);
+            return post.save();
+          }
+          else {
+            return rejectionPromise("Seems no Post-Comment");
+          }
+        }
+        else {
+          return rejectionPromise("Seems no post here");
+        }
+      })
+      .then((post) => {
         return res.json({
-          message: "Comment succesfully removed",
+          message: `Deleted comment`,
           post: post
         });
       })
       .catch((err) => {
         return res.status(400).json({
-          message: "An error occurred",
+          message: "An error occured",
           errors: err
-        });
-      });
+        })
+      })
+      
   }
  
-}
+};
