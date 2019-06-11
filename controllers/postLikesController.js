@@ -4,14 +4,15 @@ import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 export default {
   createLike: (req, res) => {
     const userId = req.user._id;
-    const postId = req.query.postId;
+    const postId = req.params.postId;
 
     Post.findOne({_id: postId})
       .then((post) => {
         if(post) {
           //loop post likes
           //if user already liked break out early and reject
-          for (let i = 0; i < post.likes.length; i++) {
+          let likesLength = post.likes.length;
+          for (let i = 0; i < likesLength; i++) {
             if (post.likes[i].user.equals(userId)) {
               return rejectionPromise("Already Liked!");
             }
@@ -28,7 +29,7 @@ export default {
       .then((post) => {
         return res.json({
           message: "Liked",
-          post: post
+          likeCount: post.likes.length
         });
       })
       .catch((err) => {
@@ -41,22 +42,24 @@ export default {
 
   removeLike: (req, res) => {
     const userId = req.user._id;
-    const postId = req.query.postId;
+    const postId = req.params.postId;
+    console.log(postId)
 
     Post.findOne({_id: postId})
       .then((post) => {
         if (post) {
           //find index of a like
           //if like exists, set the index break the loop early
-          let removeIndex;
-          for (let i = 0; i < post.likes.length; i++) {
+          let removeIndex = -1;
+          let likesLength = post.likes.length;
+          for (let i = 0; i < likesLength; i++) {
             if (post.likes[i].user.equals(userId)) {
               removeIndex = i;
               break;
             }
           }
           //if like exists remove like from post and save()          
-          if (removeIndex) {
+          if (removeIndex > -1) {
             post.likes.splice(removeIndex, 1);
             return post.save();
           }
@@ -72,7 +75,7 @@ export default {
       .then((post) => {
         return res.json({
           message: "Unliked",
-          post: post
+          likeCount: post.likes.length
         });
       })
       //catch all
