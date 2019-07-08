@@ -1,12 +1,11 @@
 export default function(params) {
-  console.log(params)
-  console.log(typeof params)
+  //console.log(params)
+  //console.log(typeof params)
 
   if (typeof params !== "object") {
     throw new TypeError("Expected an object");
   }
   let argParams = Object.keys(params);
-  console.log(argParams)
   if (argParams[0] === undefined || argParams[1] === undefined) {
     throw new Error(`Invalid paramaters passed`);
   }

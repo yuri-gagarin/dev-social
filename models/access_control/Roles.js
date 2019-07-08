@@ -1,8 +1,8 @@
-import verifyAccessParams from "../../helpers/access_control/verifyAccessParams.js";
+import verifyParams from "../../helpers/access_control/verifyAccessParams.js";
 
 export default {
   administrator: {
-    can: ["edit_comment","edit_post", "modify_user", "assign_moderator", "delete_user"],
+    can: ["edit_comment","edit_post", "modify_user", "assign_moderator", "delete_user", "delete_profile"],
     inherits: ["moderator"]
   },
   moderator: {
@@ -14,37 +14,72 @@ export default {
       "create_comment",
       {
         name: "edit_comment",
-        when: ((params) => {
+        when: ((params, cb) => {
           verifyParams(params);
+          if (cb && typeof cb === "function") {
+            if (params.userId === params.commentUser) {
+              cb(undefined, true);
+            }
+            else {
+              cb(undefined, false);
+            }
+          }
           return params.userId === params.commentId;
         })
       },
       {
         name: "delete_comment",
-        when: ((params) => {
+        when: ((params, cb) => {
           verifyParams(params);
+          if (cb && typeof cb === "function") {
+            if (params.userId === params.commentUser) {
+              cb(undefined, true);
+            }
+            else {
+              cb(undefined, false);
+            }
+          }
           return params.userId === params.commentId;
         })
       },
       "create_post", 
       {
         name: "edit_post",
-        when: ((params) => {
+        when: ((params, cb) => {
           verifyParams(params);
-          return params.userId === params.postId;
+          if (cb && typeof cb === "function") {
+            if (params.userId === params.postUser) {
+              cb(undefined, true);
+            }
+            else {
+              cb(undefined, false);
+            }
+          }
+          else {
+            return params.userId === params.postId;
+          }
         })
       },
       {
         name: "delete_post",
-        when: ((user, params) => {
+        when: ((params, cb) => {
           verifyParams(params);
-          return user.userId === params.postId;
+          if (cb && typeof cb === "function") {
+            if(params.userId === params.postUser) {
+              cb(undefined, true);
+            }
+            else {
+              cb(undefined, false);
+            }
+          }
+          return user.userId === params.postUser;
         })
       }
     ],
-    inherits: ["reader"]
+    inherits: ["guest"]
   },
   guest: {
     can: ["read"]
   }
 };
+

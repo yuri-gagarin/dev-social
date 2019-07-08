@@ -1,12 +1,10 @@
 export default class RBAC {
   constructor(options) {
-    //check for correct input
-    //if (typeof options !== "object") {
-    //  throw new TypeError("Expected an object type as input");
-    //}
+
     this.init(options);
     this.roles;
-    console.log(this.roles)
+    this.iterations = 0;
+
   }
 
   init(roles) {
@@ -37,30 +35,73 @@ export default class RBAC {
     this.roles = map;
   }
 
-  can(role, operation, params={}) {
+  can(role, operation, params={}, cb) {
+    let callback = cb || function(){};
     //check for a valid role
-    if (!this.roles[role]) {
-      return false;
-    }
-    //set role to a variable, check if operation is allowed
-    let $role = this.roles[role];
-    if ($role.can[operation]) {
-      if (typeof $role.can[operation] !== "function") {
-        return true;
+    this.iterations +=1;
+    return new Promise((resolvePromise, rejectPromise) => {
+
+
+      function resolve(result) {
+        resolvePromise(result);
+        callback(undefined, result);
       }
-      console.log(51)
+      function reject(err) {
+        rejectPromise(err);
+        callback(err);
+      }
+
+      if (typeof role !== "string") {
+        throw new TypeError("Expected the first paramater to be a String : role");
+      }
+      if (typeof operation !== "string") {
+        throw new TypeError("Expected the second parameter to be a String: operation");
+      }
+      //set role to a variable, check if operation is allowed
+      let $role = this.roles[role];
+
+      if ($role.can[operation] === 1) {
+        console.log(85)
+        return resolve({permitted: true});
+      }
+
+      console.log(`Iterations: ${this.iterations}`);
+      if (!$role) {
+        return reject(new Error("Cannot find a user role"));
+      }
+      if (!$role.can[operation]) {
+        if (!$role.inherits) {
+          return resolve({permitted: false});
+        }
+        return Promise.race(
+          $role.inherits.map((child) => {
+            return this.can(child, operation, params)
+          })
+        ).then(resolve, reject);
+      }
       
-      if ($role.can[operation](params)) {
-        return true;
+    
+
+      if(typeof $role.can[operation] === "function") {
+        $role.can[operation](params, function(err, result) {
+          if (err) {
+            return reject(err);
+          }
+          if (!result || result === undefined) {
+           // console.log(typeof reject("cannot edit"))
+            return resolve({permitted: false})
+          }
+          if (result) {
+            return resolve({permitted: true});
+          }
+        });
       }
-    }
-    //check for parent roles
-    if (!$role.inherits || $role.inherits.length < 1) {
-      return false;
-    }
-    //checks for a passed role and if the roles operation exists
-    return $role.inherits.some((childRole) => {
-      return this.can(childRole, operation, params);
+      return reject("Not allowed");
+    })
+    .catch((err) => {
+      console.log("An error occured")
+      console.log(err)
+      return;
     });
   }
-};
+}

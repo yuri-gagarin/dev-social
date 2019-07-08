@@ -3,6 +3,7 @@ import postValidator from "../helpers/postValidator.js";
 import User from "../models/User.js";
 import Comment from "../models/Comment.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
+import RBAC from "./access_control/RBAC.js";
 
 export default {
   newPosts: (req, res) => {
@@ -69,12 +70,11 @@ export default {
     const userId = req.user._id;
     const postId = req.params.postId;
 
-    //console.log(req.params);
 
     Post.findByIdAndDelete(postId)
       .then((post) => {
         if (post) {
-         return Comment.deleteMany({post: postId});
+          return Comment.deleteMany({post: postId});
         }
         else {
           return rejectionPromise("No Post found");

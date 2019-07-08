@@ -1,5 +1,6 @@
 import passport from "passport";
 import postsController from "../controllers/postsController.js";
+import accessController from "../controllers/access_control/accessController.js";
 
 export default function(router) {
 
@@ -21,6 +22,6 @@ export default function(router) {
   // @desc Deletes a post
   // @access Private
   router
-    .route("/posts/:postId")
-    .delete(passport.authenticate("jwt", {session: false}), postsController.deletePost);
+    .route("/posts/:post")
+    .delete([passport.authenticate("jwt", {session: false}), accessController("post", "delete_post")], postsController.deletePost);
 };
