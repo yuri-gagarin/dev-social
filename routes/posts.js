@@ -15,10 +15,17 @@ export default function(router) {
   // @desc Create a post
   // @access Private
   router
-    .route("/posts")
+    .route("/posts/:id")
     .post(passport.authenticate("jwt", {session: false}), postsController.createPost);
   
-  // @route DELETE /posts
+  // @route PATCH  /posts/:id
+  // @desc Edits a post
+  // @access Private
+  router
+    .route("/posts/:id")
+    .patch([passport.authenticate("jwt", {session: false}), accessController("post", "edit_post")], postsController.editPost);
+  
+  // @route DELETE /posts/:id
   // @desc Deletes a post
   // @access Private
   router

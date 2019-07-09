@@ -2,7 +2,6 @@ import UserAvatar from "../models/UserAvatar.js";
 import User from "../models/User.js";
 import deleteFile from "../helpers/APIhelpers/deleteFile.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
-import Post from "../models/Post.js";
 
 //working upload/update/delete avatar routes
 //perhaps refactor later with less nested promises
@@ -37,7 +36,6 @@ export default {
         })
         .then((user) => {
           //return a new updated user with avatar
-          console.log("Line 44 \n", user);
           return res.json({
             message: "Avatar successfully uploaded",
             user: user

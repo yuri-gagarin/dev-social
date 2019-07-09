@@ -3,7 +3,6 @@ import postValidator from "../helpers/postValidator.js";
 import User from "../models/User.js";
 import Comment from "../models/Comment.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
-import RBAC from "./access_control/RBAC.js";
 
 export default {
   newPosts: (req, res) => {
@@ -64,6 +63,10 @@ export default {
     }
   },
 
+  editPost: (req, res) => {
+    const postId = req.params.id;
+  },
+
   deletePost: (req, res) => {
 
     // add some moderator functionality later
@@ -81,7 +84,6 @@ export default {
         }
       })
       .then((result) => {
-        console.log(result);
         return res.json({
           message: `deleted post and ${result.deletedCount} post comments`
         });

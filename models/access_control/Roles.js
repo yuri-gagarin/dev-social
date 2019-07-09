@@ -1,6 +1,10 @@
 import verifyParams from "../../helpers/access_control/verifyAccessParams.js";
 
 export default {
+  super_admin: {
+    can: ["assign_administrator"],
+    inherits: ["administrator"]
+  },
   administrator: {
     can: ["edit_comment","edit_post", "modify_user", "assign_moderator", "delete_user", "delete_profile"],
     inherits: ["moderator"]
@@ -72,12 +76,37 @@ export default {
               cb(undefined, false);
             }
           }
-          console.log(75)
-          console.log( typeof params.userId)
-          console.log( typeof params.modelUserId)
-          return false
+          return params.userId === params.modelUserId;
         })
-      }
+      },
+      {
+        name: "edit_user",
+        when: ((params, cb) => {
+          if (cb && typeof cb === "function") {
+            if(params.userId === params.modelId) {
+              cb(undefined, true);
+            }
+            else {
+              cb(undefined, false);
+            }
+          }
+          return params.userId === params.modelId;
+        })
+      },
+      {
+        name: "delete_user",
+        when: ((params, cb) => {
+          if (cb && typeof cb === "function") { 
+            if(params.userId === params.modelId) {
+              cb(undefined, true);
+            }
+            else {
+              cb(undefined, false);
+            }
+          }
+          return params.userId === params.modelId;
+        })
+      }        
     ],
     inherits: ["guest"]
   },

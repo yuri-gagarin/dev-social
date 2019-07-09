@@ -11,10 +11,10 @@ export default function (modelName, action) {
 
     //type checks for arguments
     if (typeof modelName !== "string") {
-      next(new TypeError("Expected the first argument to be model name : String"));
+      next(new TypeError("Expected the first argument to be {Model Name} : {String}"));
     }
     if (typeof action !== "string") {
-      next(new TypeError("Expected the second argument to be action name : String"));
+      next(new TypeError("Expected the second argument to be {Action Name} : {String}"));
     }
     //keys of params passed in by request
     const paramKeys = Object.keys(req.params);
@@ -26,7 +26,6 @@ export default function (modelName, action) {
     //get the model name to be modified and normalize
     const _model = modelName.charAt(0).toUpperCase() + modelName.slice(1);
 
-    console.log(44)
     try {
       //get the Model to be modified and the user
       const MongoModel = await loadModel(_model);
@@ -39,15 +38,22 @@ export default function (modelName, action) {
           message: "Not Authorized"
         });
       }
-
       //assign a user role from the user model
       let userRole = user.role || "user";
       //params for rbac.can() function
       const rbacParams = {
         userId: userId.toString(),
         modelId: modelId.toString(),
-        modelUserId: model.user.toString(),
       };
+
+      if (model.user) {
+        rbacParams.modelUserId = model.user.toString();
+      }
+      else {
+        rbacParams.modelUserId = "";
+      }
+
+      console.log(rbacParams);
       //check for permission object
       const permission = await rbac.can(userRole, action, rbacParams);
 
@@ -77,7 +83,7 @@ function loadModel(modelName) {
       resolve(model.default);
     }
     else {
-      reject("Couldnt load model");
+      reject("Couldn't load model");
     }
   });
 };

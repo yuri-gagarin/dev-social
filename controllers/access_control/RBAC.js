@@ -61,11 +61,9 @@ export default class RBAC {
       let $role = this.roles[role];
 
       if ($role.can[operation] === 1) {
-        console.log(85)
         return resolve({permitted: true});
       }
 
-      console.log(`Iterations: ${this.iterations}`);
       if (!$role) {
         return reject(new Error("Cannot find a user role"));
       }

@@ -80,7 +80,8 @@ export default {
             const newUser = new User({
               name: req.body.name,
               email: req.body.email,
-              password: req.body.password
+              password: req.body.password,
+              role: "user"
             });
 
             bcrypt.genSalt(10, (err, salt) => {
@@ -99,6 +100,12 @@ export default {
           }
         });
     }
+  },
+  modifyUser: (req, res) => {
+    const params = req.params;
+    return res.json({
+      message: "success"
+    });
   },
   currentUser: (req, res) => {
     User.findOne({_id: req.user.id})

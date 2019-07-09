@@ -1,5 +1,6 @@
 import passport from "passport";
 import commentsController from "../controllers/commentsController";
+import accessController from "../controllers/access_control/accessController.js";
 
 export default function(router) {
   router
@@ -17,18 +18,18 @@ export default function(router) {
     .route("/comments")
     .post(passport.authenticate("jwt", {session: false}), commentsController.createComment);
 
-  // @route PATCH /comments
+  // @route PATCH /comments/:id
   // @desc Modifies a comment
   // @access Private
   router
-    .route("/comments")
-    .patch(passport.authenticate("jwt", {session: false}),commentsController.modifyComment);
+    .route("/comments/:id")
+    .patch([passport.authenticate("jwt", {session: false}), accessController("comment", "edit_comment")],commentsController.modifyComment);
   
-  // @route DELETE /comments
+  // @route DELETE /comments/:id
   // @desc Deletes a comment
   // @access Private
   router  
-    .route("/comments")
-    .delete(passport.authenticate("jwt", {session: false}),
+    .route("/comments/:id")
+    .delete([passport.authenticate("jwt", {session: false}), accessController("comment", "delete_comment")],
     commentsController.deleteComment);
 };
