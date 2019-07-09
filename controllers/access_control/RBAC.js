@@ -88,6 +88,8 @@ export default class RBAC {
             return reject(err);
           }
           if (!result || result === undefined) {
+            console.log(91)
+            console.log(result)
            // console.log(typeof reject("cannot edit"))
             return resolve({permitted: false})
           }

@@ -22,6 +22,6 @@ export default function(router) {
   // @desc Deletes a post
   // @access Private
   router
-    .route("/posts/:post")
-    .delete([passport.authenticate("jwt", {session: false}), accessController("post", "delete_post")], postsController.deletePost);
+    .route("/posts/:id")
+    .delete([passport.authenticate("jwt", {session: false}), accessController( "post", "delete_post")], postsController.deletePost);
 };

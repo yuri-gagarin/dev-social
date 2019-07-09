@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "nodemon --exec babel-node server.js"
+    "server": "nodemon --exec babel-node server.js",
+    "debug_server": "nodemon --inspect --exec babel-node server.js"
   },
   "author": "yuri-gagarin",
   "license": "ISC",

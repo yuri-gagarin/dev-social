@@ -68,7 +68,7 @@ export default {
 
     // add some moderator functionality later
     const userId = req.user._id;
-    const postId = req.params.postId;
+    const postId = req.params.id;
 
 
     Post.findByIdAndDelete(postId)

@@ -17,14 +17,14 @@ export default {
         when: ((params, cb) => {
           verifyParams(params);
           if (cb && typeof cb === "function") {
-            if (params.userId === params.commentUser) {
+            if (params.userId === params.modelUserId) {
               cb(undefined, true);
             }
             else {
               cb(undefined, false);
             }
           }
-          return params.userId === params.commentId;
+          return params.userId === params.modelUserId;
         })
       },
       {
@@ -32,14 +32,14 @@ export default {
         when: ((params, cb) => {
           verifyParams(params);
           if (cb && typeof cb === "function") {
-            if (params.userId === params.commentUser) {
+            if (params.userId === params.modelUserId) {
               cb(undefined, true);
             }
             else {
               cb(undefined, false);
             }
           }
-          return params.userId === params.commentId;
+          return params.userId === params.modelUserId;
         })
       },
       "create_post", 
@@ -48,7 +48,7 @@ export default {
         when: ((params, cb) => {
           verifyParams(params);
           if (cb && typeof cb === "function") {
-            if (params.userId === params.postUser) {
+            if (params.userId === params.modelUserId) {
               cb(undefined, true);
             }
             else {
@@ -56,7 +56,7 @@ export default {
             }
           }
           else {
-            return params.userId === params.postId;
+            return params.userId === params.modelUserId;
           }
         })
       },
@@ -65,14 +65,17 @@ export default {
         when: ((params, cb) => {
           verifyParams(params);
           if (cb && typeof cb === "function") {
-            if(params.userId === params.postUser) {
+            if(params.userId === params.modelUserId) {
               cb(undefined, true);
             }
             else {
               cb(undefined, false);
             }
           }
-          return user.userId === params.postUser;
+          console.log(75)
+          console.log( typeof params.userId)
+          console.log( typeof params.modelUserId)
+          return false
         })
       }
     ],
