@@ -15,7 +15,7 @@ export default function(router) {
   // @desc Create a post
   // @access Private
   router
-    .route("/posts/:id")
+    .route("/posts")
     .post(passport.authenticate("jwt", {session: false}), postsController.createPost);
   
   // @route PATCH  /posts/:id

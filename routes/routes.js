@@ -1,3 +1,4 @@
+import indexRoutes from "./index.js";
 import userRoutes from "./users.js";
 import commentRoutes from "./comments.js";
 import postRoutes from "./posts.js";
@@ -14,4 +15,5 @@ export default function(router) {
   uploadRoutes(router);
   commentLikes(router);
   postLikes(router);
+  indexRoutes(router);
 };

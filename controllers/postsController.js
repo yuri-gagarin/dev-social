@@ -3,6 +3,7 @@ import postValidator from "../helpers/postValidator.js";
 import User from "../models/User.js";
 import Comment from "../models/Comment.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
+import getDateWithTime from "../helpers/getDateWithTime.js";
 
 export default {
   newPosts: (req, res) => {
@@ -65,6 +66,39 @@ export default {
 
   editPost: (req, res) => {
     const postId = req.params.id;
+    const user = req.user;
+
+    const postText = req.body.text;
+    if (!postText) {
+      return res.status(400).json({
+        message: "You should probably put in some text"
+      });
+    }
+    Post.findOne({_id: postId})
+      .then((post) => {
+        if(post) {
+          post.text = `EDITED: ${getDateWithTime()}
+                       BY: ${user.name || "anonymous"}
+                       ${postText}
+                      `;
+          return post.save();
+        }
+        else {
+          return rejectionPromise("Seems no post found...");
+        }
+      })
+      .then((post) => {
+        return res.json({
+          message: "Post successfully edited",
+          post: post
+        });
+      })
+      .catch((error) => {
+        return res.status(400).json({
+          message: "Something went wrong",
+          error: error
+        });
+      });
   },
 
   deletePost: (req, res) => {
