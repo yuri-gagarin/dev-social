@@ -1,13 +1,11 @@
 import RBAC from "./RBAC.js";
 import Roles from "../../models/access_control/Roles.js";
 import User from "../../models/User.js";
+import isEmpty from "../../helpers/isEmpty.js";
 
 export default function (modelName, action) {
   
   return async function(req, res, next) {
-
-    //load RBAC
-    const rbac = new RBAC(Roles);
 
     //type checks for arguments
     if (typeof modelName !== "string") {
@@ -16,44 +14,55 @@ export default function (modelName, action) {
     if (typeof action !== "string") {
       next(new TypeError("Expected the second argument to be {Action Name} : {String}"));
     }
-    //keys of params passed in by request
-    const paramKeys = Object.keys(req.params);
-    //request parameters
+    //load RBAC
+    const rbac = new RBAC(Roles);
+    let user, model, modelId, paramKeys, MongoModel;
+    const userId = req.user.id;
     const params = req.params;
-    const userId = req.user._id;
-    const modelId = params.id || params[paramKeys[0]];
+
+    console.log(req.user);
+    console.log(isEmpty(params))
+
+    //keys of params passed in by request
+    if (!isEmpty(params)) {
+      paramKeys = Object.keys(req.params);
+      modelId = params.id || params[paramKeys[0]] || null;
+    }
 
     //get the model name to be modified and normalize
     const _model = modelName.charAt(0).toUpperCase() + modelName.slice(1);
 
     try {
-      //get the Model to be modified and the user
-      const MongoModel = await loadModel(_model);
-      const user = await User.findOne({_id: req.user._id}).exec();
-      const model = await MongoModel.findOne({_id: modelId}).exec();
-      
-      //check for valid User and Mongoose.Model to be modified
-      if (!user || !model) {
+      //get the User
+      user = await User.findOne({_id: req.user._id}).exec();
+
+      //check for valid User 
+      if (!user) {
         return res.status(401).json({
           message: "Not Authorized"
         });
       }
+
+      if (modelId) {
+        MongoModel = await loadModel(_model);
+        model = await MongoModel.findOne({_id: modelId}).exec();
+        if (model.user) {
+          rbacParams.modelUserId = model.user.toString();
+        }
+        else {
+          rbacParams.modelUserId = null;
+        }  
+      }
+      
       //assign a user role from the user model
-      let userRole = user.role || "user";
+      let userRole = user.role || "guest";
+
       //params for rbac.can() function
       const rbacParams = {
         userId: userId.toString(),
-        modelId: modelId.toString(),
+        modelId: modelId ? modelId.toString() : null,
       };
 
-      if (model.user) {
-        rbacParams.modelUserId = model.user.toString();
-      }
-      else {
-        rbacParams.modelUserId = "";
-      }
-
-      console.log(rbacParams);
       //check for permission object
       const permission = await rbac.can(userRole, action, rbacParams);
 
@@ -69,6 +78,7 @@ export default function (modelName, action) {
       }
     }
     catch (err) {
+      console.log(err);
       return res.status(401).json({
         message: "error",
       });

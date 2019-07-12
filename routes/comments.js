@@ -16,7 +16,7 @@ export default function(router) {
   // @access Private
   router 
     .route("/comments")
-    .post(passport.authenticate("jwt", {session: false}), commentsController.createComment);
+    .post([passport.authenticate("jwt", {session: false}), accessController("comment", "create_comment")], commentsController.createComment);
 
   // @route PATCH /comments/:id
   // @desc Modifies a comment

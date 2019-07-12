@@ -1,5 +1,6 @@
 import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
+import commentValidator from "../helpers/commentValidator.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 
@@ -7,8 +8,10 @@ export default {
 
   createComment: (req, res) => {
     const userId = req.user._id;
-    const postId = req.query.postId;
+    const postId = req.body.postId;
     let commentedPost;
+
+    console.log(postId)
 
     //build a comment
     let newComment = {
@@ -18,7 +21,16 @@ export default {
       name: req.body.name || "anonymous",
       avatar: req.body.avatar || null
     };
-    //push a comment to post, resolve promise
+
+    let {errors, isValid} = commentValidator(newComment);
+    //check if comment is valid
+    if(!isValid) {
+      return res.status(400).json({
+        message: "Error in your comment",
+        errors: errors
+      });
+    }
+    //match comment to post
     Post.findOne({_id: postId})
       .then((post) => {
         if(post) {
@@ -29,7 +41,7 @@ export default {
           return rejectionPromise("Cant match post to comment");
         }
       })
-      //match comment to post
+      //push a comment to post, resolve promise
       .then((comment) => {
         commentedPost.comments.push(comment);
         return commentedPost.save();
@@ -51,21 +63,23 @@ export default {
 
   modifyComment: (req, res) => {
     const userId = req.user._id;
-    const {postId, commentId, text} = req.body
+    const text = req.body.text;
+
+    const {errors, isValid} = commentValidator(req.body);
+    //validate input
+    if(!isValid) {
+      return res.status(400).json({
+        message: "Error editing comment",
+        errors: errors
+      });
+    }
     //find post to modify comment
     Comment.findOne({_id: commentId})
       .then((comment) => {
         if(comment) {
-          //verify user
-          //add moderator functionality
-          if (comment.user.equals(userId)) {
-            comment.text = `EDITED: ${getDateWithTime()} 
-                            ${text}`;
-            return comment.save();
-          }
-          else {
-            return rejectionPromise("Not authorized to edit comment");
-          }
+          comment.text = `EDITED: ${getDateWithTime()} 
+                          ${text}`;
+          return comment.save();
         }
         else {
           return rejectionPromise("Seems no comment here");
@@ -87,7 +101,7 @@ export default {
 
   deleteComment: (req, res) => {
 
-    const commentId= req.query.commentId;
+    const commentId= req.params.id;
     const userId = req.user.id;
     let postId;
 
@@ -97,12 +111,7 @@ export default {
       .then((comment) => {
         if (comment) {
           postId = comment.post.toString();
-          if (comment.user.equals(userId)) {
-            return Comment.deleteOne({_id: commentId});
-          }
-          else {
-            return rejectionPromise("Not authorized to delete the comment");
-          }
+          return Comment.deleteOne({_id: commentId});
         }
         else {
           return rejectionPromise("Seems to be a problem finding the comment");
