@@ -6,11 +6,11 @@ export default {
     inherits: ["administrator"]
   },
   administrator: {
-    can: ["edit_comment","edit_post", "modify_user", "assign_moderator", "delete_user", "delete_profile"],
+    can: ["edit_comment","edit_post", "edit_user", "set_access_level", "delete_user", "delete_profile"],
     inherits: ["moderator"]
   },
   moderator: {
-    can: ["delete_post", 'delete_comment', "ban_user"],
+    can: ["delete_post", 'delete_comment', "ban_user", "set_moderator", "remove_moderator"],
     inherits: ["user"]
   },
   user: {

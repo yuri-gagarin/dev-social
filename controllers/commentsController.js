@@ -11,7 +11,7 @@ export default {
     const postId = req.body.postId;
     let commentedPost;
 
-    console.log(postId)
+    console.log(req.body);
 
     //build a comment
     let newComment = {
@@ -27,7 +27,7 @@ export default {
     if(!isValid) {
       return res.status(400).json({
         message: "Error in your comment",
-        errors: errors
+        errors: errors.text
       });
     }
     //match comment to post

@@ -15,15 +15,14 @@ export default function (modelName, action) {
       next(new TypeError("Expected the second argument to be {Action Name} : {String}"));
     }
     //load RBAC
-    const rbac = new RBAC(Roles);
     let user, model, modelId, paramKeys, MongoModel;
+    const rbac = new RBAC(Roles);
     const userId = req.user.id;
     const params = req.params;
-
-    console.log(req.user);
-    console.log(isEmpty(params))
+    const rbacParams = {};
 
     //keys of params passed in by request
+    //modelId to be modified should be the first parameter
     if (!isEmpty(params)) {
       paramKeys = Object.keys(req.params);
       modelId = params.id || params[paramKeys[0]] || null;
@@ -46,6 +45,7 @@ export default function (modelName, action) {
       if (modelId) {
         MongoModel = await loadModel(_model);
         model = await MongoModel.findOne({_id: modelId}).exec();
+        
         if (model.user) {
           rbacParams.modelUserId = model.user.toString();
         }
@@ -58,10 +58,9 @@ export default function (modelName, action) {
       let userRole = user.role || "guest";
 
       //params for rbac.can() function
-      const rbacParams = {
-        userId: userId.toString(),
-        modelId: modelId ? modelId.toString() : null,
-      };
+      rbacParams.userId = userId.toString(),
+      rbacParams.modelId = modelId ? modelId.toString() : null;
+      
 
       //check for permission object
       const permission = await rbac.can(userRole, action, rbacParams);
@@ -79,8 +78,8 @@ export default function (modelName, action) {
     }
     catch (err) {
       console.log(err);
-      return res.status(401).json({
-        message: "error",
+      return res.status(400).json({
+        message: "An error occured"
       });
     }
   }

@@ -25,12 +25,33 @@ export default function(router) {
     .route("/users/login")
     .post(usersController.login);
 
-  // @route POST /users/modify
-  // @desc Modifies User Access Control
+  // @route PATCH /users/edit/
+  // @desc Edits a user
   // @access Private
   router
     .route("/users/edit/:id")
-    .patch([passport.authenticate("jwt", { session: false }), accessController("user", "edit_user")], usersController.modifyUser);
+    .patch([passport.authenticate("jwt", { session: false }), accessController("user", "edit_user")], usersController.editUser);
+  
+  // @route PATCH /users/set_access_level
+  // @desc sets a user access level
+  // @access Private
+  router
+    .route("/users/set_access_level")
+    .patch([passport.authenticate("jwt", {session: false}), accessController("user", "set_access_level")], usersController.setUserAccessLevel);
+
+  // @route PATCH /users/set_moderator
+  // @desc sets new moderator privileges
+  // @access Private
+  router
+    .route("/users/set_moderator")
+    .patch([passport.authenticate("jwt", {session: false}), accessController("user", "set_moderator")], usersController.setModerator);
+  
+  // @route PATCH /users/remove_moderator
+  // @desc removes moderator privileges
+  // @access Private
+  router 
+    .route("/users/remove_moderator")
+    .patch([passport.authenticate("jwt", {session: false}), accessController("user", "remove_moderator")], usersController.removeModerator);
 
   // @route GET /users/current_user
   // @desc Return current user
