@@ -105,43 +105,117 @@ export default {
     }
   },
   editUser: (req, res) => {
-    const {oldPassword, newPassword, newPasswordConfirmm, email, name} = req.body;
+    const {oldPassword, newPassword, newPasswordConfirm, email, name} = req.body;
     const userId = req.params.id;
     const user = req.user;
     const errors = {};
-    let databaseUser, isValid
+    const modifiedUSer = {};
+    let isValid = true;
 
     //validate input
+    //validate email
     if(email) {
       if(!emailValidator(email)) {
         errors.email = "Seems to be an invalid email";
         isValid = false;
       }
+      else {
+        modifiedUSer.email = email;
+      }
     }
-    if(!oldPassword) {
-        error.password = "Need to enter your old password";
+    //validate new password and confirm
+    if(newPassword) {
+      if(newPassword !== newPasswordConfirm || !newPasswordConfirm) {
+        errors.passwordConfirm = "New passwords do not match";
         isValid = false;
+      }
+      else {
+        modifiedUSer.password = newPassword;
+        //modifiedUSer.matchedPasswords = true;
+      }
     }
+    //validate name
+    if(name) {
+      if (name.length > 1) {
+        modifiedUSer.name = name;
+      }
+      else {
+        errors.name = "Name should be at least two characters"
+        isValid = false;
+      }
+    }
+    //check if validations passed
     if (!isValid) {
       return res.status(400).json({
-        message: "Imput error",
-        errors
+        message: "Input error",
+        errors: errors
       });
     }
-
-
-    //superadmin can edit users
+    //superadmin or admin can edit users without user password
     if(user.role === "super_admin" || user.role === "administrator") {
-      return res.json({
-        message: "Admin logged in"
-      });
+      const options = {new: true, maxTimeMS: 3000, runValidators: true};
+      //if admin is setting a new password for a user
+      //first hash the password
+      if (modifiedUSer.password) {
+        bcrypt.genSalt(10)
+          .then((salt) => {
+            return bcrypt.hash(modifiedUSer.password, salt);
+          })
+          .then((hashedPassword) => {
+            modifiedUSer.password = hashedPassword;
+            return User.findOneAndUpdate({_id: userId}, modifiedUSer, options);
+          })
+          .then((user) => {
+            return res.json({
+              message: "User successfuly updated",
+              user: {
+                name: user.name,
+                email: user.email
+              }
+            })
+          })
+          .catch((error) => {
+            console.log(error);
+            return res.status(400).json({
+              message: "An error occured"
+            });
+          })
+      }
+      //else admin is editing everything else but the password
+      else {
+        User.findOneAndUpdate({_id: userId}, modifiedUSer, options)
+          .then((user) => {
+            return res.json({
+              message: "User successfully updated",
+              user: {
+                name: user.name,
+                email: user.email
+              }
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            return res.status(400).json({
+              message: "An error occured"
+            });
+          });
+      }
+      //end admin - super-admin user edit
     }
     else {
-      if (!oldPassword) {
-        return res.status(400).json({
-          message: "You need to enter your current password to modify"
-        });
+      //if the user.role is user or moderator
+      //regular users and moderators must enter their old password to edit
+      if(!oldPassword) {
+        errors.password = "You must enter your current password to make changes";
+        isValid = false;
       }
+      if(!isValid) {
+        return res.status(400).json({
+          message: "Input error",
+          errors: errors
+        })
+      }
+      const options = {new: true, maxTimeMS: 3000, runValidators: true};
       User.findOne({_id: userId})
         .then((user) => {
           if(user) {
@@ -154,11 +228,54 @@ export default {
           }
         })
         .then((matched) => {
+          //if passwords match - user can do modifications
           if (matched) {
-            return res.json({
-              message: "Able to modify",
-            });
+            if (modifiedUSer.password) {
+              bcrypt.genSalt(10)
+                .then((salt) => {
+                  return bcrypt.hash(modifiedUSer.password, salt);
+                })
+                .then((hash) => {
+                  modifiedUSer.password = hash;
+                  return User.findOneAndUpdate({_id: userId}, modifiedUSer, options)
+                })
+                .then((updatedUser) => {
+                  console.log(updatedUser)
+                  return res.json({
+                    message: "User updated",
+                    user: {
+                      name: updatedUser.name,
+                      email: updatedUser.email
+                    }
+                  });
+                })
+                .catch((error) => {
+                  console.log(error);
+                  return res.status(400).json({
+                    message: "An error occured"
+                  });
+                });
+            }
+            else {
+              User.findOneAndUpdate({_id: userId}, modifiedUSer, options)
+                .then((updatedUser) => {
+                  return res.json({
+                    message: "User updated",
+                    user: {
+                      name: updatedUser.name,
+                      email: updatedUser.email
+                    }
+                  });
+                })
+                .catch((error) => {
+                  console.log(error);
+                  return res.status(400).json({
+                    message: "An error occured"
+                  });
+                });
+            }
           }
+          //if user password is wrong
           else {
             return res.status(400).json({
               message: "Wrong password entered"
@@ -171,7 +288,7 @@ export default {
             message: "An error occured"
           });
         });
-      }
+    }
   },
 
   setUserAccessLevel: (req, res) => {
@@ -312,7 +429,7 @@ export default {
       .catch((err) => {
         return res.status(404).json({
           message: "Nothing seems to be here",
-          eroors: err
+          errors: err
         });
       });
     

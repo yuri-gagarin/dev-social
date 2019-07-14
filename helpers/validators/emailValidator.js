@@ -1,7 +1,8 @@
  /**
+  * Validates user email input
   * 
-  * @param {String} user email
-  * @returns {Boolean} result tested against regex
+  * @param {String} user email.
+  * @return {Boolean} result tested against regex.
   */
  
  export default function(email) {
