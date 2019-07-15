@@ -1,6 +1,6 @@
 import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
-import commentValidator from "../helpers/commentValidator.js";
+import commentValidator from "../helpers/validators/commentValidator.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 

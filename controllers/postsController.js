@@ -1,5 +1,5 @@
 import Post from "../models/Post.js";
-import postValidator from "../helpers/postValidator.js";
+import postValidator from "../helpers/validators/postValidator.js";
 import User from "../models/User.js";
 import Comment from "../models/Comment.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";

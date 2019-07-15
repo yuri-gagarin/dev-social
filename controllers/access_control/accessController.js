@@ -1,7 +1,7 @@
 import RBAC from "./RBAC.js";
 import Roles from "../../models/access_control/Roles.js";
 import User from "../../models/User.js";
-import isEmpty from "../../helpers/isEmpty.js";
+import isEmpty from "../../helpers/validators/isEmpty.js";
 
 export default function (modelName, action) {
   

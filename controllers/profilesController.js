@@ -1,9 +1,9 @@
 import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 import mongoose from "mongoose";
-import profileValidator from "../helpers/profileValidator.js";
-import experienceValidator from "../helpers/experienceValidator.js"; 
-import educationValidator from "../helpers/educationValidator.js";
+import profileValidator from "../helpers/validators/profileValidator.js";
+import experienceValidator from "../helpers/validators/experienceValidator.js"; 
+import educationValidator from "../helpers/validators/educationValidator.js";
 
 
 

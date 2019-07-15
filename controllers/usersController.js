@@ -1,10 +1,13 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import keys from "../config/keys.js";
 import User from "../models/User.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 import Roles from "../models/access_control/Roles.js";
 import emailValidator from "../helpers/validators/emailValidator.js";
+import newUserValidator from "../helpers/validators/newUserValidator.js"
+import hashPassword from "./controller_helpers/hashPassword.js";
+
 
 
 export default {
@@ -16,100 +19,132 @@ export default {
   login: (req, res) => {
     const email = req.body.email;
     const password = req.body.password
+    //validate for valid email
+    if (!emailValidator(email)) {
+      return res.status(400).json({
+        message: "Invalid email"
+      });
+    }
+
     if (email && password) {
       User.findOne({email: email})
       .then((user) => {
         //found user
         if(user) {
           //check password
-          bcrypt.compare(password, user.password)
-          .then((correctPassword) => {
-            if (correctPassword) {
-              //user email and password matched
-              //login
-              const tokenPayload = {
-                id: user.id,
-                name: user.name,
-                email: user.email
-              };
-
-              jwt.sign(tokenPayload, keys.secretOrKey, {expiresIn: 7200}, (err, token) => {
-                if (err) {
-                  console.log(err);
-                }
-                else {
-                  return res.json({
-                    success: true,
-                    token: `Bearer ${token}`,
-                    message: "logged in",
-                    name: user.name,
-                    email: user.email
-                  });
-                }
-              });       
-            }
-            else {
-              return res.status(400).json({
-                message: "failed login",
-                errorMsg: "password incorrect"
-              });
-            }
-          })
-          .catch((err) => {
-            return res.status(400).json(err);
-          });
+          return bcrypt.compare(password, user.password);
         }
         else {
-          return res.status(404).json({message: "user not found"});
+          let noUserError = new Error("No user was found with that email");
+          return Promise.reject(noUserError);
         }
-        //end if found user
       })
+      .then((correctPassword) => {
+        if (correctPassword) {
+          //user email and password matched
+          //login
+          const tokenPayload = {
+            id: user.id,
+            name: user.name,
+            email: user.email
+          };
+          //sign the token
+          jwt.sign(tokenPayload, keys.secretOrKey, {expiresIn: 7200}, (err, token) => {
+            if (err) {
+              console.log(err);
+              return res.status(400).json({
+                message: "An error occured"
+              });
+            }
+            else {
+              return res.json({
+                success: true,
+                token: `Bearer ${token}`,
+                message: "logged in",
+                name: user.name,
+                email: user.email
+              });
+            }
+          });       
+        }
+        else {
+          return res.status(400).json({
+            message: "failed login",
+            errorMsg: "password incorrect"
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+        return res.status(400).json({
+          message: "An error occured",
+          errorMsg: error.message
+        });
+      });
     }
     else {
-      return res.status(400).json({message: "bad request"});
+      return res.status(400).json({
+        message: "Input error",
+        error: "Email and password are required fields"
+      })
     }
-    //end if (email && password)
   },
+  
   register: (req, res) => {
-    const email = req.body.email;
+    const {email, name, password, passwordConfirm} = req.body;
+    const {errors, isValid} = newUserValidator(req.body);
+    let newUser;
 
-    if (email) { 
+    if (isValid) { 
       User.findOne({email: email})
         .then((user) => {
           if(user) {
             return res.status(400).json({message: "email already exists"});
           }
           else {
-            const newUser = new User({
+            newUser = new User({
               name: req.body.name,
               email: req.body.email,
               password: req.body.password,
               role: "user"
             });
-
-            bcrypt.genSalt(10, (err, salt) => {
-              bcrypt.hash(newUser.password, salt, (err, hash) => {
-                if(err) {
-                  console.log(err)
-                }
-                else {
-                  newUser.password = hash;
-                  newUser.save() 
-                    .then((user) => res.json(user))
-                    .catch((err) => console.log(err));
-                }
-              });
-            });
+            return hashPassword(10, newUser.password);
           }
+        })
+        .then((hash) => {
+          newUser.password = hash;
+          return newUser.save();
+        })
+        .then((user) => {
+          return res.json({
+            message: "New user created",
+            user: {
+              name: user.name,
+              email: user.email
+            }
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          return res.status(400).json({
+            message: "An error occured"
+          });
         });
     }
+    else {
+      return res.status(400).json({
+        message: "Invalid user input",
+        errors: errors
+      })
+    }
   },
+
   editUser: (req, res) => {
     const {oldPassword, newPassword, newPasswordConfirm, email, name} = req.body;
     const userId = req.params.id;
     const user = req.user;
     const errors = {};
-    const modifiedUSer = {};
+    const modifiedUser = {};
     let isValid = true;
 
     //validate input
@@ -120,7 +155,7 @@ export default {
         isValid = false;
       }
       else {
-        modifiedUSer.email = email;
+        modifiedUser.email = email;
       }
     }
     //validate new password and confirm
@@ -130,14 +165,14 @@ export default {
         isValid = false;
       }
       else {
-        modifiedUSer.password = newPassword;
-        //modifiedUSer.matchedPasswords = true;
+        modifiedUser.password = newPassword;
+        //modifiedUser.matchedPasswords = true;
       }
     }
     //validate name
     if(name) {
       if (name.length > 1) {
-        modifiedUSer.name = name;
+        modifiedUser.name = name;
       }
       else {
         errors.name = "Name should be at least two characters"
@@ -156,14 +191,11 @@ export default {
       const options = {new: true, maxTimeMS: 3000, runValidators: true};
       //if admin is setting a new password for a user
       //first hash the password
-      if (modifiedUSer.password) {
-        bcrypt.genSalt(10)
-          .then((salt) => {
-            return bcrypt.hash(modifiedUSer.password, salt);
-          })
+      if (modifiedUser.password) {
+        hashPassword(10, modifiedUser.password)
           .then((hashedPassword) => {
-            modifiedUSer.password = hashedPassword;
-            return User.findOneAndUpdate({_id: userId}, modifiedUSer, options);
+            modifiedUser.password = hashedPassword;
+            return User.findOneAndUpdate({_id: userId}, modifiedUser, options);
           })
           .then((user) => {
             return res.json({
@@ -183,7 +215,7 @@ export default {
       }
       //else admin is editing everything else but the password
       else {
-        User.findOneAndUpdate({_id: userId}, modifiedUSer, options)
+        User.findOneAndUpdate({_id: userId}, modifiedUser, options)
           .then((user) => {
             return res.json({
               message: "User successfully updated",
@@ -219,7 +251,6 @@ export default {
       User.findOne({_id: userId})
         .then((user) => {
           if(user) {
-            databaseUser = user;
             //check for correct password for modifications
             return bcrypt.compare(oldPassword, user.password);
           }
@@ -230,17 +261,13 @@ export default {
         .then((matched) => {
           //if passwords match - user can do modifications
           if (matched) {
-            if (modifiedUSer.password) {
-              bcrypt.genSalt(10)
-                .then((salt) => {
-                  return bcrypt.hash(modifiedUSer.password, salt);
-                })
+            if (modifiedUser.password) {
+              hashPassword(10, modifiedUser.password)
                 .then((hash) => {
-                  modifiedUSer.password = hash;
-                  return User.findOneAndUpdate({_id: userId}, modifiedUSer, options)
+                  modifiedUser.password = hash;
+                  return User.findOneAndUpdate({_id: userId}, modifiedUser, options)
                 })
                 .then((updatedUser) => {
-                  console.log(updatedUser)
                   return res.json({
                     message: "User updated",
                     user: {
@@ -257,7 +284,7 @@ export default {
                 });
             }
             else {
-              User.findOneAndUpdate({_id: userId}, modifiedUSer, options)
+              User.findOneAndUpdate({_id: userId}, modifiedUser, options)
                 .then((updatedUser) => {
                   return res.json({
                     message: "User updated",
