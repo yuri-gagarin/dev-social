@@ -19,6 +19,7 @@ export default {
   login: (req, res) => {
     const email = req.body.email;
     const password = req.body.password
+    let user;
     //validate for valid email
     if (!emailValidator(email)) {
       return res.status(400).json({
@@ -28,11 +29,12 @@ export default {
 
     if (email && password) {
       User.findOne({email: email})
-      .then((user) => {
+      .then((foundUser) => {
         //found user
-        if(user) {
+        if(foundUser) {
+          user = foundUser
           //check password
-          return bcrypt.compare(password, user.password);
+          return bcrypt.compare(password, foundUser.password);
         }
         else {
           let noUserError = new Error("No user was found with that email");
@@ -89,7 +91,7 @@ export default {
       })
     }
   },
-  
+
   register: (req, res) => {
     const {email, name, password, passwordConfirm} = req.body;
     const {errors, isValid} = newUserValidator(req.body);

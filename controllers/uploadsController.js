@@ -2,57 +2,67 @@ import UserAvatar from "../models/UserAvatar.js";
 import User from "../models/User.js";
 import deleteFile from "../helpers/APIhelpers/deleteFile.js";
 import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
-
+import avatarUploader from "../uploaders/avatarUploader.js";
 //working upload/update/delete avatar routes
 //perhaps refactor later with less nested promises
 
 export default {
   uploadAvatar: async(req, res) => {
-    
     const userId = req.user._id;
-    //grab a user model with possible avatar
-    const user = await User.findOne({_id: userId}).populate("avatar", ["path", "description"]);
-    
-    if (req.file) {
-      //check for an already present avatar so no garbage downloads present
-      //theoretically this shouldn't be allowed in the front end
-      if(user.avatar) {
-        const deletedFile = await deleteFile(req.file.path);
-        return res.status(400).json({
-          message: "avatar already present",
-          file: deletedFile
-        });
-      }
+    //grab a user model with possible avatars
+    try {
+      let user = await User.findOne({_id: userId}).populate("avatar", ["path", "description"]);
+     
+      if (req.file) {
+        //get avatar options
+        const avatarOptions = {};
+        if (req.body.description) avatarOptions.description = req.body.description || "";
+        if (req.file.path) avatarOptions.path = req.file.path;
+        if (req.user._id) avatarOptions.user = req.user._id;
 
-      const avatarOptions = {};
-      if (req.body.description) avatarOptions.description = req.body.description;
-      if (req.file.path) avatarOptions.path = req.file.path;
-      if (req.user._id) avatarOptions.user = req.user._id;
-
-      //create avatar, update user model
-      UserAvatar.create(avatarOptions)
-        .then((avatar) => {
-          return  User.findOneAndUpdate({_id: userId}, {avatar: avatar._id}, {new: true}).populate("avatar", ["path", "description"]);
-        })
-        .then((user) => {
-          //return a new updated user with avatar
+        //check for an already present avatar so no garbage download and database entries present
+        //theoretically this shouldn't be allowed in the front end
+        if(user.avatar) {
+          let deletedFile = await deleteFile(user.avatar.path);
+          let deletedAvatar = await UserAvatar.deleteOne({_id: user.avatar._id});
+          let newAvatar = await UserAvatar.create(avatarOptions);
+          let updatedUserWithAvatar = await User.findOneAndUpdate(
+            {_id: userId},
+            {avatar: newAvatar._id},
+            {new: true}
+          ).populate("avatar", ["path", "description"]);
+          //assuming everything went smooth
           return res.json({
-            message: "Avatar successfully uploaded",
-            user: user
-          })
-        })
-        .catch((err) => {
-          //catch any possible errors
-          return res.status(400).json({
-            message: "An error occured",
-            errors: err
+            message: "Old avatar deleted, new avatar uploaded",
+            user: updatedUserWithAvatar
           });
-        }); 
+        }
+        else {
+          let newAvatar = await UserAvatar.create(avatarOptions);
+          let updatedUserWithAvatar = await User.findOneAndUpdate(
+            {_id: userId},
+            {avatar: newAvatar._id},
+            {new: true}
+          ).populate("avatar", ["path", "description"]);
+          return res.json({
+            message: "New user avatatar uploaded ",
+            user: updatedUserWithAvatar
+          });
+        }
+        //end if(user.avatar)s
+      }
+      //else req.file is empty user should link a file
+      else {
+        res.status(400).json({
+          message: "You should upload a file"
+        })
+      }
     }
-    else {
-      // in case no file present
-      res.status(400).json({
-        message: "You probably should upload a picture"
+    catch(error) {
+      console.error(error);
+      return res.status(400).json({
+        message: "An error occured processing the avatar",
+        error: error.message
       });
     }
   },
