@@ -26,6 +26,6 @@ export default function(router) {
   // @access Private
   router  
     .route("/uploads/delete_avatar")
-    .delete(passport.authenticate("jwt", {session: false}));
+    .delete(passport.authenticate("jwt", {session: false}), uploadsController.deleteAvatar);
 };
 

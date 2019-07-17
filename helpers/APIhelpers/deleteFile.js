@@ -1,19 +1,45 @@
 import fs from "fs";
 
+/**
+ * Deletes a file from the file system
+ * @param {string} filePath Path to the file deleted
+ * @param {Object} data Optional deleted object to return
+ * @return {promise} A promise which resolves to an optional deleted object
+ */
+export default function(filePath, data=null) {
 
-export default function(filePath, data=undefined) {
   return new Promise((resolve, reject) => {
-    fs.unlink(filePath, (error) => {
+    fs.stat(filePath, (error, stats) => {
       if (error) {
-        reject(error);
-      }
-      else {
-        if (data !== undefined) {
-          resolve(data);
+        if(error.code === "ENOENT") {
+          reject(new Error("File not found"));
         }
         else {
-          resolve("Successfully Deleted");
+          reject(error);
         }
+      }
+      else {
+        fs.unlink(filePath, (error) => {
+          if (error) {
+            reject(error);
+          }
+          else {
+            if(data) {
+              resolve({
+                success: true,
+                message: "Successfully deleted",
+                data: data
+              });
+            }
+            else {
+              resolve({
+                success: true,
+                message: "Successfully deleted",
+                data: null
+              });
+            }
+          }
+        });
       }
     });
   });
