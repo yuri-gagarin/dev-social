@@ -7,6 +7,8 @@ import Roles from "../models/access_control/Roles.js";
 import emailValidator from "../helpers/validators/emailValidator.js";
 import newUserValidator from "../helpers/validators/newUserValidator.js"
 import hashPassword from "./controller_helpers/hashPassword.js";
+import getIp from "./controller_helpers/getIp.js";
+import getUserInfo from "./controller_helpers/getUserInfo.js";
 
 
 
@@ -93,7 +95,7 @@ export default {
   },
 
   register: (req, res) => {
-    const {email, name, password, passwordConfirm} = req.body;
+    const email = req.body.email;
     const {errors, isValid} = newUserValidator(req.body);
     let newUser;
 
