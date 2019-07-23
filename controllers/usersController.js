@@ -97,7 +97,8 @@ export default {
   register: (req, res) => {
     const email = req.body.email;
     const {errors, isValid} = newUserValidator(req.body);
-    let newUser;
+    let newUser, userInfo;
+    let userIp = getIp(req);
 
     if (isValid) { 
       User.findOne({email: email})
@@ -108,24 +109,28 @@ export default {
           else {
             newUser = new User({
               name: req.body.name,
+              lastName: req.body.lastName,
               email: req.body.email,
               password: req.body.password,
-              role: "user"
+              role: "user",
+              banned: false
             });
             return hashPassword(10, newUser.password);
           }
         })
         .then((hash) => {
           newUser.password = hash;
-          return newUser.save();
+          if (userIp && typeof userIp === "string") {
+            return getUserInfo(userIp)
+          }
+          else {
+            return Promise.resolve({success: false, message: "Was not able to obtain User IP"});
+          }
         })
-        .then((user) => {
+        .then((userData) => {
+
           return res.json({
-            message: "New user created",
-            user: {
-              name: user.name,
-              email: user.email
-            }
+            message: "Done"
           });
         })
         .catch((error) => {
