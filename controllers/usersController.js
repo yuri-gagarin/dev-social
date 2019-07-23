@@ -121,16 +121,30 @@ export default {
         .then((hash) => {
           newUser.password = hash;
           if (userIp && typeof userIp === "string") {
-            return getUserInfo(userIp)
+            getUserInfo(userIp, (err, data) => {
+              if (err) {
+                return res.status(500).json({
+                  message: "An error occured",
+                  error: err.message
+                });
+              }
+              else {
+                return res.json({
+                  message: "Got user data",
+                  userData: data
+                })
+              } 
+            });
           }
           else {
             return Promise.resolve({success: false, message: "Was not able to obtain User IP"});
           }
         })
+        /*
         .then((userData) => {
-
           return res.json({
-            message: "Done"
+            message: "Done",
+            userData
           });
         })
         .catch((error) => {
@@ -139,6 +153,7 @@ export default {
             message: "An error occured"
           });
         });
+        */
     }
     else {
       return res.status(400).json({
