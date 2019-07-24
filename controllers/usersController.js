@@ -9,6 +9,7 @@ import newUserValidator from "../helpers/validators/newUserValidator.js"
 import hashPassword from "./controller_helpers/hashPassword.js";
 import getIp from "./controller_helpers/getIp.js";
 import getUserInfo from "./controller_helpers/getUserInfo.js";
+import jwtSignPromise from "./controller_helpers/jwtSignPromise.js";
 
 
 
@@ -34,13 +35,16 @@ export default {
       .then((foundUser) => {
         //found user
         if(foundUser) {
+          //check for a ban
+          if (foundUser.banned) {
+            return Promise.reject(new Error("Your profile is banned. Contact an admin"));
+          }
           user = foundUser
           //check password
           return bcrypt.compare(password, foundUser.password);
         }
         else {
-          let noUserError = new Error("No user was found with that email");
-          return Promise.reject(noUserError);
+          return Promise.reject(new Error("No user was found with that email"));
         }
       })
       .then((correctPassword) => {
@@ -53,30 +57,25 @@ export default {
             email: user.email
           };
           //sign the token
-          jwt.sign(tokenPayload, keys.secretOrKey, {expiresIn: 7200}, (err, token) => {
-            if (err) {
-              console.log(err);
-              return res.status(400).json({
-                message: "An error occured"
-              });
-            }
-            else {
-              return res.json({
-                success: true,
-                token: `Bearer ${token}`,
-                message: "logged in",
-                name: user.name,
-                email: user.email
-              });
-            }
-          });       
+          return jwtSignPromise(tokenPayload, keys.secretOrKey,{expiresIn: 3600});
         }
         else {
-          return res.status(400).json({
-            message: "failed login",
-            errorMsg: "password incorrect"
-          });
+          return Promise.reject(new Error("Incorrect password"));
         }
+      })
+      .then((result) => {
+       return User.findOneAndUpdate({_id: user.id}, {lastLogin: Date.now()});
+      })
+      .then((user) => {
+        return res.status(200).json({
+          message: "Logged in",
+          user: {
+            name: user.name,
+            lastName: user.lastName,
+            email: user.email,
+            lastLogin: user.lastLogin
+          }
+        })
       })
       .catch((error) => {
         console.log(error)
@@ -120,31 +119,30 @@ export default {
         })
         .then((hash) => {
           newUser.password = hash;
-          if (userIp && typeof userIp === "string") {
-            getUserInfo(userIp, (err, data) => {
-              if (err) {
-                return res.status(500).json({
-                  message: "An error occured",
-                  error: err.message
-                });
-              }
-              else {
-                return res.json({
-                  message: "Got user data",
-                  userData: data
-                })
-              } 
-            });
+          return getUserInfo(userIp)
+        })
+        .then((response) => {
+          if (response.success) {
+            //build user details
+            newUser.details.ip = response.userData.ip;
+            newUser.details.country = response.userData.country;
+            newUser.details.countryName = response.userData.countryName;
+            newUser.details.languages = response.userData.languages;
+            newUser.details.continentCode = response.userData.continentCode;
+            newUser.details.timezone = response.userData.timezone;
+            newUser.details.currency = response.userData.currency;
+            return newUser.save();
           }
           else {
-            return Promise.resolve({success: false, message: "Was not able to obtain User IP"});
+            //was not able to get client info
+            newUser.details.ip = userIp;
+            return newUser.save();
           }
         })
-        /*
-        .then((userData) => {
+        .then((user) => {
           return res.json({
-            message: "Done",
-            userData
+            message: "new user created",
+            user: user
           });
         })
         .catch((error) => {
@@ -153,7 +151,6 @@ export default {
             message: "An error occured"
           });
         });
-        */
     }
     else {
       return res.status(400).json({

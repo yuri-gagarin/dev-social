@@ -52,7 +52,7 @@ const UserSchema = new Schema({
     continentCode: {
       type: String,
     },
-    timeZone: {
+    timezone: {
       type: String
     },
     currency: {

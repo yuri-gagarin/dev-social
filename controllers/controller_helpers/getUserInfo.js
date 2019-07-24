@@ -19,7 +19,7 @@ export default function(ipAddress, cb) {
     }
   }
   //maybe add more providers as a fallback later
-  let providers = [`https://ipapi.co/302.43.ghd/json/`];
+  let providers = [`https://ipapi.co/${ipAddress}/json/`];
   const response= {
     success: false,
     reason: null,
@@ -42,11 +42,11 @@ export default function(ipAddress, cb) {
         response.success = true;
         response.userData.ip = ipAddress;
         response.userData.country = user.country;
-        response.userData.country_name = user.country_name;
+        response.userData.countryName = user.country_name;
         response.userData.region = user.region;
         response.userData.city = user.city;
-        response.userData.continent_code = response.userData.continent_code;
-        response.userData.userData.timezone = user.timezone;
+        response.userData.continentCode = user.continent_code;
+        response.userData.timezone = user.timezone;
         response.userData.currency = user.currency;
         response.userData.languages = user.languages;
 
