@@ -13,13 +13,15 @@ import jwtSignPromise from "./controller_helpers/jwtSignPromise.js";
 
 
 
-export default {
-  test: (req, res) => {
+export default class UsersController {
+
+  static test(req, res) {
     res.json({
       user: "user details here"
     });
-  },
-  login: (req, res) => {
+  };
+
+  static login(req, res) {
     const email = req.body.email;
     const password = req.body.password
     let user;
@@ -91,9 +93,9 @@ export default {
         error: "Email and password are required fields"
       })
     }
-  },
+  };
 
-  register: (req, res) => {
+  static register(req, res) {
     const email = req.body.email;
     const {errors, isValid} = newUserValidator(req.body);
     let newUser, userInfo;
@@ -158,9 +160,9 @@ export default {
         errors: errors
       })
     }
-  },
+  };
 
-  editUser: (req, res) => {
+  static editUser(req, res) {
     const {oldPassword, newPassword, newPasswordConfirm, email, name} = req.body;
     const userId = req.params.id;
     const user = req.user;
@@ -337,9 +339,9 @@ export default {
           });
         });
     }
-  },
+  };
 
-  setUserAccessLevel: (req, res) => {
+  static setUserAccessLevel (req, res) {
     const {userToChange, accessLevel} = req.body;
     const userRoles = Object.keys(Roles);
     //check for a valid role passed in
@@ -377,9 +379,9 @@ export default {
         })
       });
     
-  },
+  };
 
-  setModerator: (req, res) => {
+  static setModerator (req, res) {
     let newModerator = req.body.newModId;
     //check for a moderator id passed in
     if(!newModerator) {
@@ -420,9 +422,9 @@ export default {
           message: "An error occured"
         });
       });
-  },
+  };
 
-  removeModerator: (req, res) => {
+  static removeModerator (req, res) {
     let modToRemove = req.body.moderatorId;
 
     if(!modToRemove) {
@@ -463,9 +465,9 @@ export default {
           message: "An error occured"
         });
       });
-  },
+  };
 
-  currentUser: (req, res) => {
+  static currentUser(req, res) {
     User.findOne({_id: req.user.id})
       .populate("avatar", ["path", "description"])
       .then((user) => {
@@ -481,6 +483,6 @@ export default {
         });
       });
     
-  },
+  };
   
 };
