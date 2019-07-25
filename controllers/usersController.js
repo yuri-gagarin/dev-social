@@ -1,8 +1,6 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import keys from "../config/keys.js";
 import User from "../models/User.js";
-import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 import Roles from "../models/access_control/Roles.js";
 import emailValidator from "../helpers/validators/emailValidator.js";
 import newUserValidator from "../helpers/validators/newUserValidator.js"
@@ -13,18 +11,17 @@ import jwtSignPromise from "./controller_helpers/jwtSignPromise.js";
 
 
 
-export default class UsersController {
-
-  static test(req, res) {
+export default  {
+  
+  test: (req, res) => {
     res.json({
       user: "user details here"
     });
-  };
-
-  static login(req, res) {
+  },
+  login: (req, res) => {
     const email = req.body.email;
     const password = req.body.password
-    let user;
+    let user, token;
     //validate for valid email
     if (!emailValidator(email)) {
       return res.status(400).json({
@@ -66,21 +63,23 @@ export default class UsersController {
         }
       })
       .then((result) => {
-       return User.findOneAndUpdate({_id: user.id}, {lastLogin: Date.now()});
+        token = result.token;
+        return User.findOneAndUpdate({_id: user.id}, {lastLogin: Date.now()}, {new: true});
       })
       .then((user) => {
+        console.log(this)
         return res.status(200).json({
           message: "Logged in",
           user: {
             name: user.name,
             lastName: user.lastName,
             email: user.email,
+            token: token,
             lastLogin: user.lastLogin
           }
         })
       })
       .catch((error) => {
-        console.log(error)
         return res.status(400).json({
           message: "An error occured",
           errorMsg: error.message
@@ -93,9 +92,9 @@ export default class UsersController {
         error: "Email and password are required fields"
       })
     }
-  };
+  },
 
-  static register(req, res) {
+  register:  (req, res) => {
     const email = req.body.email;
     const {errors, isValid} = newUserValidator(req.body);
     let newUser, userInfo;
@@ -160,9 +159,9 @@ export default class UsersController {
         errors: errors
       })
     }
-  };
+  },
 
-  static editUser(req, res) {
+  editUser: (req, res) => {
     const {oldPassword, newPassword, newPasswordConfirm, email, name} = req.body;
     const userId = req.params.id;
     const user = req.user;
@@ -339,9 +338,9 @@ export default class UsersController {
           });
         });
     }
-  };
+  },
 
-  static setUserAccessLevel (req, res) {
+  setUserAccessLevel: (req, res) => {
     const {userToChange, accessLevel} = req.body;
     const userRoles = Object.keys(Roles);
     //check for a valid role passed in
@@ -379,9 +378,9 @@ export default class UsersController {
         })
       });
     
-  };
+  },
 
-  static setModerator (req, res) {
+  setModerator: (req, res) => {
     let newModerator = req.body.newModId;
     //check for a moderator id passed in
     if(!newModerator) {
@@ -422,9 +421,9 @@ export default class UsersController {
           message: "An error occured"
         });
       });
-  };
+  },
 
-  static removeModerator (req, res) {
+  removeModerator: (req, res) => {
     let modToRemove = req.body.moderatorId;
 
     if(!modToRemove) {
@@ -465,9 +464,9 @@ export default class UsersController {
           message: "An error occured"
         });
       });
-  };
+  },
 
-  static currentUser(req, res) {
+  currentUser: (req, res) => {
     User.findOne({_id: req.user.id})
       .populate("avatar", ["path", "description"])
       .then((user) => {
@@ -483,6 +482,6 @@ export default class UsersController {
         });
       });
     
-  };
+  }
   
 };
