@@ -10,6 +10,13 @@ export default function(router) {
   router
     .route("/posts/newest")
     .get(postsController.newPosts);
+  
+  // @route GET /posts/:slug
+  // @desc Gets a post by its slug
+  // @access Public
+  router  
+    .route("/posts/:id/:slug")
+    .get(postsController.viewBySlug);
 
   // @route POST /posts
   // @desc Create a post

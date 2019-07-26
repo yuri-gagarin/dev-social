@@ -2,8 +2,8 @@ import Post from "../models/Post.js";
 import postValidator from "../helpers/validators/postValidator.js";
 import User from "../models/User.js";
 import Comment from "../models/Comment.js";
-import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
+import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
 
 export default {
   newPosts: (req, res) => {
@@ -30,6 +30,28 @@ export default {
       });
   },
 
+  viewBySlug: (req, res) => {
+    Post.findOne({_id: req.params.id})
+      .then((post) => {
+        if(post) {
+          return res.json({
+            post: post
+          });
+        }
+        else {
+          return res.status(404).json({
+            message: "Seems no post found"
+          });
+        }
+      })
+      .catch((error) => {
+        return res.status(400).json({
+          message: "An error occured",
+          error: error.message
+        });
+      });
+  },
+
   createPost: (req, res) => {
 
     const {errors, isValid} = postValidator(req.body);
@@ -39,7 +61,8 @@ export default {
         text: req.body.text,
         name: req.body.name,
         avatar: req.body.avatar,
-        user: req.user.id
+        user: req.user.id,
+        slug: makeRouteSlug(req.body.name)
       });
 
       newPost.save()
@@ -77,14 +100,15 @@ export default {
     Post.findOne({_id: postId})
       .then((post) => {
         if(post) {
-          post.text = `EDITED: ${getDateWithTime()}
+          post.editedAt = Date.now();
+          post.text = `EDITED: ${getDateWithTime({format: "dateAndHour"})}
                        BY: ${user.name || "anonymous"}
                        ${postText}
                       `;
           return post.save();
         }
         else {
-          return rejectionPromise("Seems no post found...");
+          return Promise.reject(new Error("No post found"));
         }
       })
       .then((post) => {
@@ -96,7 +120,7 @@ export default {
       .catch((error) => {
         return res.status(400).json({
           message: "Something went wrong",
-          error: error
+          error: error.message
         });
       });
   },
@@ -108,13 +132,13 @@ export default {
     const postId = req.params.id;
 
 
-    Post.findByIdAndDelete(postId)
+    Post.findOneAndDelete({_id: postId})
       .then((post) => {
         if (post) {
           return Comment.deleteMany({post: postId});
         }
         else {
-          return rejectionPromise("No Post found");
+          return Promise.reject(new Error("Seems no post found..."))
         }
       })
       .then((result) => {
@@ -122,10 +146,10 @@ export default {
           message: `deleted post and ${result.deletedCount} post comments`
         });
       })
-      .catch((err) => {
+      .catch((error) => {
         return res.status(400).json({
           message: "Error deleting Post",
-          errors: err
+          errors: error.message
         });
       });
   }

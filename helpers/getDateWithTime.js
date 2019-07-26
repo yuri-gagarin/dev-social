@@ -1,5 +1,12 @@
-export default function() {
-
+/**
+ * A date formatter function
+ * @param {object} options Options for return value format
+ * @return {string} Formatted date string
+ */
+export default function(options) {
+  if (typeof options !== "object") {
+    throw new TypeError("Expected the first argument to be {object} : {options}");
+  }
   function addZero(val) {
     if (val < 10) {
       return `0${val}`;
@@ -15,6 +22,7 @@ export default function() {
   let year = today.getFullYear();
   let hour = addZero(today.getHours());
   let minutes = addZero(today.getMinutes());
+  let seconds = addZero(today.getSeconds());
 
   let month;
   switch(mm) {
@@ -43,6 +51,16 @@ export default function() {
     case 12: month = "Dec";
     break;
   }
-  return `${month} ${day}, ${year} - ${hour}:${minutes}`;
 
-}
+  if (options.format === "slugDate") {
+    return `${year}_${addZero(mm)}_${day}_${hour}_${minutes}`;
+  }
+  else if (options.format === "dateAndHour") {
+    return `${month} ${day}, ${year} - ${hour}:${minutes}`;
+  }
+  else if (options.format === "time") {
+    return `${addZero(hour)} : ${addZero(seconds)}`;
+  }
+
+
+};

@@ -13,6 +13,9 @@ const PostSchema = new Schema({
   name: {
     type: String
   },
+  slug: {
+    type: String
+  },
   avatar: {
     type: String
   },
@@ -30,7 +33,11 @@ const PostSchema = new Schema({
       ref: "Comment"
     }
   ],
-  date: {
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  editedAt: {
     type: Date,
     default: Date.now
   }

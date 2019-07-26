@@ -74,7 +74,7 @@ export default  {
             name: user.name,
             lastName: user.lastName,
             email: user.email,
-            token: token,
+            token: `Bearer ${token}`,
             lastLogin: user.lastLogin
           }
         })
