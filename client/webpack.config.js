@@ -11,6 +11,7 @@ module.exports = {
     path: path.join(__dirname, "/dist"),
     filename: "appBundle.js"
   },
+  mode: "development",
 
   devServer: {
     contentBase: path.join(__dirname, '/src'),
@@ -41,22 +42,40 @@ module.exports = {
         {
           loader: DEV_MODE ? "style-loader" : MiniCssExtractPlugin.loader
         },
+        //resolve url() and @imports in CSS
         {
           loader: "css-loader",
-          options: {
-            modules: true,
-            importLoaders: 1,
-        }
         },
         {
-          loader: "sass-loader"
+          loader: "postcss-loader",
+          options: {
+            config: {
+              path: path.resolve(__dirname, "postcss.config.js")
+            }
+          }
+        },
+        {
+          loader: "sass-loader",
+          options: 
+          {
+            implementation: require("sass")
+          }
         }
         ]
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              outputPath: "fonts"
+            }
+          }
+        ]
       }
-
-    ],
-
-  },
+    ], //end [rules]
+  }, //end {this.module}
 
   plugins: [
     new HtmlWebpackPlugin({
