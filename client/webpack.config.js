@@ -37,30 +37,38 @@ module.exports = {
         }
       },
       {
-      test: /\.(css|sass|scss)$/i,
-      use: [
-        {
-          loader: DEV_MODE ? "style-loader" : MiniCssExtractPlugin.loader
-        },
-        //resolve url() and @imports in CSS
-        {
-          loader: "css-loader",
-        },
-        {
-          loader: "postcss-loader",
-          options: {
-            config: {
-              path: path.resolve(__dirname, "postcss.config.js")
+        test: /\.(css|sass|scss)$/i,
+        use: [
+          {
+            loader: DEV_MODE ? "style-loader" : MiniCssExtractPlugin.loader
+          },
+          //resolve url() and @imports in CSS
+          {
+            loader: "css-loader",
+            options:
+            {
+              importLoaders: 2,
+              modules:
+              {
+              localIdentName: "[name]_[local]_[hash:base64]",
+              }
+            }
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              config: {
+                path: path.resolve(__dirname, "postcss.config.js")
+              }
+            }
+          },
+          {
+            loader: "sass-loader",
+            options: 
+            {
+              implementation: require("sass")
             }
           }
-        },
-        {
-          loader: "sass-loader",
-          options: 
-          {
-            implementation: require("sass")
-          }
-        }
         ]
       },
       {
@@ -82,8 +90,8 @@ module.exports = {
       template: "./src/index.html"
     }),
     new MiniCssExtractPlugin({
-      filename: DEV_MODE ? "[name].css" : "[name].[hash].css",
-      chunkFilename: DEV_MODE ? "[id].css" : "[id].[hash].css"
+      filename: "[name].css",
+      chunkFilename: "[id].css"
     }),
   ]
 };

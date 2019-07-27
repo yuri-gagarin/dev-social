@@ -8,7 +8,7 @@ export default function(router) {
   // @desc Gets newest posts
   // @access Public
   router
-    .route("/posts/newest")
+    .route("/api/posts/newest")
     .get(postsController.newPosts);
   
   // @route GET /posts/:slug
