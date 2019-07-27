@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import SplashPage from "./components/SplashPage.jsx"
 
 export default class App extends React.Component {
   constructor() {
@@ -9,7 +10,7 @@ export default class App extends React.Component {
   clickButton() {
     axios({
       method: "GET",
-      url: "posts/newest"
+      url: "api/posts/newest"
     })
     .then((response) => {
       console.log(response);
@@ -21,10 +22,9 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <h2>React Test</h2>
-        <div>
-          <button type="button" onClick={this.clickButton}>Click Me</button>
-        </div>
+        <SplashPage 
+          
+        />
       </div>
     );
   }
