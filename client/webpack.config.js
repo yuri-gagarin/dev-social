@@ -1,6 +1,8 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+
 const DEV_MODE = process.env.NODE_ENV !== "production";
 
 
@@ -72,12 +74,27 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpe?g|gif|svg)$/,
+        test: /\.(png|jpe?g|gif)$/,
+        use: [
+          {
+            loader: "url-loader",
+            options:
+            {
+              fallback: "file-loader",
+              limit: 8000,
+              name: DEV_MODE ? "[path]-[name].[ext]" : "[hash]-[name].[ext]"
+            }
+          }
+        ]
+      },
+      {
+        test: /\.(svg)$/,
         use: [
           {
             loader: "file-loader",
-            options: {
-              outputPath: "fonts"
+            options:
+            {
+              name: DEV_MODE ? "[path]-[name].[ext]" : "[hash]-[name].[ext]"
             }
           }
         ]
@@ -86,6 +103,7 @@ module.exports = {
   }, //end {this.module}
 
   plugins: [
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: "./src/index.html"
     }),
