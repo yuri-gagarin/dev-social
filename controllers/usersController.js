@@ -13,10 +13,19 @@ import jwtSignPromise from "./controller_helpers/jwtSignPromise.js";
 
 export default  {
   
-  test: (req, res) => {
-    res.json({
-      user: "user details here"
-    });
+  registerTest: (req, res) => {
+    console.log(req.body.name);
+    if (req.body.name === "yuriy") {
+      return res.status(400).json({
+        message: "an error occured",
+        error: "go away yuriy"
+      });
+    }
+    else {
+      return res.json({
+        message: "user registration from frontend"
+      });
+    }
   },
   login: (req, res) => {
     const email = req.body.email;

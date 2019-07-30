@@ -1,10 +1,12 @@
 import {combineReducers} from "redux";
-import loginReducer from "./loginReducer.js";
+import authReducer from "./authReducer.js";
 import testReducer from "./testReducer.js";
+import errorReducer from "./errorReducer.js";
 
 export default combineReducers({
-  login: loginReducer,
-  test: testReducer
+  auth: authReducer,
+  test: testReducer,
+  error: errorReducer
 });
 
 

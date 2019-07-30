@@ -1,30 +1,21 @@
 import React from "react";
 import {connect} from "react-redux";
-import axios from "axios";
 import SplashPage from "./components/SplashPage.jsx"
 import {test, cancelTest} from "./actions/appAction.js";
+import {registerUserTest, registerUser} from "./actions/authActions.js";
 import homeIcon from "./assets/images/iconfinder_go-home_118770.svg";
 
 let homeImg = document.getElementById("home");
 homeImg.src = homeIcon;
 
+
 class App extends React.Component {
   constructor() {
     super();
-    this.clickButton = this.clickButton.bind(this);
     this.testRedux = this.testRedux.bind(this);
-  }
-  clickButton() {
-    axios({
-      method: "GET",
-      url: "api/posts/newest"
-    })
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error);
-    })
+    this.cancelTest = this.cancelTest.bind(this);
+    this.registerUserTest = this.registerUserTest.bind(this);
+    this.registerUser = this.registerUser.bind(this);
   }
   testRedux(e) {
     console.log(this)
@@ -34,13 +25,33 @@ class App extends React.Component {
     console.log(this)
     this.props.cancelTest();
   }
+  registerUserTest(e) {
+    const newUser = {
+      name: "yuriy",
+      email: "bob@mail.com",
+      password: "password",
+      passwordConfirm: "password"
+    }    
+    this.props.registerUserTest(newUser);
+  }
+  registerUser(e) {
+    const newUser ={
+      name: "yuriy",
+      email: "yuriy@mail.com",
+      lastName: "super",
+      password: "password",
+      passwordConfirm: "password",
+    };
+    this.props.registerUser(newUser)
+  }
   render() {
     return (
       <div>
-        <pre>{JSON.stringify(this.props)}</pre>
         <SplashPage />
         <button onClick={this.testRedux}>TEST REDUX</button>
-        <button onClick={(e) => this.cancelTest(e)}>CANCEL TEST</button>
+        <button onClick={this.cancelTest}>CANCEL TEST</button>
+        <button onClick={this.registerUserTest}>REGISTER TEST</button>
+        <button onClick={this.registerUser}>REGISTER USER</button>
       </div>
     );
   }
@@ -48,15 +59,19 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    ...state
+    testState: state.test,
+    authState: state.auth,
+    errorState: state.error
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    test: () => dispatch(test),
-    cancelTest: () => dispatch(cancelTest)
+    test: () => dispatch(test()),
+    cancelTest: () => dispatch(cancelTest()),
+    registerUserTest: (newUserData) => dispatch(registerUserTest(newUserData)),
+    registerUser: (newUserData) => dispatch(registerUser(newUserData))
   };
 };
 
-export default connect(mapStateToProps, {test: test, cancelTest: cancelTest})(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

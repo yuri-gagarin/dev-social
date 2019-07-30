@@ -5,15 +5,16 @@
  */
 export default function(request) {
   //attempt to extract IP from 'x-forwared-for' headers]
-  let ipAddress = request.headers["x-forwarded-for"].split(",").pop();
-  if(ipAddress) {
-    
-    return ipAddress;
+  let ipAddress;
+  let ipAddressFromHeaders = request.headers["x-forwarded-for"];
+  //a safety check for array
+  if (ipAddressFromHeaders && Array.isArray(ipAddressFromHeaders)) {
+   ipAddress = ipAddressFromHeaders.split(",").pop();
   }
   //fall back on other request properties
   else {
     ipAddress = request.connection.remoteAddress || request.socket.remoteAddress || request.connection.socket.remoteAddress;
-
-    return ipAddress;
   }
+  console.log(ipAddress);
+  return ipAddress;
 };

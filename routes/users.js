@@ -4,20 +4,20 @@ import accessController from "../controllers/access_control/accessController.js"
 
 export default function(router) {
 
-  // @route GET /users/index
-  // @desc Users test
+  // @route POST /api/user/register_test
+  // @desc User registration front end test
   // @access Public
   router
-    .route("/users/index")
-    .get(UsersController.test);
-
-  // @route POST /users/register
+    .route("/api/users/register_test")
+    .post(UsersController.registerTest);
+  
+  // @route POST /api/users/register
   // @desc User registration
   // @access Public 
   router 
-    .route("/users/register")
+    .route("/api/users/register")
     .post(UsersController.register);
-  
+
   // @route POST /users/login
   // @desc Login User / Return JWT Token
   // @access Public
