@@ -4,7 +4,7 @@ export default function(state={}, action) {
       return ({
         result: action.payload
       });
-    case "TEST_ACTION":
+    case "LOGIN":
       return ({
         result: action.payload
       });
