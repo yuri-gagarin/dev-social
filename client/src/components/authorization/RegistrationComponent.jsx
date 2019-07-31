@@ -1,29 +1,63 @@
 import React, {Component} from "react";
 import {Container, Form, Button} from "semantic-ui-react";
 import style from "../../assets/stylesheets/authorization/registration.scss";
-import emailValidator from "../../helpers/emailValidator";
-import nameValidator from "../../helpers/nameValidator";
-import passwordValidator from "../../helpers/passwordValidator";
+import emailValidator from "../../helpers/emailValidator.js";
+import nameValidator from "../../helpers/nameValidator.js";
+import passwordValidator from "../../helpers/passwordValidator.js";
+import authHelper from "../../helpers/authHelper.js";
 
 class RegistrationComponent extends Component {
   constructor() {
     super();
     this.state = {
-      email: {},
+      email: {
+        typing: false,
+        typingTimeout: 0
+      },
       firstName: {},
       lastName: {},
       password: {},
-      passwordConfirm: {}
+      passwordConfirm: {},
     };
   }
 
   handleEmail(event) {
+    const self = this;
+    if (this.state.email.typingTimeout) {
+      clearTimeout(this.state.email.typingTimeout);
+    }
     const emailState = {...this.state.email};
     emailState.value = event.target.value;
+    
     //check for valid email
     //if invalid set the error for form
-    emailState.error = emailValidator(emailState.email) ? null : {content: "Invalid Email", pointing: "below"};
+    emailState.error = emailValidator(emailState.value) ? null : {content: "Invalid Email", pointing: "below"};
+    emailState.typingTimeout = setTimeout(() => {
+      emailState.typing = false;
+      self.setState({
+        email: emailState
+      }, () => {
+        console.log("Here we fetch")
+        console.log(this.state.email.error)
+        if (!this.state.email.error) {
+          console.log("Now we can fetch");
+        }
+        else {
+          console.log("invalid email")
+          return;
+        }
+      });
+    }, 5000);
+    emailState.typing = true;
     this.setState({email: emailState});
+    /*
+    if (!this.state.email.error) {
+      authHelper(this.state.email.value)
+        .then((respose) => {
+          console.log(response);
+        });
+    }
+    */
   }
 
   handleFirstName(event) {

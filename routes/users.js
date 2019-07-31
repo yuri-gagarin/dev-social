@@ -11,6 +11,13 @@ export default function(router) {
     .route("/api/users/register_test")
     .post(UsersController.registerTest);
   
+  // @route POST /api/users/check_email
+  // @desc Check for a present User email
+  // @access Public
+  router
+    .route("/api/users/check_email")
+    .post(UsersController.checkEmail);
+  
   // @route POST /api/users/register
   // @desc User registration
   // @access Public 

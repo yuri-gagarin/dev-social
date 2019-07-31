@@ -27,6 +27,27 @@ export default  {
       });
     }
   },
+  checkEmail: (req, res) => {
+    User.findOne({email: req.body.email})
+      .then((user) => {
+        if(user) {
+          return res.json({
+            message: "Account already exists with that email"
+          }); 
+        }
+        else {
+          return res.json({
+            message: "Email ok"
+          });
+        }
+      })
+      .catch((error) => {
+        return res.status(500).json({
+          message: "Server error",
+          error: error.message
+        });
+      });
+  },
   login: (req, res) => {
     const email = req.body.email;
     const password = req.body.password
