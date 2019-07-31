@@ -1,9 +1,11 @@
 import React from "react";
 import {connect} from "react-redux";
-import SplashPage from "./components/SplashPage.jsx"
+import SplashPage from "./components/SplashPage.jsx";
+import AuthorizationComponent from "./components/authorization/AuthorizationComponent.jsx";
 import {test, cancelTest} from "./actions/appAction.js";
 import {registerUserTest, registerUser} from "./actions/authActions.js";
 import homeIcon from "./assets/images/iconfinder_go-home_118770.svg";
+
 
 let homeImg = document.getElementById("home");
 homeImg.src = homeIcon;
@@ -47,7 +49,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <SplashPage />
+        <AuthorizationComponent />
         <button onClick={this.testRedux}>TEST REDUX</button>
         <button onClick={this.cancelTest}>CANCEL TEST</button>
         <button onClick={this.registerUserTest}>REGISTER TEST</button>

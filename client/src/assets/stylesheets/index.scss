@@ -1,10 +1,7 @@
-#app {
-  p {
-    color: red;
-  }
-}
+@import "./authorization/registration.scss";
+
 body {
-  background-color: green;
+  background-color: rgb(197, 206, 197);
 }
 .splashPage {
   color: rgb(8, 8, 95);
