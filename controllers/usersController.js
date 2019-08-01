@@ -32,11 +32,13 @@ export default  {
       .then((user) => {
         if(user) {
           return res.json({
+            available: false,
             message: "Account already exists with that email"
           }); 
         }
         else {
           return res.json({
+            available: true,
             message: "Email ok"
           });
         }

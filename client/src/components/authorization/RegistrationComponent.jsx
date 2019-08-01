@@ -11,53 +11,64 @@ class RegistrationComponent extends Component {
     super();
     this.state = {
       email: {
-        typing: false,
-        typingTimeout: 0
+        value: null,
+        typingTimeout: 0,
       },
-      firstName: {},
-      lastName: {},
-      password: {},
-      passwordConfirm: {},
+      firstName: {
+        value: null,
+      },
+      lastName: {
+        value: null,
+      },
+      password: {
+        value: null,
+      },
+      passwordConfirm: {
+        value: null,
+      },
     };
   }
 
   handleEmail(event) {
-    const self = this;
     if (this.state.email.typingTimeout) {
       clearTimeout(this.state.email.typingTimeout);
     }
     const emailState = {...this.state.email};
     emailState.value = event.target.value;
-    
     //check for valid email
     //if invalid set the error for form
     emailState.error = emailValidator(emailState.value) ? null : {content: "Invalid Email", pointing: "below"};
+    //set timeout to dynamically check typed in email
     emailState.typingTimeout = setTimeout(() => {
-      emailState.typing = false;
-      self.setState({
-        email: emailState
-      }, () => {
-        console.log("Here we fetch")
-        console.log(this.state.email.error)
-        if (!this.state.email.error) {
-          console.log("Now we can fetch");
-        }
-        else {
-          console.log("invalid email")
-          return;
-        }
-      });
-    }, 5000);
-    emailState.typing = true;
+      if (!this.state.email.error) {
+         authHelper(this.state.email.value)
+          .then((response) => {
+            //if email is unaivalable
+            if (!response.data.available) {
+              emailState.error = {content: response.data.message, pointing: "below"};
+              this.setState({
+                email: emailState
+              });
+            }
+            else {
+              console.log(this.state.email)
+              return;
+            }
+          })
+          .catch((error) => {
+            console.log(error.response);
+            const {status, statusText} = error.response;
+            emailState.error = {content: `${status}:  ${statusText}`};
+            this.setState({
+              email: emailState
+            });
+          });
+      }
+      else {
+        return;
+      }
+    }, 2500);
     this.setState({email: emailState});
-    /*
-    if (!this.state.email.error) {
-      authHelper(this.state.email.value)
-        .then((respose) => {
-          console.log(response);
-        });
-    }
-    */
   }
 
   handleFirstName(event) {
@@ -126,6 +137,25 @@ class RegistrationComponent extends Component {
     });
   }
 
+  handleSubmit(event) {
+    event.preventDefault();
+    console.log(this.state.okToSubmit)
+    const currentState = this.state;
+    const errors = {};
+    for (let key in currentState) {
+      if(currentState[key].value && currentState[key].error){
+        errors[key] = currentState[key].error;
+      }
+      else if(!currentState[key].value) {
+        errors[key] = `${key}: value is required`;
+      }
+      else if(currentState[key].value && !currentState[key].error) {
+        errors[key] = null;
+      }
+    }
+    console.log(errors);
+  }
+
 
   render() {
     return (
@@ -169,7 +199,7 @@ class RegistrationComponent extends Component {
             placeholder="Confirm Password"
             onChange={ (e) => {this.handlePasswordConfirm(e)} }
           />
-          <Button type="submit">Submit</Button>
+          <Button disabled={this.state.disabled} type="submit" onClick={ (e) => this.handleSubmit(e) }>Submit</Button>
         </Form>
       </Container>
     )
