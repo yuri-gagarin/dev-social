@@ -6,6 +6,18 @@ import nameValidator from "../../helpers/nameValidator.js";
 import passwordValidator from "../../helpers/passwordValidator.js";
 import authHelper from "../../helpers/authHelper.js";
 
+const handleButton = function(className, state){
+  let btn = document.getElementsByClassName(className)[0];
+  console.log(this)
+  if (!state.valid) {
+    btn.classList.add("disabled");
+  }
+  else {
+    btn.classList.remove("disabled")
+  }
+  console.log(btn);
+};
+
 class RegistrationComponent extends Component {
   constructor() {
     super();
@@ -26,9 +38,17 @@ class RegistrationComponent extends Component {
       passwordConfirm: {
         value: null,
       },
+      valid: false
     };
   }
-
+  componentDidMount() {
+    console.log("mounted");
+    handleButton("submitBtn", this.state);
+  }
+  componentDidUpdate() {
+    console.log("updated");
+    handleButton("submitBtn", this.state);
+  }
   handleEmail(event) {
     if (this.state.email.typingTimeout) {
       clearTimeout(this.state.email.typingTimeout);
@@ -58,7 +78,7 @@ class RegistrationComponent extends Component {
           .catch((error) => {
             console.log(error.response);
             const {status, statusText} = error.response;
-            emailState.error = {content: `${status}:  ${statusText}`};
+            emailState.error = {content: `${status}:  Unable to reach server and verify email`, pointing: "below"};
             this.setState({
               email: emailState
             });
@@ -139,12 +159,12 @@ class RegistrationComponent extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log(this.state.okToSubmit)
     const currentState = this.state;
     const errors = {};
+    let valid;
     for (let key in currentState) {
       if(currentState[key].value && currentState[key].error){
-        errors[key] = currentState[key].error;
+        errors[key] = currentState[key].error.content;
       }
       else if(!currentState[key].value) {
         errors[key] = `${key}: value is required`;
@@ -153,6 +173,17 @@ class RegistrationComponent extends Component {
         errors[key] = null;
       }
     }
+    for (let key in errors) {
+      if(errors[key]) {
+        valid = false;
+      }
+      else {
+        valid = true
+      }
+    }
+    this.setState({
+      valid: valid
+    });
     console.log(errors);
   }
 
@@ -199,11 +230,12 @@ class RegistrationComponent extends Component {
             placeholder="Confirm Password"
             onChange={ (e) => {this.handlePasswordConfirm(e)} }
           />
-          <Button disabled={this.state.disabled} type="submit" onClick={ (e) => this.handleSubmit(e) }>Submit</Button>
+          <Button className="submitBtn" type="submit" onClick={ (e) => this.handleSubmit(e) }>Submit</Button>
         </Form>
       </Container>
     )
   }
 }
+
 
 export default RegistrationComponent;
