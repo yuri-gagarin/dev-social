@@ -6,16 +6,39 @@ import nameValidator from "../../helpers/nameValidator.js";
 import passwordValidator from "../../helpers/passwordValidator.js";
 import authHelper from "../../helpers/authHelper.js";
 
-const handleButton = function(className, state){
+const checkForFormCompletion = (state) => {
+  console.log(state.emailVerified.value)
+  if (!state.emailVerified.value) return false;
+  for(let key in state) {
+    console.log("no value");
+    if(!state[key].value) {
+      return false;
+    }
+    if(state[key].value && state[key].error){
+      return false;
+    }
+  }
+  console.log("HERE")
+  this.setState({completed: true}, ()=> {
+    return true;
+  }, () => {
+    console.log(this.state);
+  });
+};
+const disableButton = (className, state) => {
   let btn = document.getElementsByClassName(className)[0];
-  console.log(this)
-  if (!state.valid) {
+  if (!state.valid.value) {
     btn.classList.add("disabled");
   }
   else {
     btn.classList.remove("disabled")
   }
-  console.log(btn);
+};
+const enableButton = (className, state) => {
+  let btn = document.getElementsByClassName(className)[0];
+  if (checkForFormCompletion(state)) {
+    btn.classList.remove("disabled");
+  }
 };
 
 class RegistrationComponent extends Component {
@@ -38,16 +61,19 @@ class RegistrationComponent extends Component {
       passwordConfirm: {
         value: null,
       },
-      valid: false
+      emailVerified: {
+        value: false,
+      },
+      valid: {
+        value: false,
+      }
     };
   }
   componentDidMount() {
-    console.log("mounted");
-    handleButton("submitBtn", this.state);
+    disableButton("submitBtn", this.state);
   }
   componentDidUpdate() {
-    console.log("updated");
-    handleButton("submitBtn", this.state);
+    enableButton("submitBtn", this.state);
   }
   handleEmail(event) {
     if (this.state.email.typingTimeout) {
@@ -67,12 +93,21 @@ class RegistrationComponent extends Component {
             if (!response.data.available) {
               emailState.error = {content: response.data.message, pointing: "below"};
               this.setState({
-                email: emailState
+                email: emailState,
+                emailVerified: {
+                  value: false,
+                  error: "Email Taken"
+                }
               });
             }
             else {
-              console.log(this.state.email)
-              return;
+              this.setState({
+                email: emailState,
+                emailVerified: {
+                  value: true,
+                  error: null
+                }
+              });
             }
           })
           .catch((error) => {
@@ -80,7 +115,11 @@ class RegistrationComponent extends Component {
             const {status, statusText} = error.response;
             emailState.error = {content: `${status}:  Unable to reach server and verify email`, pointing: "below"};
             this.setState({
-              email: emailState
+              email: emailState,
+              emailVerified: {
+                value: false,
+                error: "Server error verifying email"
+              }
             });
           });
       }
@@ -159,31 +198,6 @@ class RegistrationComponent extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const currentState = this.state;
-    const errors = {};
-    let valid;
-    for (let key in currentState) {
-      if(currentState[key].value && currentState[key].error){
-        errors[key] = currentState[key].error.content;
-      }
-      else if(!currentState[key].value) {
-        errors[key] = `${key}: value is required`;
-      }
-      else if(currentState[key].value && !currentState[key].error) {
-        errors[key] = null;
-      }
-    }
-    for (let key in errors) {
-      if(errors[key]) {
-        valid = false;
-      }
-      else {
-        valid = true
-      }
-    }
-    this.setState({
-      valid: valid
-    });
     console.log(errors);
   }
 
