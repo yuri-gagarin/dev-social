@@ -6,40 +6,122 @@ import nameValidator from "../../helpers/nameValidator.js";
 import passwordValidator from "../../helpers/passwordValidator.js";
 import authHelper from "../../helpers/authHelper.js";
 
-const checkForFormCompletion = (state) => {
-  console.log(state.emailVerified.value)
-  if (!state.emailVerified.value) return false;
-  for(let key in state) {
-    console.log("no value");
-    if(!state[key].value) {
-      return false;
+
+const setTypingTimeout = (self) => {
+  return setTimeout(() => {
+    self.setState({
+      typing: {
+        value: false
+      }
+    })
+  }, 4000);
+};
+
+const setEmailTimout = (self) => {
+  return setTimeout(() => {
+    const {value, error} = self.state.email;
+    if (value && !error) {
+      authHelper(value)
+        .then((response) => {
+          if(!response.data.available) {
+            self.setState({
+              email: {
+                value: value,
+                error: {content: response.data.message, pointing: "below"}
+              },
+              emailAvailable: {
+                value: false
+              }
+            });
+          }
+          else {
+            self.setState({
+              email: {
+                value: value,
+                error: null
+              },
+              emailAvailable: {
+                value: true
+              }
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error.response);
+          self.setState({
+            email: {
+              value: value,
+              error: {content: `${error.response.statusText}: Unable to verify Email`}
+            },
+            emailAvailable: {
+              value: false
+            }
+          });
+        });
     }
-    if(state[key].value && state[key].error){
-      return false;
+    else {
+      //email not valid - not sent to the server to check
+      return;
+    }
+  }, 3000)
+};
+
+const matchPasswords = (self, password1, password2) => {
+  if(password1 && password2) {
+    console.log("matching")
+    console.log(`${password1} --- ${password2}`)
+    if(password1 !== password2) {
+      self.setState({
+        passwordConfirm: {
+          value: password2,
+          error: {content: "Passwords don't match",  pointing: "below"},
+        }
+      });
+    }
+    else {
+      self.setState({
+        passwordConfirm: {
+          value: password2,
+          error: null,
+        }
+      });
     }
   }
-  console.log("HERE")
-  this.setState({completed: true}, ()=> {
-    return true;
-  }, () => {
-    console.log(this.state);
-  });
 };
-const disableButton = (className, state) => {
-  let btn = document.getElementsByClassName(className)[0];
-  if (!state.valid.value) {
-    btn.classList.add("disabled");
+
+const checkTyping = (self) => {
+  if (self.state.typing.value === true) {
+    return true;
   }
   else {
-    btn.classList.remove("disabled")
+    return false;
   }
+};
+
+const checkForFormCompletion = (self, keys) => {
+  const currentState = self.state;
+
+  if (currentState.typing.value) return false;
+  if (!currentState.emailAvailable.value) return false;
+
+  for (let i = 0; i < keys.length; i++) {
+    if (!currentState[keys[i]].value) {console.log(`${keys[i]}: needs a value`); return false};
+    if (currentState[keys[i]].error) {console.log(`${keys[i]} has error: ${keys[i].error}` ); return false};
+    if (currentState[keys[i]].value && currentState[keys[i]].error) {console.log(`Error: ${keys[i].error}`); return false};
+  }
+  return true;
+};
+
+
+const disableButton = (className, state) => {
+  let btn = document.getElementsByClassName(className)[0];
+  btn.classList.add("disabled");
 };
 const enableButton = (className, state) => {
   let btn = document.getElementsByClassName(className)[0];
-  if (checkForFormCompletion(state)) {
-    btn.classList.remove("disabled");
-  }
+  btn.classList.remove("disabled");
 };
+
 
 class RegistrationComponent extends Component {
   constructor() {
@@ -47,7 +129,10 @@ class RegistrationComponent extends Component {
     this.state = {
       email: {
         value: null,
-        typingTimeout: 0,
+        emailTimeout: null,
+      },
+      emailAvailable: {
+        value: false,
       },
       firstName: {
         value: null,
@@ -61,144 +146,228 @@ class RegistrationComponent extends Component {
       passwordConfirm: {
         value: null,
       },
-      emailVerified: {
+      valid: {
         value: false,
       },
-      valid: {
+      typingTimeout: {
+        value: null,
+      },
+      typing: {
+        value: false,
+      },
+      completed: {
         value: false,
       }
     };
+
+    this.toValidate = ["email", "firstName", "lastName", "password", "passwordConfirm"];
   }
+  //lifecycle methods
   componentDidMount() {
-    disableButton("submitBtn", this.state);
-  }
-  componentDidUpdate() {
-    enableButton("submitBtn", this.state);
-  }
-  handleEmail(event) {
-    if (this.state.email.typingTimeout) {
-      clearTimeout(this.state.email.typingTimeout);
-    }
-    const emailState = {...this.state.email};
-    emailState.value = event.target.value;
-    //check for valid email
-    //if invalid set the error for form
-    emailState.error = emailValidator(emailState.value) ? null : {content: "Invalid Email", pointing: "below"};
-    //set timeout to dynamically check typed in email
-    emailState.typingTimeout = setTimeout(() => {
-      if (!this.state.email.error) {
-         authHelper(this.state.email.value)
-          .then((response) => {
-            //if email is unaivalable
-            if (!response.data.available) {
-              emailState.error = {content: response.data.message, pointing: "below"};
-              this.setState({
-                email: emailState,
-                emailVerified: {
-                  value: false,
-                  error: "Email Taken"
-                }
-              });
-            }
-            else {
-              this.setState({
-                email: emailState,
-                emailVerified: {
-                  value: true,
-                  error: null
-                }
-              });
-            }
-          })
-          .catch((error) => {
-            console.log(error.response);
-            const {status, statusText} = error.response;
-            emailState.error = {content: `${status}:  Unable to reach server and verify email`, pointing: "below"};
-            this.setState({
-              email: emailState,
-              emailVerified: {
-                value: false,
-                error: "Server error verifying email"
-              }
-            });
-          });
-      }
-      else {
-        return;
-      }
-    }, 2500);
-    this.setState({email: emailState});
+    disableButton("registerButton", this.state);
   }
 
-  handleFirstName(event) {
-    const firstNameState = {...this.state.firstName};
-    firstNameState.value = event.target.value;
-    //validate name and length of at least one char
-    const {error, valid} = nameValidator(firstNameState.value);
-    if(!valid) {
-      firstNameState.error = {content: error, pointing: "below"};
+  componentDidUpdate() {
+    if(!checkTyping(this)) {
+      if(checkForFormCompletion(this, this.toValidate)) {
+        enableButton("registerButton");
+      }
+      else {
+        disableButton("registerButton");
+      }
+    };
+  }
+
+  componentWillUnMount() {
+    if(this.state.email.emailTimeout) {
+      clearTimeout(this.state.email.emailTimeout);
+    }
+    if(this.state.typingTimeout) {
+      clearTimeout(this.state.typingTimeout);
+    }
+  }
+
+  //form methods
+  handleEmail(event) {
+
+    if(this.state.typingTimeout.value) {
+      clearTimeout(this.state.typingTimeout.value);
+    }
+    if(this.state.email.emailTimeout) {
+      clearTimeout(this.state.email.emailTimeout);
+    }
+
+    if(!emailValidator(this.state.email.value)) {
       this.setState({
-        firstName: firstNameState
+        email: {
+          value: event.target.value,
+          emailTimeout: setEmailTimout(this),
+          error: {content: "Invalid Email", pointing: "below"},
+        },
+        typingTimeout: {
+          value: setTypingTimeout(this),
+        },
+        typing: {
+          value: true,
+        }
       });
     }
     else {
-      firstNameState.error = null;
       this.setState({
-        firstName: firstNameState
+        email: {
+          value: event.target.value,
+          emailTimeout: setEmailTimout(this),
+          error: null,
+        },
+        typingTimeout: {
+          value: setTypingTimeout(this),
+        },
+        typing: {
+          value: true,
+        }
+      })
+    }
+  }
+
+  handleFirstName(event) {
+    if(this.state.typingTimeout.value) {
+      clearTimeout(this.state.typingTimeout.value);
+    }
+    //validate name and length of at least one char
+    const {error, valid} = nameValidator(event.target.value);
+    if(!valid) {
+      this.setState({
+        firstName: {
+          value: event.target.value,
+          error: {content: error, pointing: "below"},
+        },
+        typingTimeout: {
+          value: setTypingTimeout(this),
+        },
+        typing: {
+          value: true,
+        }
+      });
+    }
+    else {
+      this.setState({
+        firstName: {
+          value: event.target.value,
+          error: null,
+        },
+        typingTimeout: {
+          value: setTypingTimeout(this),
+        },
+        typing: {
+          value: true,
+        }
       });
     }
   }
 
   handleLastName(event) {
-    const lastNameState = {...this.state.lastName};
-    lastNameState.value = event.target.value;
+    if(this.state.typingTimeout.value) {
+      clearTimeout(this.state.typingTimeout.value);
+    }
     //validate last name as well
-    const {error, valid} = nameValidator(lastNameState.value);
+    const {error, valid} = nameValidator(event.target.value);
     if(!valid) {
-      lastNameState.error = {content: error, pointing: "below"};
       this.setState({
-        lastName: lastNameState
+        lastName: {
+          value: event.target.value,
+          error: {content: error, pointing: "below"},
+        },
+        typingTimeout: {
+          value: setTypingTimeout(this),
+        },
+        typing: {
+          value: true,
+        }
       });
     }
     else {
-      lastNameState.error = null;
       this.setState({
-        lastName: lastNameState
+        lastName: {
+          value: event.target.value,
+          error: null
+        },
+        typingTimeout: {
+          value: setTypingTimeout(this),
+        },
+        typing: {
+          value: true,
+        }
       });
     }
   }
 
   handlePassword(event) {
-    const passwordReqs = `Password must be: At least 8 letters. One uppercase letter.One lowercase letter. And one number.`;
-    const passwordState = {...this.state.password};
-    passwordState.value = event.target.value;
+    if(this.state.typingTimeout.value) {
+      clearTimeout(this.state.typingTimeout.value);
+    }
+    if(this.state.passwordConfirm.value) {
+      matchPasswords(this, event.target.value, this.state.passwordConfirm.value);
+    };
+
+    const passwordReqs = `Password must be: At least 8 letters. One uppercase letter. One lowercase letter. And one number.`;
     //validate password length and chars
-    passwordState.error = passwordValidator([passwordState.value]) ? null : {content: passwordReqs, pointing: "below"};
+    const error = passwordValidator(event.target.value) ? null : {content: passwordReqs, pointing: "below"};
     this.setState({
-      password: passwordState
+      password: {
+        value: event.target.value,
+        error: error,
+      },
+      typingTimeout: {
+        value: setTypingTimeout(this),
+      },
+      typing: {
+        value: true,
+      }
     });
   }
 
   handlePasswordConfirm(event) {
-    const passwordConfirmState = {...this.state.passwordConfirm};
-    passwordConfirmState.value = event.target.value;
-    this.setState({
-      passwordConfirm: passwordConfirmState
-    }, () => {
-      if (this.state.password.value === this.state.passwordConfirm.value) {
-        passwordConfirmState.error = null
-        this.setState({passwordConfirm: passwordConfirmState});
-      }
-      else {
-        passwordConfirmState.error ={content: "Passwords do not match", pointing: "below"};
-        this.setState({passwordConfirm: passwordConfirmState});
-      }
-    });
+    if(this.state.typingTimeout.value) {
+      clearTimeout(this.state.typingTimeout.value);
+    }
+    if(this.state.password.value) {
+      matchPasswords(this, this.state.password.value, event.target.value);
+    };
+    
+    if (this.state.password.value !== event.target.value) {
+      this.setState({
+        passwordConfirm: {
+          value: event.target.value,
+          error: {content: "Passwords do not match", pointing: "below"},
+        },
+        typingTimeout: {
+          value: setTypingTimeout(this),
+        },
+        typing: {
+          value: true,
+        }
+      });
+    }
+    else {
+      this.setState({
+        passwordConfirm: {
+          value: event.target.value,
+          error: null,
+        },
+        typingTimeout: {
+          value: setTypingTimeout(this),
+        },
+        typing: {
+          value: true,
+        }
+      });
+    }
+  
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log(errors);
+    console.log(this.state);
   }
 
 
@@ -232,7 +401,7 @@ class RegistrationComponent extends Component {
             error={this.state.password.error}
             fluid
             label="Password"
-            type="password"
+            //type="password"
             placeholder="Password"
             onChange={ (e) => {this.handlePassword(e)} }
           />
@@ -240,11 +409,11 @@ class RegistrationComponent extends Component {
             error={this.state.passwordConfirm.error}
             fluid
             label="Confirm Password"
-            type="password"
+            //type="password"
             placeholder="Confirm Password"
             onChange={ (e) => {this.handlePasswordConfirm(e)} }
           />
-          <Button className="submitBtn" type="submit" onClick={ (e) => this.handleSubmit(e) }>Submit</Button>
+          <Button className="registerButton" type="submit" onClick={ (e) => this.handleSubmit(e) }>Submit</Button>
         </Form>
       </Container>
     )
