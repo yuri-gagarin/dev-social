@@ -8,8 +8,8 @@ import axios from "axios";
 
 
 class LoginComponent extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
       email: {
         value: null,
@@ -87,10 +87,11 @@ class LoginComponent extends Component {
     }
 
     if(!passwordValidator(event.target.value)) {
+      console.log("here");
       this.setState({
         password: {
           value: event.target.value,
-          error: {content: "Password must be: At least 8 letters. One uppercase letter. One lowercase letter. And one number.", pointing: "down"},
+          error: {content: "Password must be: At least 8 letters. One uppercase letter. One lowercase letter. And one number.",pointing: "below"},
         },
         typing: {
           value: true,
@@ -125,13 +126,15 @@ class LoginComponent extends Component {
         password: this.state.password.value,
       }
     };
+    console.log("firing");
+    console.log("login");
     axios(options)
       .then((response) => {
         console.log(response);
       })
       .catch((error) => {
         console.log(error.response);
-      })
+      });
   }
 
   render() {
@@ -152,9 +155,9 @@ class LoginComponent extends Component {
             label="Password"
             placeholder="Password"
             type="password"
-            onChange={ (e) => {this.handPassword(e)} }
+            onChange={ (e) => {this.handlePassword(e)} }
           />
-          <Button className="loginButton" onClick={ () => {this.handleLogin} }>Login</Button>
+          <Button className="loginButton" onClick={ (e) => {this.handleLogin(e)} }>Login</Button>
         </Form>
       </Container>
     );

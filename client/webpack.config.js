@@ -13,11 +13,9 @@ module.exports = {
     path: path.join(__dirname, "/dist"),
     filename: "appBundle.js"
   },
-  mode: "development",
-
   devServer: {
     contentBase: path.join(__dirname, '/src'),
-    compress: true,
+    //compress: true,
     port: 5000,
     proxy: {
       "/api" : {

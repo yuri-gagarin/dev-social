@@ -29,7 +29,7 @@ export default function(router) {
   // @desc Login User / Return JWT Token
   // @access Public
   router 
-    .route("/users/login")
+    .route("/api/users/login")
     .post(UsersController.login);
 
   // @route PATCH /users/edit/
