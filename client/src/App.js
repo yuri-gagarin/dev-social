@@ -5,6 +5,8 @@ import AuthorizationComponent from "./components/authorization/AuthorizationComp
 import {test, cancelTest} from "./actions/appAction.js";
 import {registerUserTest, registerUser} from "./actions/authActions.js";
 import homeIcon from "./assets/images/iconfinder_go-home_118770.svg";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
 
 
 let homeImg = document.getElementById("home");
@@ -49,7 +51,10 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <AuthorizationComponent />
+        <Router>
+          <Route path="/" component={WelcomeComponent} />
+          <Route path="/authorize" component={AuthorizationComponent} />
+        </Router>
         <button onClick={this.testRedux}>TEST REDUX</button>
         <button onClick={this.cancelTest}>CANCEL TEST</button>
         <button onClick={this.registerUserTest}>REGISTER TEST</button>

@@ -23,7 +23,8 @@ module.exports = {
         changeOrigin: true,
         secure: false,
       }
-    }
+    },
+    historyApiFallback: true,
   },
 
   module: {

@@ -5,6 +5,7 @@ import routes from "./routes/routes.js";
 import passport from "passport";
 import keys from  "./config/keys.js";
 import passportStrategy from "./config/passportConfig.js";
+import path from "path";
 
 const app = express();
 const router = express.Router();
@@ -18,8 +19,13 @@ mongoose
   .catch((err) => console.log(err));
 
 
-app.get("/", (req, res) => {
-  res.send("Hello There Yo");
+app.get("/*", (req, res) => {
+  if(process.env.NODE_ENV !== "production") {
+    res.sendFile(path.resolve(__dirname, "client", "src", "index.html"));
+  }
+  else {
+    res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
+  }
 });
 
 app.use(function(err, req, res, next) {
@@ -44,5 +50,6 @@ app.use(router);
 
 app.listen(PORT, () => {
   console.log(`App listening at PORT: ${PORT}`);
+  console.log(process.env.NODE_ENV);
 });
 
