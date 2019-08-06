@@ -2,10 +2,14 @@ import React, {Component} from "react";
 import {Container, Grid, GridColumn, Image } from "semantic-ui-react";
 
 import RegistrationComponent from "./RegistrationComponent.jsx";
+import LoginComponent from "./LoginComponent.jsx";
 
 class AuthorizationComponent extends Component {
   constructor(){
     super();
+    this.state = {
+
+    };
   }
 
   render() {
@@ -19,6 +23,11 @@ class AuthorizationComponent extends Component {
         <Grid centered columns={2}>
           <GridColumn>
             <RegistrationComponent />
+          </GridColumn>
+        </Grid>
+        <Grid centered columns={2}>
+          <GridColumn>
+            <LoginComponent />
           </GridColumn>
         </Grid>
       </Container>

@@ -80,8 +80,8 @@ class RegistrationComponent extends Component {
     if(this.state.email.emailTimeout) {
       clearTimeout(this.state.email.emailTimeout);
     }
-    if(this.state.typingTimeout) {
-      clearTimeout(this.state.typingTimeout);
+    if(this.state.typingTimeout.value) {
+      clearTimeout(this.state.typingTimeout.value);
     }
   }
 
@@ -312,7 +312,7 @@ class RegistrationComponent extends Component {
             error={this.state.password.error}
             fluid
             label="Password"
-            //type="password"
+            type="password"
             placeholder="Password"
             onChange={ (e) => {this.handlePassword(e)} }
           />
@@ -320,7 +320,7 @@ class RegistrationComponent extends Component {
             error={this.state.passwordConfirm.error}
             fluid
             label="Confirm Password"
-            //type="password"
+            type="password"
             placeholder="Confirm Password"
             onChange={ (e) => {this.handlePasswordConfirm(e)} }
           />

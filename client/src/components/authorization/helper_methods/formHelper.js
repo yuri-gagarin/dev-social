@@ -123,7 +123,9 @@ export const checkForFormCompletion = (self, keys) => {
   const currentState = self.state;
 
   if (currentState.typing.value) return false;
-  if (!currentState.emailAvailable.value) return false;
+  if(currentState.emailAvailable) {
+    if (!currentState.emailAvailable.value) return false;
+  }
 
   for (let i = 0; i < keys.length; i++) {
     if (!currentState[keys[i]].value) { return false };
