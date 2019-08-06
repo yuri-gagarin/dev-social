@@ -4,122 +4,20 @@ import style from "../../assets/stylesheets/authorization/registration.scss";
 import emailValidator from "../../helpers/emailValidator.js";
 import nameValidator from "../../helpers/nameValidator.js";
 import passwordValidator from "../../helpers/passwordValidator.js";
-import authHelper from "../../helpers/authHelper.js";
+import axios from "axios";
+import {setTypingTimeout, setEmailTimeout, checkTyping,
+        matchPasswords, checkForFormCompletion, 
+        disableButton, enableButton } from "./helper_methods/formHelper.js";
 
-
-const setTypingTimeout = (self) => {
-  return setTimeout(() => {
-    self.setState({
-      typing: {
-        value: false
-      }
-    })
-  }, 4000);
-};
-
-const setEmailTimout = (self) => {
-  return setTimeout(() => {
-    const {value, error} = self.state.email;
-    if (value && !error) {
-      authHelper(value)
-        .then((response) => {
-          if(!response.data.available) {
-            self.setState({
-              email: {
-                value: value,
-                error: {content: response.data.message, pointing: "below"}
-              },
-              emailAvailable: {
-                value: false
-              }
-            });
-          }
-          else {
-            self.setState({
-              email: {
-                value: value,
-                error: null
-              },
-              emailAvailable: {
-                value: true
-              }
-            });
-          }
-        })
-        .catch((error) => {
-          console.log(error.response);
-          self.setState({
-            email: {
-              value: value,
-              error: {content: `${error.response.statusText}: Unable to verify Email`}
-            },
-            emailAvailable: {
-              value: false
-            }
-          });
-        });
+const registerUser = (userInfo) => {
+  const options = {
+    method: "POST",
+    url: "/api/users/register",
+    data: {
+      ...userInfo
     }
-    else {
-      //email not valid - not sent to the server to check
-      return;
-    }
-  }, 3000)
-};
-
-const matchPasswords = (self, password1, password2) => {
-  if(password1 && password2) {
-    console.log("matching")
-    console.log(`${password1} --- ${password2}`)
-    if(password1 !== password2) {
-      self.setState({
-        passwordConfirm: {
-          value: password2,
-          error: {content: "Passwords don't match",  pointing: "below"},
-        }
-      });
-    }
-    else {
-      self.setState({
-        passwordConfirm: {
-          value: password2,
-          error: null,
-        }
-      });
-    }
-  }
-};
-
-const checkTyping = (self) => {
-  if (self.state.typing.value === true) {
-    return true;
-  }
-  else {
-    return false;
-  }
-};
-
-const checkForFormCompletion = (self, keys) => {
-  const currentState = self.state;
-
-  if (currentState.typing.value) return false;
-  if (!currentState.emailAvailable.value) return false;
-
-  for (let i = 0; i < keys.length; i++) {
-    if (!currentState[keys[i]].value) {console.log(`${keys[i]}: needs a value`); return false};
-    if (currentState[keys[i]].error) {console.log(`${keys[i]} has error: ${keys[i].error}` ); return false};
-    if (currentState[keys[i]].value && currentState[keys[i]].error) {console.log(`Error: ${keys[i].error}`); return false};
-  }
-  return true;
-};
-
-
-const disableButton = (className, state) => {
-  let btn = document.getElementsByClassName(className)[0];
-  btn.classList.add("disabled");
-};
-const enableButton = (className, state) => {
-  let btn = document.getElementsByClassName(className)[0];
-  btn.classList.remove("disabled");
+  };
+  return axios(options);
 };
 
 
@@ -201,7 +99,7 @@ class RegistrationComponent extends Component {
       this.setState({
         email: {
           value: event.target.value,
-          emailTimeout: setEmailTimout(this),
+          emailTimeout: setEmailTimeout(this, 2000),
           error: {content: "Invalid Email", pointing: "below"},
         },
         typingTimeout: {
@@ -216,7 +114,7 @@ class RegistrationComponent extends Component {
       this.setState({
         email: {
           value: event.target.value,
-          emailTimeout: setEmailTimout(this),
+          emailTimeout: setEmailTimeout(this, 2000),
           error: null,
         },
         typingTimeout: {
@@ -362,12 +260,25 @@ class RegistrationComponent extends Component {
         }
       });
     }
-  
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log(this.state);
+    const newUserInfo = {
+      name: this.state.firstName.value,
+      lastName: this.state.lastName.value,
+      email: this.state.email.value,
+      password: this.state.password.value,
+      passwordConfirm: this.state.passwordConfirm.value,
+    };
+    
+    registerUser(newUserInfo)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error.response);
+      })
   }
 
 
