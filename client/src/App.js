@@ -1,16 +1,25 @@
 import React from "react";
 import {connect} from "react-redux";
-import SplashPage from "./components/SplashPage.jsx";
 import AuthorizationComponent from "./components/authorization/AuthorizationComponent.jsx";
 import {test, cancelTest} from "./actions/appAction.js";
 import {registerUserTest, registerUser} from "./actions/authActions.js";
 import homeIcon from "./assets/images/iconfinder_go-home_118770.svg";
 import { BrowserRouter as Router, Route } from "react-router-dom";
+import NavBar from "./components/navbar/Navbar.jsx";
 import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
 
 
-let homeImg = document.getElementById("home");
-homeImg.src = homeIcon;
+//let homeImg = document.getElementById("home");
+//homeImg.src = homeIcon;
+
+const leftNav = [
+  {as: "a", content: "Home", key: "home", onClick: () => console.log(this) },
+  {as: "a", content: "Users", key: "users", onClick: () => console.log(this) },
+];
+const rightNav = [
+  {as: "a", content: "Login", key: "login", onClick: () => console.log(this) },
+  {as: "a", content: "Register", key: "register", onClick: () => console.log(this) },
+];
 
 
 class App extends React.Component {
@@ -51,6 +60,10 @@ class App extends React.Component {
   render() {
     return (
       <div>
+        <NavBar
+          leftItems = {leftNav}
+          rightItems = {rightNav}
+        />
         <Router>
           <Route exact path="/" component={WelcomeComponent} />
           <Route path="/authorize" component={AuthorizationComponent} />

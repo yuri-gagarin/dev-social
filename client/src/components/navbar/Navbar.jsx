@@ -9,14 +9,20 @@ const NavBarMobile = ({ children, leftItems, rightItems, onPusherClick, onToggle
         animation="overlay"
         icon="labeled"
         inverted
-        items={leftItems}
         vertical
         visible={visible}
-      />
+        style={{width: "50vw"}}
+      >
+      <Menu.Item as='a' onClick={onToggle}>
+        <Icon name='arrow left'/>
+        Back
+      </Menu.Item>
+      </Sidebar>
       <Sidebar.Pusher
         dimmed={visible}
         onClick={onPusherClick}
-        style={{minHeight: "100vh", width: "50vw"}}>
+        style={{minHeight: "100vh", width: "100vw"}}
+        >
           <Menu fixed="top" inverted>
             <Menu.Item>
               <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
