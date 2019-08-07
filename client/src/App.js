@@ -52,7 +52,7 @@ class App extends React.Component {
     return (
       <div>
         <Router>
-          <Route path="/" component={WelcomeComponent} />
+          <Route exact path="/" component={WelcomeComponent} />
           <Route path="/authorize" component={AuthorizationComponent} />
         </Router>
         <button onClick={this.testRedux}>TEST REDUX</button>
