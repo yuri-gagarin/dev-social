@@ -3,10 +3,10 @@ import {connect} from "react-redux";
 import AuthorizationComponent from "./components/authorization/AuthorizationComponent.jsx";
 import {test, cancelTest} from "./actions/appAction.js";
 import {registerUserTest, registerUser} from "./actions/authActions.js";
-import homeIcon from "./assets/images/iconfinder_go-home_118770.svg";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import NavBar from "./components/navbar/Navbar.jsx";
+import Navbar from "./components/navbar/Navbar.jsx";
 import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
+import { Container, Responsive, Segment } from "semantic-ui-react";
 
 
 //let homeImg = document.getElementById("home");
@@ -59,20 +59,33 @@ class App extends React.Component {
   }
   render() {
     return (
-      <div>
-        <NavBar
-          leftItems = {leftNav}
-          rightItems = {rightNav}
-        />
-        <Router>
-          <Route exact path="/" component={WelcomeComponent} />
-          <Route path="/authorize" component={AuthorizationComponent} />
-        </Router>
-        <button onClick={this.testRedux}>TEST REDUX</button>
-        <button onClick={this.cancelTest}>CANCEL TEST</button>
-        <button onClick={this.registerUserTest}>REGISTER TEST</button>
-        <button onClick={this.registerUser}>REGISTER USER</button>
-      </div>
+      <Navbar
+        leftItems = {leftNav}
+        rightItems = {rightNav}
+        children = {
+          <div>
+            <Responsive maxWidth={768}>
+              <Segment inverted>
+                Visible only if display is <code>768px</code> and lower
+              </Segment>
+            </Responsive>
+            <Responsive minWidth={769}>
+              <Segment>
+                Visivle only if display is <code>769px</code> and higher
+              </Segment>
+            </Responsive>
+            <Router>
+              <Route exact path="/" component={WelcomeComponent} />
+              <Route path="/authorize" component={AuthorizationComponent} />
+            </Router>
+            <button onClick={this.testRedux}>TEST REDUX</button>
+            <button onClick={this.cancelTest}>CANCEL TEST</button>
+            <button onClick={this.registerUserTest}>REGISTER TEST</button>
+            <button onClick={this.registerUser}>REGISTER USER</button>
+          </div>
+        }
+      >
+      </Navbar>
     );
   }
 }

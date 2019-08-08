@@ -1,7 +1,17 @@
 import React, {Component} from "react";
 import {Container, Icon, Image, Sidebar, Responsive, Menu} from "semantic-ui-react";
 
-const NavBarMobile = ({ children, leftItems, rightItems, onPusherClick, onToggle, visible }) => {
+const leftItems = [
+  { as: "a", content: "Home", key: "home", onClick: "" },
+  { as: "a", content: "Users", key: "users" }
+];
+const rightItems = [
+  { as: "a", content: "Login", key: "login" },
+  { as: "a", content: "Register", key: "register" }
+];
+
+
+const NavbarMobile = ({ children, leftItems, rightItems, onPusherClick, onToggle, visible }) => {
   return (
     <Sidebar.Pushable>
       <Sidebar
@@ -11,17 +21,19 @@ const NavBarMobile = ({ children, leftItems, rightItems, onPusherClick, onToggle
         inverted
         vertical
         visible={visible}
-        style={{width: "50vw"}}
+        style={{width: "50vw", height: "100vh"}}
       >
       <Menu.Item as='a' onClick={onToggle}>
         <Icon name='arrow left'/>
         Back
       </Menu.Item>
+      { leftItems.map((item) => <Menu.Item {...item}></Menu.Item>) }
       </Sidebar>
+
       <Sidebar.Pusher
         dimmed={visible}
         onClick={onPusherClick}
-        style={{minHeight: "100vh", width: "100vw"}}
+        style={ {height: "100vh"} }
         >
           <Menu fixed="top" inverted>
             <Menu.Item>
@@ -36,45 +48,80 @@ const NavBarMobile = ({ children, leftItems, rightItems, onPusherClick, onToggle
           </Menu>
         {children}
       </Sidebar.Pusher>
+
     </Sidebar.Pushable>
   );
 };
 
-const NavBarDesktop = ({ leftItems, rightItems }) => {
-  return(
-    <Menu fixed="top" inverted>
-      <Menu.Item>
-        <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
-      </Menu.Item>
-      {leftItems.map((item) => <Menu.Item {...item} /> )}
-      <Menu.Menu position="right">
-        {rightItems.map((item) => <Menu.Item {...item} /> )}
-      </Menu.Menu>
-    </Menu>
+
+const NavbarTablet = ({children, leftItems, rightItems, onPusherClick, onLeftToggle, onLeftExpandToggle, onAuthToggle}) => {
+  return (
+    <Sidebar.Pushable>
+      <Sidebar.Pusher>
+        <Menu fixed="top" inverted>
+          <Menu.Item>
+            <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
+          </Menu.Item>
+            { leftItems.map((item) => <Menu.Item {...item} />) }
+          <Menu.Menu position="right">
+            { rightItems.map((item) => <Menu.Item {...item} />) }
+          </Menu.Menu>
+        </Menu>
+        {children}
+      </Sidebar.Pusher>
+      {children}
+    </Sidebar.Pushable>
+  );
+}
+
+const NavbarDesktop = ({ leftItems, rightItems, children }) => {
+  return (
+    <Sidebar.Pushable>
+      <Sidebar.Pusher>
+        <Menu fixed="top" inverted>
+          <Menu.Item>
+            <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
+          </Menu.Item>
+            { leftItems.map((item) => <Menu.Item {...item} />) }
+          <Menu.Menu position="right">
+            { rightItems.map((item) => <Menu.Item {...item} />) }
+          </Menu.Menu>
+        </Menu>
+        {children}
+      </Sidebar.Pusher>
+    </Sidebar.Pushable>
   );
 };
 
-const NavBarChildren = ({ children }) => {
+
+
+const NavbarChildren = ({ children }) => {
   return (
     <Container style={{marginTop: "5em"}}>
       {children}
     </Container>
   );
-}
+};
+
+/*
+/ We will have three different Navbars here depends on size of the screen
+/ {NavbarHandheld} for most cell phones 
+/ {NavbarTablet} for most tablets
+/ {NavbarDescktop} for most desktops
+*/
 
 class Navbar extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       visible: false,
     };
   }
-  handlePusher() {
+  handlePusher = () => {
     const {visible} = this.state;
     if (visible) { this.setState({visible: false}) };
   }
-  handletoggle() {
+  handletoggle = () => {
     this.setState({
       visible: !this.state.visible,
     });
@@ -86,20 +133,37 @@ class Navbar extends Component {
 
     return (
       <div>
-        <Responsive {...Responsive.onlyMobile}>
-          <NavBarMobile
+        <Responsive maxWidth={0} maxWidth={768}>
+          <NavbarMobile
             leftItems={leftItems}
             rightItems={rightItems}
-            onPusherClick={ () => {this.handlePusher()} }
-            onToggle={ () => {this.handletoggle()} }
+            onPusherClick={this.handlePusher} 
+            onToggle={this.handletoggle}
             visible={visible}
           >
-            <NavBarChildren>{children}</NavBarChildren>
-          </NavBarMobile>
+            <NavbarChildren>{children}</NavbarChildren>
+          </NavbarMobile>
         </Responsive>
-        <Responsive minWidth={Responsive.onlyTablet.minWidth}>
-          <NavBarDesktop leftItems={leftItems} rightItems={rightItems} />
-          <NavBarChildren>{children}</NavBarChildren>
+
+        <Responsive minWidth={769} maxWidth={1024}>
+          <NavbarTablet
+            leftItems={leftItems}
+            rightItems={rightItems}
+            onPusherClick={this.handlePusher}
+            onToggle={this.handleToggle}
+            visible={visible}
+          >
+          <NavbarChildren>{children}</NavbarChildren>
+          </NavbarTablet>
+
+        </Responsive>
+        <Responsive minWidth={1025}>
+          <NavbarDesktop 
+            leftItems={leftItems} 
+            rightItems={rightItems} 
+          >
+          <NavbarChildren>{children}</NavbarChildren>
+          </NavbarDesktop>
         </Responsive>
       </div>
     );
