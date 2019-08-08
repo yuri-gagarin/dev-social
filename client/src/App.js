@@ -14,7 +14,10 @@ import { Container, Responsive, Segment } from "semantic-ui-react";
 
 const leftNav = [
   {as: "a", content: "Home", key: "home", onClick: () => console.log(this) },
-  {as: "a", content: "Users", key: "users", onClick: () => console.log(this) },
+  {as: "a", content: "News", key: "news", onClick: () => console.log(this) },
+  {as: "a", content: "Topics", key: "topics" },
+  {as: "a", content: "Posts", key: "posts" },
+  {as: "a", content: "Users", key: "users"},
 ];
 const rightNav = [
   {as: "a", content: "Login", key: "login", onClick: () => console.log(this) },

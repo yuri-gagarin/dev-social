@@ -1,98 +1,9 @@
 import React, {Component} from "react";
-import {Container, Icon, Image, Sidebar, Responsive, Menu} from "semantic-ui-react";
+import {Container, Responsive} from "semantic-ui-react";
 
-const leftItems = [
-  { as: "a", content: "Home", key: "home", onClick: "" },
-  { as: "a", content: "Users", key: "users" }
-];
-const rightItems = [
-  { as: "a", content: "Login", key: "login" },
-  { as: "a", content: "Register", key: "register" }
-];
-
-
-const NavbarMobile = ({ children, leftItems, rightItems, onPusherClick, onToggle, visible }) => {
-  return (
-    <Sidebar.Pushable>
-      <Sidebar
-        as={Menu}
-        animation="overlay"
-        icon="labeled"
-        inverted
-        vertical
-        visible={visible}
-        style={{width: "50vw", height: "100vh"}}
-      >
-      <Menu.Item as='a' onClick={onToggle}>
-        <Icon name='arrow left'/>
-        Back
-      </Menu.Item>
-      { leftItems.map((item) => <Menu.Item {...item}></Menu.Item>) }
-      </Sidebar>
-
-      <Sidebar.Pusher
-        dimmed={visible}
-        onClick={onPusherClick}
-        style={ {height: "100vh"} }
-        >
-          <Menu fixed="top" inverted>
-            <Menu.Item>
-              <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
-            </Menu.Item>
-            <Menu.Item onClick={onToggle}>
-              <Icon name="sidebar" />
-            </Menu.Item>
-            <Menu.Menu position="right">
-              {rightItems.map((item) => <Menu.Item {...item} /> )}
-            </Menu.Menu>
-          </Menu>
-        {children}
-      </Sidebar.Pusher>
-
-    </Sidebar.Pushable>
-  );
-};
-
-
-const NavbarTablet = ({children, leftItems, rightItems, onPusherClick, onLeftToggle, onLeftExpandToggle, onAuthToggle}) => {
-  return (
-    <Sidebar.Pushable>
-      <Sidebar.Pusher>
-        <Menu fixed="top" inverted>
-          <Menu.Item>
-            <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
-          </Menu.Item>
-            { leftItems.map((item) => <Menu.Item {...item} />) }
-          <Menu.Menu position="right">
-            { rightItems.map((item) => <Menu.Item {...item} />) }
-          </Menu.Menu>
-        </Menu>
-        {children}
-      </Sidebar.Pusher>
-      {children}
-    </Sidebar.Pushable>
-  );
-}
-
-const NavbarDesktop = ({ leftItems, rightItems, children }) => {
-  return (
-    <Sidebar.Pushable>
-      <Sidebar.Pusher>
-        <Menu fixed="top" inverted>
-          <Menu.Item>
-            <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
-          </Menu.Item>
-            { leftItems.map((item) => <Menu.Item {...item} />) }
-          <Menu.Menu position="right">
-            { rightItems.map((item) => <Menu.Item {...item} />) }
-          </Menu.Menu>
-        </Menu>
-        {children}
-      </Sidebar.Pusher>
-    </Sidebar.Pushable>
-  );
-};
-
+import NavbarHandheld from "./handheld/NavbarHandheld.jsx";
+import NavbarTablet from "./tablet/NavbarTablet.jsx";
+import NavbarDesktop from "./desktop/NavbarDesktop.jsx";
 
 
 const NavbarChildren = ({ children }) => {
@@ -115,6 +26,7 @@ class Navbar extends Component {
     super(props);
     this.state = {
       visible: false,
+      leftVisible: false,
     };
   }
   handlePusher = () => {
@@ -126,23 +38,39 @@ class Navbar extends Component {
       visible: !this.state.visible,
     });
   }
+  onLeftToggle = () => {
+    this.setState({
+      leftVisible: !this.state.leftVisible,
+      visible: false,
+    }, () => {
+      console.log("toggling left sidebar")
+      console.log(this.state);
+    });
+  } 
+  onInnerLeftHandheldToggle = () => {
+    this.setState({
+      leftInnerVisible: !this.state.leftItems
+    });
+  }
 
   render() {
     const {children, leftItems, rightItems} = this.props;
-    const {visible} = this.state;
+    const {visible, leftVisible} = this.state;
 
     return (
       <div>
         <Responsive maxWidth={0} maxWidth={768}>
-          <NavbarMobile
+          <NavbarHandheld
             leftItems={leftItems}
             rightItems={rightItems}
             onPusherClick={this.handlePusher} 
             onToggle={this.handletoggle}
+            onLeftToggle={this.onLeftToggle}
             visible={visible}
+            leftVisible={leftVisible}
           >
             <NavbarChildren>{children}</NavbarChildren>
-          </NavbarMobile>
+          </NavbarHandheld>
         </Responsive>
 
         <Responsive minWidth={769} maxWidth={1024}>
