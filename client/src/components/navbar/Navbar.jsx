@@ -27,6 +27,8 @@ class Navbar extends Component {
     this.state = {
       visible: false,
       leftVisible: false,
+      leftInnerVisible: false,
+      leftInnerToOpen: null,
     };
   }
   handlePusher = () => {
@@ -38,6 +40,7 @@ class Navbar extends Component {
       visible: !this.state.visible,
     });
   }
+  //handheld methods
   onLeftToggle = () => {
     this.setState({
       leftVisible: !this.state.leftVisible,
@@ -47,15 +50,19 @@ class Navbar extends Component {
       console.log(this.state);
     });
   } 
-  onInnerLeftHandheldToggle = () => {
+  onLeftSubcategoryHandheldToggle = (data) => {
     this.setState({
-      leftInnerVisible: !this.state.leftItems
+      leftInnerVisible: !this.state.leftInnerVisible,
+      leftInnerToOpen: data.content || null
+    }, () => {
+      console.log(this.state);
     });
   }
+  // end handheld methods
 
   render() {
     const {children, leftItems, rightItems} = this.props;
-    const {visible, leftVisible} = this.state;
+    const {visible, leftVisible, leftInnerVisible, leftInnerToOpen} = this.state;
 
     return (
       <div>
@@ -66,8 +73,11 @@ class Navbar extends Component {
             onPusherClick={this.handlePusher} 
             onToggle={this.handletoggle}
             onLeftToggle={this.onLeftToggle}
+            onLeftSubcategoryToggle={this.onLeftSubcategoryHandheldToggle}
             visible={visible}
             leftVisible={leftVisible}
+            leftInnerVisible={leftInnerVisible}
+            leftInnerToOpen={leftInnerToOpen}
           >
             <NavbarChildren>{children}</NavbarChildren>
           </NavbarHandheld>

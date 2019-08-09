@@ -13,8 +13,7 @@ import { Container, Responsive, Segment } from "semantic-ui-react";
 //homeImg.src = homeIcon;
 
 const leftNav = [
-  {as: "a", content: "Home", key: "home", onClick: () => console.log(this) },
-  {as: "a", content: "News", key: "news", onClick: () => console.log(this) },
+  {as: "a", content: "News", key: "news",},
   {as: "a", content: "Topics", key: "topics" },
   {as: "a", content: "Posts", key: "posts" },
   {as: "a", content: "Users", key: "users"},
