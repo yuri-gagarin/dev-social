@@ -25,15 +25,16 @@ class Navbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: false,
-      leftVisible: false,
-      leftInnerVisible: false,
-      leftInnerToOpen: null,
+      pusherVisible: false,
+      mainVisible: false,
+      innerMainVisible: false,
+      innerMainToOpen: null,
+      authVisible: false
     };
   }
-  handlePusher = () => {
-    const {visible} = this.state;
-    if (visible) { this.setState({visible: false}) };
+  onPusherClick = () => {
+    const {pusherVisible} = this.state;
+    if (pusherVisible) { this.setState({pusherVisible: false}) };
   }
   handletoggle = () => {
     this.setState({
@@ -43,26 +44,32 @@ class Navbar extends Component {
   //handheld methods
   onLeftToggle = () => {
     this.setState({
-      leftVisible: !this.state.leftVisible,
+      mainVisible: !this.state.mainVisible,
+      pusherVisible: !this.state.pusherVisible,
       visible: false,
-    }, () => {
-      console.log("toggling left sidebar")
-      console.log(this.state);
     });
   } 
   onLeftSubcategoryHandheldToggle = (data) => {
     this.setState({
-      leftInnerVisible: !this.state.leftInnerVisible,
-      leftInnerToOpen: data.content || null
+      innerMainVisible: !this.state.innerMainVisible,
+      innerMainToOpen: data.content || null
     }, () => {
       console.log(this.state);
     });
   }
   // end handheld methods
 
+  //tablet methods
+
+  //end tablet methods
+
+  //desktop methods
+
+  //end desktop methods
+
   render() {
     const {children, leftItems, rightItems} = this.props;
-    const {visible, leftVisible, leftInnerVisible, leftInnerToOpen} = this.state;
+    const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, authVisible} = this.state;
 
     return (
       <div>
@@ -70,14 +77,15 @@ class Navbar extends Component {
           <NavbarHandheld
             leftItems={leftItems}
             rightItems={rightItems}
-            onPusherClick={this.handlePusher} 
+            onPusherClick={this.onPusherClick} 
             onToggle={this.handletoggle}
             onLeftToggle={this.onLeftToggle}
             onLeftSubcategoryToggle={this.onLeftSubcategoryHandheldToggle}
-            visible={visible}
-            leftVisible={leftVisible}
-            leftInnerVisible={leftInnerVisible}
-            leftInnerToOpen={leftInnerToOpen}
+            pusherVisible={pusherVisible}
+            leftVisible={mainVisible}
+            leftInnerVisible={innerMainVisible}
+            leftInnerToOpen={innerMainToOpen}
+            rightVisible={authVisible}
           >
             <NavbarChildren>{children}</NavbarChildren>
           </NavbarHandheld>
@@ -89,7 +97,7 @@ class Navbar extends Component {
             rightItems={rightItems}
             onPusherClick={this.handlePusher}
             onToggle={this.handleToggle}
-            visible={visible}
+            pusherVisible={pusherVisible}
           >
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarTablet>

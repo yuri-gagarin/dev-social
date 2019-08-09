@@ -70,12 +70,12 @@ const NavbarHandheld = (
     onLeftToggle,
     onLeftSubcategoryToggle,
     leftInnerToOpen, 
-    visible,
+    pusherVisible,
     leftVisible,
     leftInnerVisible,
+    rightVisible,
   }
   ) => {
-  console.log(leftInnerItems);
   return (
     <Sidebar.Pushable>
       <Sidebar
@@ -123,8 +123,31 @@ const NavbarHandheld = (
         
       </Sidebar>
 
+      <Sidebar 
+        as={Menu}
+        animation="overlay"
+        icon="labeled"
+        inverted
+        vertical
+        visible={rightVisible}
+        style={ {width: "100vw", hegiht: "100vw"}} >
+        
+        <Menu.Item onClick={onRightToggle}>
+          <Icon name="arrow -right"></Icon>
+          <h4>Back</h4>
+        </Menu.Item>
+        <Menu.Item>
+          <Icon name="user outline"></Icon>
+          <h4>Login</h4>
+        </Menu.Item>
+        <Menu.Item>
+        <Icon name="wpforms"></Icon>
+          <h4>Register</h4>
+        </Menu.Item>
+      </Sidebar>
+
       <Sidebar.Pusher
-        dimmed={visible}
+        dimmed={pusherVisible}
         onClick={onPusherClick}
         style={ {height: "100vh"} }
         >
