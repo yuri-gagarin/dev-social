@@ -1,6 +1,9 @@
 import React, {Component} from "react";
 import {Container, Icon, Image, Sidebar, Responsive, Menu, Divider} from "semantic-ui-react";
 
+import LoginComponent from "../../authorization/LoginComponent.jsx"
+import RegistrationComponent from  "../../authorization/RegistrationComponent.jsx"
+
  /**
   * Filters the options for left inner sidebar on handheld
   * @param
@@ -8,7 +11,6 @@ import {Container, Icon, Image, Sidebar, Responsive, Menu, Divider} from "semant
   * @returns
   */
 const getInnerSidebarOptions = (leftInnerSidebarData, target) => {
-  console.log("firing");
   const testString = target ? target.toLowerCase() : null;
   if(testString) {
     for (let key in leftInnerSidebarData) {
@@ -21,6 +23,35 @@ const getInnerSidebarOptions = (leftInnerSidebarData, target) => {
     return [];
   }
 };
+const leftMenuOption = ({...props}) => {
+  const {type, toggle} = props;
+  console.log(props)
+  if(type === "login") {
+    return (
+      <div>
+        <Menu.Item onClick={props.toggle}>
+          <Icon name="arrow right">
+            <h3>Back</h3>
+          </Icon>
+        </Menu.Item>
+        <LoginComponent />
+      </div>
+    );
+  }
+  else if (type == "register") {
+    return (
+      <div>
+        <Menu.Item onClick={props.toggle}>
+          <Icon name="arrow right">
+            <h3>Back</h3>
+          </Icon>
+        </Menu.Item>
+        <RegistrationComponent />
+      </div>
+    );
+  }
+};
+
 const innerLeftSidebarOptions = {
   news: [
     { as: "a", content: "Newest", key: "newest"},
@@ -63,10 +94,8 @@ const NavbarHandheld = (
   { 
     children, 
     leftItems, 
-    leftInnerItems, 
     rightItems, 
     onPusherClick, 
-    onToggle,
     onLeftToggle,
     onLeftSubcategoryToggle,
     leftInnerToOpen, 
@@ -74,8 +103,11 @@ const NavbarHandheld = (
     leftVisible,
     leftInnerVisible,
     rightVisible,
+    onRightToggle,
+    authType,
   }
   ) => {
+
   return (
     <Sidebar.Pushable>
       <Sidebar
@@ -94,7 +126,8 @@ const NavbarHandheld = (
         {leftItems.map((item) => {
           return (
             <Menu.Item {...item} 
-              onClick={onLeftSubcategoryToggle.bind(this, item)} > 
+              value={item.content}
+              onClick={onLeftSubcategoryToggle} > 
             </Menu.Item>
             );
           })
@@ -127,23 +160,12 @@ const NavbarHandheld = (
         as={Menu}
         animation="overlay"
         icon="labeled"
-        inverted
         vertical
+        direction="right"
         visible={rightVisible}
-        style={ {width: "100vw", hegiht: "100vw"}} >
+        style={ {width: "100vw", height: "100vw"}} >
         
-        <Menu.Item onClick={onRightToggle}>
-          <Icon name="arrow -right"></Icon>
-          <h4>Back</h4>
-        </Menu.Item>
-        <Menu.Item>
-          <Icon name="user outline"></Icon>
-          <h4>Login</h4>
-        </Menu.Item>
-        <Menu.Item>
-        <Icon name="wpforms"></Icon>
-          <h4>Register</h4>
-        </Menu.Item>
+        {leftMenuOption({type: authType, toggle: onRightToggle})}
       </Sidebar>
 
       <Sidebar.Pusher
@@ -155,11 +177,12 @@ const NavbarHandheld = (
             <Menu.Item>
               <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
             </Menu.Item>
-            <Menu.Item onClick={onLeftToggle}>
+            <Menu.Item onClick={onLeftToggle} as={"a"}>
               <Icon name="sidebar" />
+                Menu
             </Menu.Item>
             <Menu.Menu position="right">
-              {rightItems.map((item) => <Menu.Item {...item} /> )}
+              {rightItems.map((item) => <Menu.Item {...item}  onClick={onRightToggle} value={item.content}/> )}
             </Menu.Menu>
           </Menu>
         {children}

@@ -29,7 +29,8 @@ class Navbar extends Component {
       mainVisible: false,
       innerMainVisible: false,
       innerMainToOpen: null,
-      authVisible: false
+      authVisible: false,
+      authType: null,
     };
   }
   onPusherClick = () => {
@@ -48,13 +49,25 @@ class Navbar extends Component {
       pusherVisible: !this.state.pusherVisible,
       visible: false,
     });
-  } 
-  onLeftSubcategoryHandheldToggle = (data) => {
+  }
+  onLeftSubcategoryHandheldToggle = (event) => {
+    let toOpen = event.target.getAttribute("value");
+    if(toOpen) toOpen = toOpen.toLowerCase();
+    console.log(toOpen)
+
     this.setState({
       innerMainVisible: !this.state.innerMainVisible,
-      innerMainToOpen: data.content || null
-    }, () => {
-      console.log(this.state);
+      innerMainToOpen: toOpen || null
+    });
+  }
+  onRightToggle = (event) => {
+    let authType = event.target.getAttribute("value");
+    if(authType) authType = authType.toLowerCase();
+    console.log(authType);
+
+    this.setState({
+      authVisible: !this.state.authVisible,
+      authType: authType
     });
   }
   // end handheld methods
@@ -69,7 +82,7 @@ class Navbar extends Component {
 
   render() {
     const {children, leftItems, rightItems} = this.props;
-    const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, authVisible} = this.state;
+    const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, authVisible, authType} = this.state;
 
     return (
       <div>
@@ -77,15 +90,19 @@ class Navbar extends Component {
           <NavbarHandheld
             leftItems={leftItems}
             rightItems={rightItems}
+
             onPusherClick={this.onPusherClick} 
-            onToggle={this.handletoggle}
             onLeftToggle={this.onLeftToggle}
             onLeftSubcategoryToggle={this.onLeftSubcategoryHandheldToggle}
+            onRightToggle={this.onRightToggle}
+
             pusherVisible={pusherVisible}
             leftVisible={mainVisible}
             leftInnerVisible={innerMainVisible}
             leftInnerToOpen={innerMainToOpen}
             rightVisible={authVisible}
+            authType={authType}
+      
           >
             <NavbarChildren>{children}</NavbarChildren>
           </NavbarHandheld>
