@@ -4,51 +4,50 @@ import {Container, Icon, Image, Sidebar, Responsive, Menu, Divider} from "semant
 import LoginComponent from "../../authorization/LoginComponent.jsx"
 import RegistrationComponent from  "../../authorization/RegistrationComponent.jsx"
 
+import getInnerSidebarOptions from "../helpers/getInnerSidebarOptions.js";
+
  /**
   * Filters the options for left inner sidebar on handheld
   * @param
   * @param
   * @returns
   */
-const getInnerSidebarOptions = (leftInnerSidebarData, target) => {
-  const testString = target ? target.toLowerCase() : null;
-  if(testString) {
-    for (let key in leftInnerSidebarData) {
-      if (key === testString) {
-        return leftInnerSidebarData[key];
-      }
-    }
-  }
-  else {
-    return [];
-  }
-};
+
 const leftMenuOption = ({...props}) => {
   const {type, toggle} = props;
-  console.log(props)
+  //console.log(props)
   if(type === "login") {
     return (
       <div>
         <Menu.Item onClick={props.toggle}>
-          <Icon name="arrow right">
-            <h3>Back</h3>
-          </Icon>
+          <Icon name="arrow right"></Icon>
+          <h3>Back</h3>
         </Menu.Item>
         <LoginComponent />
       </div>
     );
   }
-  else if (type == "register") {
+  else if (type === "register") {
     return (
       <div>
         <Menu.Item onClick={props.toggle}>
-          <Icon name="arrow right">
-            <h3>Back</h3>
-          </Icon>
+          <Icon name="arrow right"></Icon>
+          <h3>Back</h3>
         </Menu.Item>
         <RegistrationComponent />
       </div>
     );
+  }
+  else if (type === "my-account") {
+    return(
+      <div>
+        <Menu.Item onClick={props.toggle}>
+          <Icon name="cancel">
+      
+          </Icon>
+        </Menu.Item>
+      </div>
+    )
   }
 };
 
@@ -107,7 +106,7 @@ const NavbarHandheld = (
     authType,
   }
   ) => {
-
+    console.log(children)
   return (
     <Sidebar.Pushable>
       <Sidebar
@@ -119,9 +118,12 @@ const NavbarHandheld = (
         visible={leftVisible}
         style={ {width: "100vw", height: "100vh"} }>
 
-        <Menu.Item  onClick={onLeftToggle}>
-          <Icon name="arrow left"></Icon>
-          <h4>Back</h4>
+        <Menu.Item  
+          as="a"
+          onClick={onLeftToggle} 
+          value={"main-back"}>
+            <Icon name="arrow left"></Icon>
+            <h4>Back</h4>
         </Menu.Item>
         {leftItems.map((item) => {
           return (
@@ -177,7 +179,7 @@ const NavbarHandheld = (
             <Menu.Item>
               <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
             </Menu.Item>
-            <Menu.Item onClick={onLeftToggle} as={"a"}>
+            <Menu.Item onClick={onLeftToggle} as={"a"} value={"main-toggle"}>
               <Icon name="sidebar" />
                 Menu
             </Menu.Item>
@@ -186,8 +188,10 @@ const NavbarHandheld = (
             </Menu.Menu>
           </Menu>
         {children}
+        <Container>
+          <h1>Some Conent here</h1>
+        </Container>
       </Sidebar.Pusher>
-
     </Sidebar.Pushable>
   );
 };

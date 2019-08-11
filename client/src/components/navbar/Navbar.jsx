@@ -14,6 +14,42 @@ const NavbarChildren = ({ children }) => {
   );
 };
 
+//these should be dynamic based on user status and login
+const innerLeftSidebarOptions = {
+  news: [
+    { as: "a", content: "Newest", key: "newest"},
+    { as: "a", content: "Popular", key: "popular"},
+    { as: "a", content: "Controversial", key: "controversial"},
+    { divider: "-", key: "handheldNavPostDivider"},
+    { as: "a", content: "Create New", key: "createNewArticle"},
+    { as: "a", content: "My Articles", key: "myArticles"},
+  ],
+  topics: [
+    { as: "a", content: "Newest", key: "newest"},
+    { as: "a", content: "Popular", key: "popular"},
+    { as: "a", content: "Controversial", key: "controversial"},
+    { divider: "-", key: "handheldNavPostDivider"},
+    { as: "a", content: "Create New", key: "createNew"},
+    { as: "a", content: "My Topics", key: "myPosts"},
+  ],
+  posts: [
+    { as: "a", content: "Newest", key: "newest"},
+    { as: "a", content: "Popular", key: "popular"},
+    { as: "a", content: "Controversial", key: "controversial"},
+    { divider: "-", key: "handheldNavPostDivider"},
+    { as: "a", content: "Create New", key: "createNew"},
+    { as: "a", content: "My Posts", key: "myPosts"},
+  ],
+  users: [
+    { as: "a", content: "Newest", key: "newest"},
+    { as: "a", content: "Popular", key: "popular"},
+    { as: "a", content: "Controversial", key: "controversial"},
+    { divider: "-", key: "handheldNavPostDivider"},
+    { as: "a", content: "Create New", key: "createNew"},
+    { as: "a", content: "My Posts", key: "myPosts"},
+  ],
+};
+
 /*
 / We will have three different Navbars here depends on size of the screen
 / {NavbarHandheld} for most cell phones 
@@ -29,51 +65,55 @@ class Navbar extends Component {
       mainVisible: false,
       innerMainVisible: false,
       innerMainToOpen: null,
+      innerMainItems: {...innerLeftSidebarOptions},
       authVisible: false,
       authType: null,
+
     };
   }
   onPusherClick = () => {
     const {pusherVisible} = this.state;
     if (pusherVisible) { this.setState({pusherVisible: false}) };
   }
-  handletoggle = () => {
-    this.setState({
-      visible: !this.state.visible,
-    });
-  }
   //handheld methods
-  onLeftToggle = () => {
+  onMainToggle = (event) => {
     this.setState({
       mainVisible: !this.state.mainVisible,
       pusherVisible: !this.state.pusherVisible,
-      visible: false,
     });
   }
-  onLeftSubcategoryHandheldToggle = (event) => {
+  onMainInnerHandheldToggle = (event) => {
     let toOpen = event.target.getAttribute("value");
     if(toOpen) toOpen = toOpen.toLowerCase();
     console.log(toOpen)
-
     this.setState({
       innerMainVisible: !this.state.innerMainVisible,
       innerMainToOpen: toOpen || null
     });
   }
-  onRightToggle = (event) => {
+
+  onAuthToggle = (event) => {
     let authType = event.target.getAttribute("value");
     if(authType) authType = authType.toLowerCase();
-    console.log(authType);
+    //console.log(authType);
 
     this.setState({
+      pusherVisible: !this.state.pusherVisible,
       authVisible: !this.state.authVisible,
-      authType: authType
+      authType: authType,
     });
   }
   // end handheld methods
 
   //tablet methods
-
+  onInnerMainToggle = (event) => {
+    let toOpen = event.target.dataset.inner;
+    if(toOpen) toOpen = toOpen.toLowerCase();
+    this.setState({
+      innerMainVisible: !this.state.innerMainVisible,
+      innerMainToOpen: toOpen || null,
+    })
+  }
   //end tablet methods
 
   //desktop methods
@@ -82,7 +122,7 @@ class Navbar extends Component {
 
   render() {
     const {children, leftItems, rightItems} = this.props;
-    const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, authVisible, authType} = this.state;
+    const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, authVisible, authType, innerMainItems} = this.state;
 
     return (
       <div>
@@ -92,9 +132,9 @@ class Navbar extends Component {
             rightItems={rightItems}
 
             onPusherClick={this.onPusherClick} 
-            onLeftToggle={this.onLeftToggle}
-            onLeftSubcategoryToggle={this.onLeftSubcategoryHandheldToggle}
-            onRightToggle={this.onRightToggle}
+            onLeftToggle={this.onMainToggle}
+            onLeftSubcategoryToggle={this.onMainInnerHandheldToggle}
+            onRightToggle={this.onAuthToggle}
 
             pusherVisible={pusherVisible}
             leftVisible={mainVisible}
@@ -104,19 +144,24 @@ class Navbar extends Component {
             authType={authType}
       
           >
-            <NavbarChildren>{children}</NavbarChildren>
           </NavbarHandheld>
         </Responsive>
 
         <Responsive minWidth={769} maxWidth={1024}>
           <NavbarTablet
-            leftItems={leftItems}
-            rightItems={rightItems}
-            onPusherClick={this.handlePusher}
-            onToggle={this.handleToggle}
             pusherVisible={pusherVisible}
+            onPusherClick={this.onPusherClick}
+            mainVisible={mainVisible}
+            onMainToggle={this.onMainToggle}
+            mainItems={leftItems}
+            innerMainVisible={innerMainVisible}
+            innerMainToOpen={innerMainToOpen}
+            onInnerMainToggle={this.onInnerMainToggle}
+            innerMainItems={innerMainItems}
+            
+
+            rightItems={rightItems}
           >
-          <NavbarChildren>{children}</NavbarChildren>
           </NavbarTablet>
 
         </Responsive>
