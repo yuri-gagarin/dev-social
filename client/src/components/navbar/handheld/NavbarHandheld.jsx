@@ -1,9 +1,7 @@
 import React, {Component} from "react";
-import {Container, Icon, Image, Sidebar, Responsive, Menu, Divider} from "semantic-ui-react";
+import {Container, Icon, Image, Sidebar, Responsive, Menu, Divider, MenuItem} from "semantic-ui-react";
 
-import LoginComponent from "../../authorization/LoginComponent.jsx"
-import RegistrationComponent from  "../../authorization/RegistrationComponent.jsx"
-
+import buildRightMenu from "../helpers/buildRightMenu.js";
 import getInnerSidebarOptions from "../helpers/getInnerSidebarOptions.js";
 
  /**
@@ -13,97 +11,22 @@ import getInnerSidebarOptions from "../helpers/getInnerSidebarOptions.js";
   * @returns
   */
 
-const leftMenuOption = ({...props}) => {
-  const {type, toggle} = props;
-  //console.log(props)
-  if(type === "login") {
-    return (
-      <div>
-        <Menu.Item onClick={props.toggle}>
-          <Icon name="arrow right"></Icon>
-          <h3>Back</h3>
-        </Menu.Item>
-        <LoginComponent />
-      </div>
-    );
-  }
-  else if (type === "register") {
-    return (
-      <div>
-        <Menu.Item onClick={props.toggle}>
-          <Icon name="arrow right"></Icon>
-          <h3>Back</h3>
-        </Menu.Item>
-        <RegistrationComponent />
-      </div>
-    );
-  }
-  else if (type === "my-account") {
-    return(
-      <div>
-        <Menu.Item onClick={props.toggle}>
-          <Icon name="cancel">
-      
-          </Icon>
-        </Menu.Item>
-      </div>
-    )
-  }
-};
-
-const innerLeftSidebarOptions = {
-  news: [
-    { as: "a", content: "Newest", key: "newest"},
-    { as: "a", content: "Popular", key: "popular"},
-    { as: "a", content: "Controversial", key: "controversial"},
-    { divider: "-", key: "handheldNavPostDivider"},
-    { as: "a", content: "Create New", key: "createNewArticle"},
-    { as: "a", content: "My Articles", key: "myArticles"},
-  ],
-  topics: [
-    { as: "a", content: "Newest", key: "newest"},
-    { as: "a", content: "Popular", key: "popular"},
-    { as: "a", content: "Controversial", key: "controversial"},
-    { divider: "-", key: "handheldNavPostDivider"},
-    { as: "a", content: "Create New", key: "createNew"},
-    { as: "a", content: "My Topics", key: "myPosts"},
-  ],
-  posts: [
-    { as: "a", content: "Newest", key: "newest"},
-    { as: "a", content: "Popular", key: "popular"},
-    { as: "a", content: "Controversial", key: "controversial"},
-    { divider: "-", key: "handheldNavPostDivider"},
-    { as: "a", content: "Create New", key: "createNew"},
-    { as: "a", content: "My Posts", key: "myPosts"},
-  ],
-  users: [
-    { as: "a", content: "Newest", key: "newest"},
-    { as: "a", content: "Popular", key: "popular"},
-    { as: "a", content: "Controversial", key: "controversial"},
-    { divider: "-", key: "handheldNavPostDivider"},
-    { as: "a", content: "Create New", key: "createNew"},
-    { as: "a", content: "My Posts", key: "myPosts"},
-  ],
-};
-  
-
-
 
 const NavbarHandheld = (
   { 
-    children, 
-    leftItems, 
-    rightItems, 
-    onPusherClick, 
-    onLeftToggle,
-    onLeftSubcategoryToggle,
-    leftInnerToOpen, 
+    children,
     pusherVisible,
-    leftVisible,
-    leftInnerVisible,
+    mainVisible,
+    onMainToggle,
+    mainItems,
+    innerMainVisible,
+    innerMainToOpen,
+    onInnerMainToggle,
+    innerMainItems,
+    rightItems,
     rightVisible,
     onRightToggle,
-    authType,
+    rightInnerItems,
   }
   ) => {
     console.log(children)
@@ -115,47 +38,44 @@ const NavbarHandheld = (
         icon="labeled"
         inverted
         vertical
-        visible={leftVisible}
+        visible={mainVisible}
         style={ {width: "100vw", height: "100vh"} }>
 
         <Menu.Item  
           as="a"
-          onClick={onLeftToggle} 
-          value={"main-back"}>
+          onClick={onMainToggle} >
             <Icon name="arrow left"></Icon>
             <h4>Back</h4>
         </Menu.Item>
-        {leftItems.map((item) => {
-          return (
-            <Menu.Item {...item} 
-              value={item.content}
-              onClick={onLeftSubcategoryToggle} > 
-            </Menu.Item>
-            );
+        { mainItems.map((item) => {
+            return (
+              <Menu.Item {...item}
+                onClick={onInnerMainToggle}
+                data-inner={item.content}>
+              </Menu.Item>
+              );
           })
         }
       </Sidebar>
-      
       <Sidebar
         as={Menu}
         animation="overlay"
         icon="labeled"
         inverted
         vertical
-        visible={leftInnerVisible}
+        visible={innerMainVisible}
         style={ {width: "100vw", height: "100vw"} } >
-
-        <Menu.Item onClick={onLeftSubcategoryToggle}>
+        <Menu.Item onClick={onInnerMainToggle}>
           <Icon name="arrow left"></Icon>
           <h4>Back</h4>
         </Menu.Item>
-        { getInnerSidebarOptions(innerLeftSidebarOptions, leftInnerToOpen).map((option) => {
-          return (
-            <Menu.Item {...option} ></Menu.Item>
+        { getInnerSidebarOptions(innerMainItems, innerMainToOpen)
+          .map((option) => {
+            return (
+              <Menu.Item {...option} ></Menu.Item>
             );
           })
         }
-        
       </Sidebar>
 
       <Sidebar 
@@ -165,26 +85,36 @@ const NavbarHandheld = (
         vertical
         direction="right"
         visible={rightVisible}
-        style={ {width: "100vw", height: "100vw"}} >
-        
-        {leftMenuOption({type: authType, toggle: onRightToggle})}
+        style={{width: "100vw", height: "100vw"}} >
+        <Menu.Item as={"a"}
+          onClick={onRightToggle}>
+          <Icon name={"arrow right"}></Icon>
+          <div>Back</div>
+        </Menu.Item>
+        { buildRightMenu(rightInnerItems, {}) }
       </Sidebar>
 
       <Sidebar.Pusher
         dimmed={pusherVisible}
-        onClick={onPusherClick}
-        style={ {height: "100vh"} }
-        >
+        style={{height: "100vh"}} >
           <Menu fixed="top" inverted>
             <Menu.Item>
               <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
             </Menu.Item>
-            <Menu.Item onClick={onLeftToggle} as={"a"} value={"main-toggle"}>
+            <Menu.Item onClick={onMainToggle} as={"a"}>
               <Icon name="sidebar" />
-                Menu
+              Menu
             </Menu.Item>
             <Menu.Menu position="right">
-              {rightItems.map((item) => <Menu.Item {...item}  onClick={onRightToggle} value={item.content}/> )}
+              { rightItems.map((item) => {
+                  return (
+                    <Menu.Item {...item}  
+                      onClick={onRightToggle} 
+                      data-inner={item.content} >
+                    </Menu.Item>
+                  );
+                })
+              }
             </Menu.Menu>
           </Menu>
         {children}

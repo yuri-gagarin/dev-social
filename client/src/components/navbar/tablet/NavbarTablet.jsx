@@ -1,14 +1,15 @@
 import React, {Component} from "react";
-import {Container, Icon, Image, Sidebar, Responsive, Menu} from "semantic-ui-react";
+import {Container, Icon, Image, Sidebar, Responsive, Menu, Segment} from "semantic-ui-react";
 
 import getInnerSidebarOptions from "../helpers/getInnerSidebarOptions.js";
+import buildRightMenu from "../helpers/buildRightMenu.js";
 
 
 const NavbarTablet = (
   {
     children,
     pusherVisible,
-    onPusherClick,
+    onPusherToggle,
     mainVisible,
     onMainToggle,
     mainItems,
@@ -17,9 +18,13 @@ const NavbarTablet = (
     onInnerMainToggle,
     innerMainItems,
     rightItems,
+    rightVisible,
+    onRightToggle,
     rightInnerItems,
   } 
   ) => {
+  console.log(26)
+  console.log(children)
   return (
     <Sidebar.Pushable>
       <Sidebar
@@ -72,12 +77,23 @@ const NavbarTablet = (
         }
       </Sidebar>
       
-      <Sidebar>
-
+      <Sidebar
+        as={Container}
+        animation="overlay"
+        visible={rightVisible}
+        direction="right"
+        style={{width: "100vw", height: "100vh", backgroundColor: "white"}} >
+        <Menu.Item
+          as={Segment}
+          onClick={onRightToggle} >
+          <Icon name="arrow right"></Icon>
+          <div>Back</div>
+        </Menu.Item>
+        { buildRightMenu(rightInnerItems, {}) }
       </Sidebar>
       <Sidebar.Pusher
         dimmed={pusherVisible}
-        onClick={onPusherClick}
+        onClick={onPusherToggle}
         style={ {height: "100vh"} }>
         <Menu fixed="top" inverted>
           <Menu.Item>
@@ -88,7 +104,14 @@ const NavbarTablet = (
             <div>Main Menu</div>
           </Menu.Item>
           <Menu.Menu position="right">
-            { rightItems.map((item) => <Menu.Item {...item} />) }
+            { rightItems.map((item) => {
+                return( 
+                <Menu.Item {...item} onClick={onRightToggle}
+                  data-inner={item.content}>
+                </Menu.Item>
+                )
+              })
+            }
           </Menu.Menu>
         </Menu>
         {children}
