@@ -197,8 +197,20 @@ class Navbar extends Component {
         </Responsive>
         <Responsive minWidth={1025}>
           <NavbarDesktop 
-            leftItems={leftItems} 
-            rightItems={rightItems} 
+            children={children}
+            pusherVisible={pusherVisible}
+            onPusherToggle={this.onPusherToggle}
+            mainVisible={mainVisible}
+            onMainToggle={this.onMainToggle}
+            mainItems={leftItems}
+            innerMainVisible={innerMainVisible}
+            innerMainToOpen={innerMainToOpen}
+            onInnerMainToggle={this.onInnerMainToggle}
+            innerMainItems={innerMainItems}
+            rightItems={rightItems}
+            rightVisible={rightVisible}
+            onRightToggle={this.onRightToggle}
+            rightInnerItems={rightInnerItems} >
           >
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarDesktop>

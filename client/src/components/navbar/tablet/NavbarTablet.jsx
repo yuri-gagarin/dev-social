@@ -23,8 +23,6 @@ const NavbarTablet = (
     rightInnerItems,
   } 
   ) => {
-  console.log(26)
-  console.log(children)
   return (
     <Sidebar.Pushable>
       <Sidebar
