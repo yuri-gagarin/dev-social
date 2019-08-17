@@ -1,0 +1,25 @@
+.pushable {
+  position: !important;
+}
+#navbarDesktop {
+  background-color: rgb(11, 60, 124);
+  height: 100px;
+  a {
+    font-size: 1.5em;
+    color: white;
+    &:hover {
+      background-color: rgb(35, 74, 124);
+    }
+  }
+}
+
+#mainMenu {
+  background-color: rgb(11, 60, 124);
+  min-width: 100vw;
+  min-height: 60vh;
+  
+  a {
+    background-color: rgb(11, 60, 124);
+    color: white ;
+  }
+}

@@ -1,5 +1,10 @@
 import React, {Component} from "react";
-import {Container, Icon, Image, Sidebar, Responsive, Menu} from "semantic-ui-react";
+import {Container, Icon, Image, Sidebar, Responsive, Menu, Segment} from "semantic-ui-react";
+
+import getInnerSidebarOptions from "../helpers/getInnerSidebarOptions.js";
+import buildRightMenu from "../helpers/buildRightMenu.js";
+
+import style from "../../../assets/stylesheets/navbar/navbarDesktop.scss";
 
 const NavbarDesktop = (
   {
@@ -24,11 +29,10 @@ const NavbarDesktop = (
       <Sidebar
         as={Menu}
         animation="overlay"
-        inverted
         vertical
         direction="top"
         visible={innerMainVisible}
-        style={{width: "100vw", height: "33vh"}}>
+        id={style.mainMenu}>
         <Menu.Item
           as={"a"}
           onClick={onInnerMainToggle}
@@ -47,33 +51,17 @@ const NavbarDesktop = (
           })
         }
       </Sidebar>
-      <Sidebar
-        as={Menu}
-        animation="overlay"
-        inverted
-        vertical
-        visible={mainVisible}
-        style={{width: "25vw", height: "100vh"}}>
-        <Menu.Item 
-          as={"a"}
-          onClick={onMainToggle}
-          className={""} >
-          <div><Icon name="arrow left"></Icon></div>
-          <div>Back</div>
-        </Menu.Item>
-        
-      </Sidebar>
       
       <Sidebar
         as={Container}
         animation="overlay"
         visible={rightVisible}
         direction="top"
-        style={{width: "100vw", height: "100vh", backgroundColor: "white"}} >
+        style={{width: "100vw", minHeight: "100vh", backgroundColor: "white"}} >
         <Menu.Item
           as={Segment}
           onClick={onRightToggle} >
-          <Icon name="arrow right"></Icon>
+          <Icon name="window close outline"></Icon>
           <div>Close</div>
         </Menu.Item>
         { buildRightMenu(rightInnerItems, {}) }
@@ -82,13 +70,14 @@ const NavbarDesktop = (
         dimmed={pusherVisible}
         onClick={onPusherToggle}
         style={ {height: "100vh"} }>
-        <Menu fixed="top" inverted>
+        <Menu fixed="top" id={style.navbarDesktop}>
           <Menu.Item>
             <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
           </Menu.Item>
           { mainItems.map((item) => {
               return (
                 <Menu.Item {...item} 
+                  className={style.mainItem}
                   onClick={onInnerMainToggle}
                   data-inner={item.content}>
                 </Menu.Item>
