@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import {Container, Image, Grid, Segment, Button, GridColumn} from "semantic-ui-react";
-import {Link} from "react-router-dom";
+import style from "../../assets/stylesheets/welcome/welcome.scss";
+
 
 class WelcomeComponent extends Component {
   constructor(props) {
@@ -11,35 +12,25 @@ class WelcomeComponent extends Component {
   render() {
     return(
       <div>
+        <Container fluid
+          className={style.welcomeParallaxContainer}
+        />
         <Container>
-          <Image
-            fluid
-            src="/assets/images/logo.jpg"
-          />
+          <p>Text</p>
         </Container>
         <Container>
-          <Grid columns={3} divided>
-            <Grid.Column>
-              <Segment>Empty</Segment>
-            </Grid.Column>
-            <Grid.Column>
-              <Segment>
-                <Link to="/authorize">
-                  <Button>Login</Button>
-                </Link>
-              </Segment>
-              <Segment>
-                <Link to="/authorize">
-                  <Button>Register</Button>
-                </Link>
-              </Segment>
-            </Grid.Column>
-            <GridColumn>
-              <Segment>Empty</Segment>
-            </GridColumn>
-          </Grid>
+          <p>Text</p>
         </Container>
-      </div>
+        <Container>
+          <p>Text</p>
+        </Container>
+        <Container>
+          <p>Text</p>
+        </Container>
+        <Container>
+          <p>Text</p>
+        </Container>
+       </div>
     );
   }
 }

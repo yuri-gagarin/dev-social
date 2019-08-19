@@ -6,6 +6,7 @@ import {registerUserTest, registerUser} from "./actions/authActions.js";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar.jsx";
 import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
+import Footer from "./components/footer/Footer.jsx";
 import { Container, Responsive, Segment } from "semantic-ui-react";
 
 
@@ -66,16 +67,6 @@ class App extends React.Component {
         rightItems = {rightNav}
         children = {
           <div>
-            <Responsive maxWidth={768}>
-              <Segment inverted>
-                Visible only if display is <code>768px</code> and lower
-              </Segment>
-            </Responsive>
-            <Responsive minWidth={769}>
-              <Segment>
-                Visivle only if display is <code>769px</code> and higher
-              </Segment>
-            </Responsive>
             <Router>
               <Route exact path="/" component={WelcomeComponent} />
               <Route path="/authorize" component={AuthorizationComponent} />
@@ -84,6 +75,7 @@ class App extends React.Component {
             <button onClick={this.cancelTest}>CANCEL TEST</button>
             <button onClick={this.registerUserTest}>REGISTER TEST</button>
             <button onClick={this.registerUser}>REGISTER USER</button>
+            <Footer></Footer>
           </div>
         }
       >

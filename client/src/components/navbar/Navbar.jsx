@@ -8,9 +8,9 @@ import NavbarDesktop from "./desktop/NavbarDesktop.jsx";
 
 const NavbarChildren = ({ children }) => {
   return (
-    <Container style={{marginTop: "5em"}}>
+    <div>
       {children}
-    </Container>
+    </div>
   );
 };
 
@@ -157,7 +157,7 @@ class Navbar extends Component {
     const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, rightVisible, innerMainItems, rightInnerItems} = this.state;
 
     return (
-      <div>
+      <Container fluid>
         <Responsive maxWidth={0} maxWidth={414}>
           <NavbarHandheld
             children={children}
@@ -215,7 +215,7 @@ class Navbar extends Component {
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarDesktop>
         </Responsive>
-      </div>
+      </Container>
     );
   }
 }
