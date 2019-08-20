@@ -1,17 +1,12 @@
-import React from "react";
+import React, {Component, Fragment} from "react";
 import {connect} from "react-redux";
 import AuthorizationComponent from "./components/authorization/AuthorizationComponent.jsx";
 import {test, cancelTest} from "./actions/appAction.js";
 import {registerUserTest, registerUser} from "./actions/authActions.js";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import Navbar from "./components/navbar/Navbar.jsx";
+import MainNav from "./components/navbar/MainNav.jsx";
 import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
 import Footer from "./components/footer/Footer.jsx";
-import { Container, Responsive, Segment } from "semantic-ui-react";
-
-
-//let homeImg = document.getElementById("home");
-//homeImg.src = homeIcon;
 
 const leftNav = [
   {as: "a", content: "News", key: "news",},
@@ -25,7 +20,7 @@ const rightNav = [
 ];
 
 
-class App extends React.Component {
+class App extends Component {
   constructor() {
     super();
     this.testRedux = this.testRedux.bind(this);
@@ -62,24 +57,21 @@ class App extends React.Component {
   }
   render() {
     return (
-      <Navbar
+      <MainNav
         leftItems = {leftNav}
-        rightItems = {rightNav}
-        children = {
-          <div>
-            <Router>
-              <Route exact path="/" component={WelcomeComponent} />
-              <Route path="/authorize" component={AuthorizationComponent} />
-            </Router>
-            <button onClick={this.testRedux}>TEST REDUX</button>
-            <button onClick={this.cancelTest}>CANCEL TEST</button>
-            <button onClick={this.registerUserTest}>REGISTER TEST</button>
-            <button onClick={this.registerUser}>REGISTER USER</button>
-            <Footer></Footer>
-          </div>
-        }
-      >
-      </Navbar>
+        rightItems = {rightNav} >
+        <Fragment>
+          <Router>
+            <Route exact path="/" component={WelcomeComponent} />
+            <Route path="/authorize" component={AuthorizationComponent} />
+          </Router>
+          <button onClick={this.testRedux}>TEST REDUX</button>
+          <button onClick={this.cancelTest}>CANCEL TEST</button>
+          <button onClick={this.registerUserTest}>REGISTER TEST</button>
+          <button onClick={this.registerUser}>REGISTER USER</button>
+          <Footer></Footer>
+        </Fragment>
+      </MainNav>
     );
   }
 }

@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, Fragment} from "react";
 import {Container, Image, Grid, Segment, Button, GridColumn} from "semantic-ui-react";
 import style from "../../assets/stylesheets/welcome/welcome.scss";
 
@@ -11,7 +11,7 @@ class WelcomeComponent extends Component {
 
   render() {
     return(
-      <div>
+      <Fragment>
         <Container fluid
           className={style.welcomeParallaxContainer}
         />
@@ -30,7 +30,7 @@ class WelcomeComponent extends Component {
         <Container>
           <p>Text</p>
         </Container>
-       </div>
+       </Fragment>
     );
   }
 }

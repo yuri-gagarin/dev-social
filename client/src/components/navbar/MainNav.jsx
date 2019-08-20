@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, Fragment} from "react";
 import {Container, Responsive} from "semantic-ui-react";
 
 import NavbarHandheld from "./handheld/NavbarHandheld.jsx";
@@ -8,9 +8,9 @@ import NavbarDesktop from "./desktop/NavbarDesktop.jsx";
 
 const NavbarChildren = ({ children }) => {
   return (
-    <div>
+    <Fragment>
       {children}
-    </div>
+    </Fragment>
   );
 };
 
@@ -57,7 +57,7 @@ const innerLeftSidebarOptions = {
 / {NavbarDescktop} for most desktops
 */
 
-class Navbar extends Component {
+class MainNav extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -157,10 +157,9 @@ class Navbar extends Component {
     const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, rightVisible, innerMainItems, rightInnerItems} = this.state;
 
     return (
-      <Container fluid>
+      <Fragment>
         <Responsive maxWidth={0} maxWidth={414}>
           <NavbarHandheld
-            children={children}
             pusherVisible={false}
             mainVisible={mainVisible}
             onMainToggle={this.onMainToggle}
@@ -173,12 +172,12 @@ class Navbar extends Component {
             rightVisible={rightVisible}
             onRightToggle={this.onRightToggle}
             rightInnerItems={rightInnerItems} >
+          <NavbarChildren>{children}</NavbarChildren>
           </NavbarHandheld>
         </Responsive>
 
         <Responsive minWidth={415} maxWidth={1024}>
           <NavbarTablet
-            children={children}
             pusherVisible={pusherVisible}
             onPusherToggle={this.onPusherToggle}
             mainVisible={mainVisible}
@@ -192,12 +191,12 @@ class Navbar extends Component {
             rightVisible={rightVisible}
             onRightToggle={this.onRightToggle}
             rightInnerItems={rightInnerItems} >
+          <NavbarChildren>{children}</NavbarChildren>
           </NavbarTablet>
 
         </Responsive>
-        <Responsive minWidth={1025}>
+        <Responsive minWidth={1025} className="">
           <NavbarDesktop 
-            children={children}
             pusherVisible={pusherVisible}
             onPusherToggle={this.onPusherToggle}
             mainVisible={mainVisible}
@@ -211,13 +210,12 @@ class Navbar extends Component {
             rightVisible={rightVisible}
             onRightToggle={this.onRightToggle}
             rightInnerItems={rightInnerItems} >
-          >
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarDesktop>
         </Responsive>
-      </Container>
+      </Fragment>
     );
   }
 }
 
-export default Navbar;
+export default MainNav;

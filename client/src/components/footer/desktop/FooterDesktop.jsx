@@ -7,20 +7,20 @@ const FooterDesktop = (props) => {
   return (
     <Menu>
       <Menu.Item
-        name="about"
         active={activeItem === "about"}
+        data-inner="about"
         content="About"
         onClick={handleFooterItemClick}
       />
       <Menu.Item
-        name="contact"
         active={activeItem === "contact"}
+        data-inner="contact"
         content="Contact"
         onClick={handleFooterItemClick}
       />
       <Menu.Item
-        name="work"
         active={activeItem === "work"}
+        data-inner="work"
         content="Work With Us"
         onClick={handleFooterItemClick}
       />

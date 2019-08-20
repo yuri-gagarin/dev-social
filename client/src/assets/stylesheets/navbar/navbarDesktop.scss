@@ -1,6 +1,7 @@
 #sidebarPushable {
   position: relative !important;
   transform: none;
+  height: 100%;
 }
 #navbarDesktop {
   background-color: rgb(11, 60, 124);
@@ -20,7 +21,8 @@
   background-color: rgb(11, 60, 124);
   width: 100px;
   height: 100vh;
-  top: 45px;
+  position: fixed;
+  top: 50px;
   a {
     background-color: rgb(11, 60, 124);
     color: white ;
@@ -28,8 +30,17 @@
 }
 //inner main on the left
 #innerMainMenu {
-  position: absolute;
+  position: fixed;
   width: 300px;
   left: 100px;
-  top: 45px;
+  top: 50px;
+}
+
+//right desktop menu
+#rightDesktopMenu {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  min-height: 100vh;
+  background-color: white;
 }

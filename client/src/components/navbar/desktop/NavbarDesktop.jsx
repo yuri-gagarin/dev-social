@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Component, Fragment} from "react";
 import {Container, Icon, Image, Sidebar, Responsive, Menu, Segment} from "semantic-ui-react";
 
 import getInnerSidebarOptions from "../helpers/getInnerSidebarOptions.js";
@@ -25,7 +25,7 @@ const NavbarDesktop = (
   }
 ) => {
   return (
-    <div>
+    <Fragment>
       <Menu id={style.navbarDesktop} fixed="top">
         <Menu.Item>
           <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
@@ -46,7 +46,6 @@ const NavbarDesktop = (
         </Menu.Menu>
       </Menu>
       <Sidebar.Pushable id={style.sidebarPushable}>
-        
         <Sidebar
           as={Menu}
           animation="overlay"
@@ -56,8 +55,7 @@ const NavbarDesktop = (
           id={style.innerMainMenu}>
           <Menu.Item
             as={Segment}
-            onClick={onInnerMainToggle}
-            className={""} >
+            onClick={onInnerMainToggle} >
             <div><Icon name={"arrow left"}></Icon></div>
             <div>Back</div>
           </Menu.Item>
@@ -104,7 +102,7 @@ const NavbarDesktop = (
           animation="overlay"
           visible={rightVisible}
           direction="top"
-          style={{width: "100vw", minHeight: "100vh", backgroundColor: "white"}} >
+          id = {style.rightDesktopMenu} >
           <Menu.Item
             as={Segment}
             onClick={onRightToggle} >
@@ -116,13 +114,12 @@ const NavbarDesktop = (
         <Sidebar.Pusher
           dimmed={pusherVisible}
           onClick={onPusherToggle}
-          style={ {height: "100vh"} }>
-          
+          >         
           {children}
         </Sidebar.Pusher>
         
       </Sidebar.Pushable>
-    </div>
+    </Fragment>
   );
 };
 
