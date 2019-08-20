@@ -5,7 +5,9 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import MainNav from "./components/navbar/MainNav.jsx";
 import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
 import Footer from "./components/footer/Footer.jsx";
+import axios from "axios";
 
+/*
 const leftNav = [
   {as: "a", content: "News", key: "news",},
   {as: "a", content: "Topics", key: "topics" },
@@ -16,18 +18,43 @@ const rightNav = [
   {as: "a", content: "Login", key: "login", onClick: () => console.log(this) },
   {as: "a", content: "Register", key: "register", onClick: () => console.log(this) },
 ];
-
+*/
 
 class App extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      leftItems: [],
+      innerMainItems: {},
+      rightItems: [],
+    };
   }
+  
+  componentDidMount() {
+    this.buildNavBar();
+  }
+
+  buildNavBar = () => {
+    axios
+      .get("/api/getmainnav")
+      .then((response)=> {
+          this.setState({
+            leftItems: response.data.sideMain,
+            innerMainItems: response.data.innerMain,
+            rightItems: response.data.rightItems,
+          });
+      })
+      .catch((error) => {console.log(error)});
+  }
+
   render() {
+    const {leftItems, innerMainItems, rightItems} = this.state;
     return (
       <Fragment>
         <MainNav
-          leftItems = {leftNav}
-          rightItems = {rightNav} >
+          leftItems = {leftItems}
+          rightItems = {rightItems}
+          innerMainItems = {innerMainItems} >
             <Router>
               <Route exact path="/" component={WelcomeComponent} />
               <Route path="/authorize" component={AuthorizationComponent} />

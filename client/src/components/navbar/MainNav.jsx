@@ -1,5 +1,6 @@
 import React, {Component, Fragment} from "react";
 import {Container, Responsive} from "semantic-ui-react";
+import PropTypes from "prop-types";
 
 import {connect} from "react-redux";
 
@@ -14,42 +15,6 @@ const NavbarChildren = ({ children }) => {
       {children}
     </Fragment>
   );
-};
-
-//these should be dynamic based on user status and login
-const innerLeftSidebarOptions = {
-  news: [
-    { as: "a", content: "Newest", key: "newest"},
-    { as: "a", content: "Popular", key: "popular"},
-    { as: "a", content: "Controversial", key: "controversial"},
-    { divider: "-", key: "handheldNavPostDivider"},
-    { as: "a", content: "Create New", key: "createNewArticle"},
-    { as: "a", content: "My Articles", key: "myArticles"},
-  ],
-  topics: [
-    { as: "a", content: "Newest", key: "newest"},
-    { as: "a", content: "Popular", key: "popular"},
-    { as: "a", content: "Controversial", key: "controversial"},
-    { divider: "-", key: "handheldNavPostDivider"},
-    { as: "a", content: "Create New", key: "createNew"},
-    { as: "a", content: "My Topics", key: "myPosts"},
-  ],
-  posts: [
-    { as: "a", content: "Newest", key: "newest"},
-    { as: "a", content: "Popular", key: "popular"},
-    { as: "a", content: "Controversial", key: "controversial"},
-    { divider: "-", key: "handheldNavPostDivider"},
-    { as: "a", content: "Create New", key: "createNew"},
-    { as: "a", content: "My Posts", key: "myPosts"},
-  ],
-  users: [
-    { as: "a", content: "Newest", key: "newest"},
-    { as: "a", content: "Popular", key: "popular"},
-    { as: "a", content: "Controversial", key: "controversial"},
-    { divider: "-", key: "handheldNavPostDivider"},
-    { as: "a", content: "Create New", key: "createNew"},
-    { as: "a", content: "My Posts", key: "myPosts"},
-  ],
 };
 
 /*
@@ -67,7 +32,6 @@ class MainNav extends Component {
       mainVisible: false,
       innerMainVisible: false,
       innerMainToOpen: null,
-      innerMainItems: {...innerLeftSidebarOptions},
       rightVisible: false,
       rightInnerItems: null,
 
@@ -162,8 +126,9 @@ class MainNav extends Component {
   //end desktop methods
 
   render() {
-    const {children, leftItems, rightItems} = this.props;
-    const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, rightVisible, innerMainItems, rightInnerItems} = this.state;
+    const {children, leftItems, innerMainItems, rightItems} = this.props;
+    const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, rightVisible,rightInnerItems} = this.state;
+    
     return (
       <Fragment>
         <Responsive maxWidth={0} maxWidth={414}>
@@ -225,6 +190,13 @@ class MainNav extends Component {
     );
   }
 }
+
+MainNav.propTypes = {
+  leftItems: PropTypes.array,
+  innerMainItems: PropTypes.object,
+  rightVisible: PropTypes.array,
+};
+
 const mapStateToProps = (state) => {
   return {
     authState: state.auth,

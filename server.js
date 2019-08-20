@@ -18,21 +18,6 @@ mongoose
   .then(() => console.log("Database connected"))
   .catch((err) => console.log(err));
 
-
-app.get("/*", (req, res) => {
-  if(process.env.NODE_ENV !== "production") {
-    res.sendFile(path.resolve(__dirname, "client", "src", "index.html"));
-  }
-  else {
-    res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
-  }
-});
-
-app.use(function(err, req, res, next) {
-  console.log(`This is the invalid field: ${err.field}`);
-  next(err);
-});
-
 //bodyparser middleware
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -46,6 +31,21 @@ passportStrategy(passport);
 //initialize routes
 routes(router);
 app.use(router);
+
+app.get("/", (req, res) => {
+  if(process.env.NODE_ENV !== "production") {
+    res.sendFile(path.resolve(__dirname, "client", "src", "index.html"));
+  }
+  else {
+    res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
+  }
+});
+
+app.use(function(err, req, res, next) {
+  console.log(`This is the invalid field: ${err.field}`);
+  next(err);
+});
+
 
 
 app.listen(PORT, () => {
