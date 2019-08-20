@@ -61,7 +61,8 @@ export const registerUser = (newUserData) => {
   };
 };
 
-export const loginUser = (clientData) => {
+export const loginUser = (clientData, history) => {
+  console.log(history);
   return function(dispatch) {
     const config = {
       method: "POST",
@@ -70,6 +71,7 @@ export const loginUser = (clientData) => {
     };
     axios(config)
       .then((response) => {
+        history.push("/dashboard");
         dispatch({
           type: LOGIN,
           payload: {
@@ -77,17 +79,26 @@ export const loginUser = (clientData) => {
             data: response.data,
           }
         });
-        return Promise.resolve();
       })
       .catch((error) => {
-        dispatch({
-          type: LIST_ERRORS,
-          payload: {
-            message: error.response.data.message,
-            statusText: error.response.statusText,
-            status: error.response.status,
-          }
-        });
+        if (error.response) {
+          dispatch({
+            type: LIST_ERRORS,
+            payload: {
+              message: error.response.data.message,
+              statusText: error.response.statusText,
+              status: error.response.status,
+            }
+          });
+        }
+        else {
+          dispatch({
+            type: LIST_ERRORS,
+            payload: {
+              message: error.message
+            }
+          });
+        }
       });
   }
 }

@@ -51,16 +51,16 @@ class App extends Component {
     const {leftItems, innerMainItems, rightItems} = this.state;
     return (
       <Fragment>
-        <MainNav
-          leftItems = {leftItems}
-          rightItems = {rightItems}
-          innerMainItems = {innerMainItems} >
-            <Router>
-              <Route exact path="/" component={WelcomeComponent} />
-              <Route path="/authorize" component={AuthorizationComponent} />
-            </Router>
-        </MainNav>
-        <Footer></Footer>
+        <Router>
+          <MainNav
+            leftItems = {leftItems}
+            rightItems = {rightItems}
+            innerMainItems = {innerMainItems} >
+                <Route exact path="/" component={WelcomeComponent} />
+                <Route path="/authorize" component={AuthorizationComponent} />
+          </MainNav>
+          <Footer></Footer>
+        </Router>
       </Fragment>
     );
   }

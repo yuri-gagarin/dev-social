@@ -1,9 +1,12 @@
 import React, {Component} from "react";
-import {Container, Form, Button} from "semantic-ui-react";
+import {Container, Form, Button, Message} from "semantic-ui-react";
+import PropTypes from "prop-types";
+import {withRouter} from "react-router-dom";
 //redux imports
 import {connect} from "react-redux";
 import {loginUser} from "../../actions/authActions.js";
 //form helpers
+import displayFormErrors from "./helper_methods/displayFormErrors.js";
 import {setTypingTimeout, checkTyping, checkForFormCompletion, 
         disableButton, enableButton} from "./helper_methods/formHelper.js";
 //validators
@@ -26,19 +29,30 @@ class LoginComponent extends Component {
       },
       typingTimeout: {
         value: false,
-      }
+      },
+      errors: null,
     };
     console.log(props)
     this.toValidate = ["email", "password"];
   }
   //lifecycle methods
+  static getDerivedStateFromProps(props, state) {
+    if(props.authState.loggedIn) {
+      props.closeWindow();
+    }
+    
+    if(props.errors) {
+      return {
+        errors: props.errors
+      }
+    }
+    return null;
+  }
   componentDidMount() {
     disableButton("loginButton");
   }
+  
   componentDidUpdate() {
-    if(this.props.authState.loggedIn) {
-      this.props.closeWindow();
-    }
     if(!checkTyping(this)) {
       if(checkForFormCompletion(this, this.toValidate)) {
         enableButton("loginButton");
@@ -48,6 +62,7 @@ class LoginComponent extends Component {
       }
     }
   }
+
   componentWillUnmount() {
     if(this.state.typingTimeout.value) {
       clearTimeout(this.state.typingTimeout.value);
@@ -95,7 +110,6 @@ class LoginComponent extends Component {
     }
 
     if(!passwordValidator(event.target.value)) {
-      console.log("here");
       this.setState({
         password: {
           value: event.target.value,
@@ -127,19 +141,19 @@ class LoginComponent extends Component {
 
   handleLogin(event) {
     event.preventDefault();
-    const {loginUser} = this.props;
     const clientData =  {
       email: this.state.email.value,
       password: this.state.password.value,
     };
-    loginUser(clientData);
+    this.props.loginUser(clientData, this.props.history);
   }
 
   render() {
+    const {errors} = this.state;
     return (
       <Container>
         <h3 className={""}>Login</h3>
-        <Form>
+        <Form error>
           <Form.Input
             error={this.state.email.error}
             fluid
@@ -155,21 +169,32 @@ class LoginComponent extends Component {
             type="password"
             onChange={ (e) => {this.handlePassword(e)} }
           />
+          {displayFormErrors(errors)}
           <Button className="loginButton" onClick={ (e) => {this.handleLogin(e)} }>Login</Button>
         </Form>
       </Container>
     );
   }
 };
+
+LoginComponent.propTypes = {
+  loginUser: PropTypes.func.isRequired,
+  closeWindow: PropTypes.func.isRequired,
+  authState: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
+};
+
 const mapStateToProps = (state) => {
   return {
     authState: state.auth,
+    errors: state.error,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    loginUser: (clientData) => dispatch(loginUser(clientData)),
+    loginUser: (clientData, history) => dispatch(loginUser(clientData, history)),
   };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(LoginComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(LoginComponent));
