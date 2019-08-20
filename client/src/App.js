@@ -57,21 +57,17 @@ class App extends Component {
   }
   render() {
     return (
-      <MainNav
-        leftItems = {leftNav}
-        rightItems = {rightNav} >
-        <Fragment>
-          <Router>
-            <Route exact path="/" component={WelcomeComponent} />
-            <Route path="/authorize" component={AuthorizationComponent} />
-          </Router>
-          <button onClick={this.testRedux}>TEST REDUX</button>
-          <button onClick={this.cancelTest}>CANCEL TEST</button>
-          <button onClick={this.registerUserTest}>REGISTER TEST</button>
-          <button onClick={this.registerUser}>REGISTER USER</button>
-          <Footer></Footer>
-        </Fragment>
-      </MainNav>
+      <Fragment>
+        <MainNav
+          leftItems = {leftNav}
+          rightItems = {rightNav} >
+            <Router>
+              <Route exact path="/" component={WelcomeComponent} />
+              <Route path="/authorize" component={AuthorizationComponent} />
+            </Router>
+        </MainNav>
+        <Footer></Footer>
+      </Fragment>
     );
   }
 }

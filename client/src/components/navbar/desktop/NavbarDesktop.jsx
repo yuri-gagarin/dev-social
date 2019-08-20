@@ -114,6 +114,7 @@ const NavbarDesktop = (
         <Sidebar.Pusher
           dimmed={pusherVisible}
           onClick={onPusherToggle}
+          id={style.mainContent}
           >         
           {children}
         </Sidebar.Pusher>

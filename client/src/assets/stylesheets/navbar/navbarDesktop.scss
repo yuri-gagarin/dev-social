@@ -1,8 +1,16 @@
 #sidebarPushable {
   position: relative !important;
   transform: none;
-  height: 100%;
+  min-height: 100%;
 }
+
+#mainContent {
+  background-color: rgb(214, 211, 211);
+  overflow: auto;
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
+
 #navbarDesktop {
   background-color: rgb(11, 60, 124);
   height: 50px;
