@@ -1,4 +1,6 @@
-import {REGISTER, LOGIN, LOGOUT} from "../actions/cases.js";
+import {REGISTER, LOGIN, LOGOUT, SET_USER} from "../actions/cases.js";
+import isEmpty from "../helpers/validators/isEmpty.js";
+
 export default function(state={}, action) {
   switch(action.type){
     case REGISTER:
@@ -11,14 +13,21 @@ export default function(state={}, action) {
     case LOGIN:
       return ({
         ...state,
-        message: action.payload.data.message,
-        loggedIn: true,
-        user: action.payload.data.user,
+        message: action.payload.message,
+        loggedIn: !isEmpty(action.payload.data),
+        user: action.payload.data,
+      });
+    case SET_USER: 
+      return({
+        ...state,
+        message: action.payload.message,
+        loggedIn: !isEmpty(action.payload.data),
+        user: action.payload.data,
       });
     case LOGOUT:
       return ({
         result: action.payload
-      })
+      });
     default:
       return state;
   }

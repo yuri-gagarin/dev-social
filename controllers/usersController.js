@@ -99,14 +99,13 @@ export default  {
         return User.findOneAndUpdate({_id: user.id}, {lastLogin: Date.now()}, {new: true});
       })
       .then((user) => {
-        console.log(this)
         return res.status(200).json({
           message: "Logged in",
+          token: `Bearer ${token}`,
           user: {
             name: user.name,
             lastName: user.lastName,
             email: user.email,
-            token: `Bearer ${token}`,
             lastLogin: user.lastLogin
           }
         })

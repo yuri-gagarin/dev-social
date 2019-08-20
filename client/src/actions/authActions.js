@@ -1,5 +1,7 @@
 import axios from "axios";
-import {REGISTER, LIST_ERRORS, LOGIN, LOGOUT} from "../actions/cases.js";
+import jwtDecode from "jwt-decode";
+import {REGISTER, LIST_ERRORS, LOGIN, LOGOUT, SET_USER} from "../actions/cases.js";
+import setAuthToken from "../helpers/setAuthToken.js";
 
 export const registerUserTest = (newUserData) => {
   console.log(newUserData);
@@ -62,7 +64,6 @@ export const registerUser = (newUserData) => {
 };
 
 export const loginUser = (clientData, history) => {
-  console.log(history);
   return function(dispatch) {
     const config = {
       method: "POST",
@@ -71,12 +72,17 @@ export const loginUser = (clientData, history) => {
     };
     axios(config)
       .then((response) => {
+        const {token} = response.data;
+        localStorage.setItem("jwtToken", token);
+        setAuthToken(token);
+        const decodedUserData = jwtDecode(token);
         history.push("/dashboard");
         dispatch({
           type: LOGIN,
           payload: {
             statusCode: response.status,
-            data: response.data,
+            message: response.data.message,
+            data: decodedUserData,
           }
         });
       })
@@ -100,5 +106,17 @@ export const loginUser = (clientData, history) => {
           });
         }
       });
-  }
-}
+  };
+};
+
+export const setUser = (userData) => {
+  return function(dispatch) {
+    dispatch({
+      type: SET_USER,
+      payload: {
+        message: "User Logged In",
+        data: userData,
+      }
+    });
+  };
+};
