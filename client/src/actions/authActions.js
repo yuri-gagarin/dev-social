@@ -1,5 +1,4 @@
 import axios from "axios";
-import qs from "qs";
 import {REGISTER, LIST_ERRORS, LOGIN, LOGOUT} from "../actions/cases.js";
 
 export const registerUserTest = (newUserData) => {
@@ -10,7 +9,6 @@ export const registerUserTest = (newUserData) => {
       method: "POST",
       url: "/api/users/register_test",
       data: newUserData
-      //data: qs.stringify(data)
     };
     axios(config)
       .then((response) => {
@@ -60,5 +58,36 @@ export const registerUser = (newUserData) => {
           }
         });
       });
-  }
+  };
 };
+
+export const loginUser = (clientData) => {
+  return function(dispatch) {
+    const config = {
+      method: "POST",
+      url: "/api/users/login",
+      data: clientData,
+    };
+    axios(config)
+      .then((response) => {
+        dispatch({
+          type: LOGIN,
+          payload: {
+            statusCode: response.status,
+            data: response.data,
+          }
+        });
+        return Promise.resolve();
+      })
+      .catch((error) => {
+        dispatch({
+          type: LIST_ERRORS,
+          payload: {
+            message: error.response.data.message,
+            statusText: error.response.statusText,
+            status: error.response.status,
+          }
+        });
+      });
+  }
+}

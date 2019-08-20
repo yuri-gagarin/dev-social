@@ -1,6 +1,8 @@
 import React, {Component, Fragment} from "react";
 import {Container, Responsive} from "semantic-ui-react";
 
+import {connect} from "react-redux";
+
 import NavbarHandheld from "./handheld/NavbarHandheld.jsx";
 import NavbarTablet from "./tablet/NavbarTablet.jsx";
 import NavbarDesktop from "./desktop/NavbarDesktop.jsx";
@@ -139,6 +141,13 @@ class MainNav extends Component {
     })
   }
   onRightToggle = (event) => {
+    if(!event) {
+      return this.setState({
+        rightVisible: !this.state.rightVisible,
+        rightInnerItems: null,
+      });
+    }
+    
     let inner = event.target.dataset.inner;
     if(inner) inner = inner.toLowerCase();
     this.setState({
@@ -155,7 +164,6 @@ class MainNav extends Component {
   render() {
     const {children, leftItems, rightItems} = this.props;
     const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, rightVisible, innerMainItems, rightInnerItems} = this.state;
-
     return (
       <Fragment>
         <Responsive maxWidth={0} maxWidth={414}>
@@ -217,5 +225,10 @@ class MainNav extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    authState: state.auth,
+  };
+};
 
-export default MainNav;
+export default connect(mapStateToProps, null)(MainNav); 

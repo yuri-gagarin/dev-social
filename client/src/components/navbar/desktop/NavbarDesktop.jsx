@@ -109,7 +109,7 @@ const NavbarDesktop = (
             <Icon name="window close outline"></Icon>
             <div>Close</div>
           </Menu.Item>
-          { buildRightMenu(rightInnerItems, {}) }
+          { buildRightMenu(rightInnerItems, {closeWindow: onRightToggle}) }
         </Sidebar>
         <Sidebar.Pusher
           dimmed={pusherVisible}

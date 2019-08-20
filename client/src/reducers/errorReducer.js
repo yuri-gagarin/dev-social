@@ -1,14 +1,13 @@
 import {LIST_ERRORS} from "../actions/cases.js";
-const initialState = {errors: "none"};
 
-export default function(state = initialState, action) {
+export default function(state={}, action) {
   switch(action.type) {
     case LIST_ERRORS:
       return {
         ...state,
-        statusCode: action.payload.statusCode,
-        message: action.payload.data.message,
-        errors: action.payload.data.errors
+        statusCode: action.payload.status,
+        statusText: action.payload.statusText,
+        message: action.payload.message,
       }
     default: 
       return state;

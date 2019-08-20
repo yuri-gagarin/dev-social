@@ -102,7 +102,8 @@ const NavbarTablet = (
           style={{width: "100vw", height: "100vh", backgroundColor: "white"}} >
           <Menu.Item
             as={Segment}
-            onClick={onRightToggle} >
+            onClick={onRightToggle}
+            >
             <Icon name="arrow right"></Icon>
             <div>Back</div>
           </Menu.Item>

@@ -57,7 +57,7 @@ export default  {
     //validate for valid email
     if (!emailValidator(email)) {
       return res.status(400).json({
-        message: "Invalid email"
+        message: "Invalid email",
       });
     }
 
@@ -113,15 +113,13 @@ export default  {
       })
       .catch((error) => {
         return res.status(400).json({
-          message: "An error occured",
-          errorMsg: error.message
+          message: error.message,
         });
       });
     }
     else {
       return res.status(400).json({
-        message: "Input error",
-        error: "Email and password are required fields"
+        message: "Email and password are required fields",
       })
     }
   },

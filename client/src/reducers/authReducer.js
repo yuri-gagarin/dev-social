@@ -1,21 +1,19 @@
 import {REGISTER, LOGIN, LOGOUT} from "../actions/cases.js";
-const initialState = {
-  name: null,
-  lastName: null,
-  email: null
-};
-export default function(state=initialState, action) {
+export default function(state={}, action) {
   switch(action.type){
     case REGISTER:
       return ({
         ...state,
-        statusCode: action.payload.statusCode,
         message: action.payload.data.message,
-        user: action.payload.data.user
+        isRegistered: true,
+        user: action.payload.data.user,
       });
     case LOGIN:
       return ({
-        result: action.payload
+        ...state,
+        message: action.payload.data.message,
+        loggedIn: true,
+        user: action.payload.data.user,
       });
     case LOGOUT:
       return ({

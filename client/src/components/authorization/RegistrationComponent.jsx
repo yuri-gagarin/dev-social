@@ -1,29 +1,23 @@
 import React, {Component} from "react";
 import {Container, Form, Button} from "semantic-ui-react";
+import PropTypes from "prop-types";
 import style from "../../assets/stylesheets/authorization/registration.scss";
+//redux imports
+import {connect} from "react-redux";
+import {registerUser} from "../../actions/authActions.js";
+//validator imports
 import emailValidator from "../../helpers/emailValidator.js";
 import nameValidator from "../../helpers/nameValidator.js";
 import passwordValidator from "../../helpers/passwordValidator.js";
-import axios from "axios";
+//form helper imports
 import {setTypingTimeout, setEmailTimeout, checkTyping,
         matchPasswords, checkForFormCompletion, 
         disableButton, enableButton } from "./helper_methods/formHelper.js";
 
-const registerUser = (userInfo) => {
-  const options = {
-    method: "POST",
-    url: "/api/users/register",
-    data: {
-      ...userInfo
-    }
-  };
-  return axios(options);
-};
-
 
 class RegistrationComponent extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       email: {
         value: null,
@@ -57,7 +51,7 @@ class RegistrationComponent extends Component {
         value: false,
       }
     };
-
+    console.log(props)
     this.toValidate = ["email", "firstName", "lastName", "password", "passwordConfirm"];
   }
   //lifecycle methods
@@ -66,6 +60,9 @@ class RegistrationComponent extends Component {
   }
 
   componentDidUpdate() {
+    if(this.props.authState.isRegistered) {
+      this.props.closeWindow();
+    }
     if(!checkTyping(this)) {
       if(checkForFormCompletion(this, this.toValidate)) {
         enableButton("registerButton");
@@ -264,6 +261,7 @@ class RegistrationComponent extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    const {registerUser} = this.props;
     const newUserInfo = {
       name: this.state.firstName.value,
       lastName: this.state.lastName.value,
@@ -271,14 +269,8 @@ class RegistrationComponent extends Component {
       password: this.state.password.value,
       passwordConfirm: this.state.passwordConfirm.value,
     };
+    registerUser(newUserInfo);
     
-    registerUser(newUserInfo)
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error.response);
-      })
   }
 
 
@@ -329,7 +321,25 @@ class RegistrationComponent extends Component {
       </Container>
     )
   }
+};
+
+//validate props
+RegistrationComponent.propTypes = {
+  registerUser: PropTypes.func,
+}
+//
+
+const mapStateToProps = (state) => {
+  return {
+    authState: state.auth,
+    errorState: state.error,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    registerUser: (newUserData) =>  dispatch(registerUser(newUserData)),
+  }
 }
 
 
-export default RegistrationComponent;
+export default connect(mapStateToProps, mapDispatchToProps)(RegistrationComponent);

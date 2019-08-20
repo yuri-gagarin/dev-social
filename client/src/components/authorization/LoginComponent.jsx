@@ -1,15 +1,19 @@
 import React, {Component} from "react";
 import {Container, Form, Button} from "semantic-ui-react";
+//redux imports
+import {connect} from "react-redux";
+import {loginUser} from "../../actions/authActions.js";
+//form helpers
 import {setTypingTimeout, checkTyping, checkForFormCompletion, 
         disableButton, enableButton} from "./helper_methods/formHelper.js";
+//validators
 import emailValidator from "../../helpers/emailValidator.js";
 import passwordValidator from "../../helpers/passwordValidator.js";
-import axios from "axios";
 
 
 class LoginComponent extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       email: {
         value: null,
@@ -24,6 +28,7 @@ class LoginComponent extends Component {
         value: false,
       }
     };
+    console.log(props)
     this.toValidate = ["email", "password"];
   }
   //lifecycle methods
@@ -31,6 +36,9 @@ class LoginComponent extends Component {
     disableButton("loginButton");
   }
   componentDidUpdate() {
+    if(this.props.authState.loggedIn) {
+      this.props.closeWindow();
+    }
     if(!checkTyping(this)) {
       if(checkForFormCompletion(this, this.toValidate)) {
         enableButton("loginButton");
@@ -118,23 +126,13 @@ class LoginComponent extends Component {
   }
 
   handleLogin(event) {
-    const options = {
-      method: "POST",
-      url: "/api/users/login",
-      data: {
-        email: this.state.email.value,
-        password: this.state.password.value,
-      }
+    event.preventDefault();
+    const {loginUser} = this.props;
+    const clientData =  {
+      email: this.state.email.value,
+      password: this.state.password.value,
     };
-    console.log("firing");
-    console.log("login");
-    axios(options)
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error.response);
-      });
+    loginUser(clientData);
   }
 
   render() {
@@ -163,5 +161,15 @@ class LoginComponent extends Component {
     );
   }
 };
+const mapStateToProps = (state) => {
+  return {
+    authState: state.auth,
+  };
+};
 
-export default LoginComponent;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loginUser: (clientData) => dispatch(loginUser(clientData)),
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(LoginComponent);
