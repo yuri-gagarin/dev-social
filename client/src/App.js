@@ -20,10 +20,12 @@ class App extends Component {
   }
   
   componentDidMount() {
-    this.buildNavBar();
+    console.log(this.props.authState);
+    const authState = this.props;
+    this.buildNavBar(authState);
   }
 
-  buildNavBar = () => {
+  buildNavBar = (authState) => {
     axios
       .get("/api/getmainnav")
       .then((response)=> {

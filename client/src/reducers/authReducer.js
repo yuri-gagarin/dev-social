@@ -26,7 +26,10 @@ export default function(state={}, action) {
       });
     case LOGOUT:
       return ({
-        result: action.payload
+        ...state,
+        message: action.payload.message,
+        loggedIn: false,
+        user: null,
       });
     default:
       return state;

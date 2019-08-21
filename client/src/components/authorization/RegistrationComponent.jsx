@@ -326,9 +326,10 @@ class RegistrationComponent extends Component {
 //validate props
 RegistrationComponent.propTypes = {
   registerUser: PropTypes.func.isRequired,
-
+  history: PropTypes.object.isRequired,
+  authState: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
 }
-//
 
 const mapStateToProps = (state) => {
   return {

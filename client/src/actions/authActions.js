@@ -120,3 +120,14 @@ export const setUser = (userData) => {
     });
   };
 };
+
+export const logoutUser = (useToken) => {
+  return function(dispatch) {
+    dispatch(({
+      type: LOGOUT,
+      payload: {
+        message: "User Logged Out",
+      }
+    }))
+  }
+}
