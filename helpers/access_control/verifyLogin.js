@@ -8,12 +8,13 @@ export default function(req, res, next) {
         next();
       }
       else if(!user) {
+        if( info && info.name === "TokenExpiredError" ) {
+          res.locals.message = "Login has expired";
+        } 
         res.locals.loggedIn = false;
         next();
       }
       else {
-        console.log(13)
-        console.log(user)
         res.locals.loggedIn = true;
         res.locals.user = user;
         next();

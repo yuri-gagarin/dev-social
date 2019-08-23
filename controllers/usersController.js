@@ -88,7 +88,7 @@ export default  {
             email: user.email
           };
           //sign the token
-          return jwtSignPromise(tokenPayload, keys.secretOrKey,{expiresIn: 3600});
+          return jwtSignPromise(tokenPayload, keys.secretOrKey,{expiresIn: "2h"});
         }
         else {
           return Promise.reject(new Error("Incorrect password"));

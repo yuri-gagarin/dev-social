@@ -11,13 +11,12 @@ import setAuthToken from "./helpers/setAuthToken.js";
 
 //check for a user login
 if(localStorage.jwtToken) {
-  console.log("here");
   const currentUser = jwtDecode(localStorage.jwtToken)
   const timeNow = Date.now();
   console.log(16)
-  console.log(currentUser.exp)
+  console.log(currentUser.exp * 1000)
   console.log(timeNow)
-  if(currentUser.exp > timeNow) {
+  if(currentUser.exp*1000 > timeNow) {
     delete localStorage.jwtToken;
     store.dispatch(logoutUser(currentUser));
   }

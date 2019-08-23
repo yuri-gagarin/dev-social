@@ -18,16 +18,17 @@ class App extends Component {
       rightItems: [],
     };
   }
-  
+
   componentDidMount() {
-    console.log(this.props.authState);
-    const authState = this.props;
-    this.buildNavBar(authState);
+    this.buildNavBar(this.props.authState);
   }
 
   buildNavBar = (authState) => {
+    console.log(authState)
     axios
-      .get("/api/getmainnav")
+      .get("/api/getmainnav", {params: 
+        {loggedIn: authState.loggedIn}
+      })
       .then((response)=> {
           this.setState({
             leftItems: response.data.sideMain,
