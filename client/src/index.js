@@ -5,31 +5,15 @@ import App from "./App.js";
 import store from "./store.js";
 import "./styles.scss";
 
-import jwtDecode from "jwt-decode";
-import {setUser, logoutUser} from "./actions/authActions.js";
-import setAuthToken from "./helpers/setAuthToken.js";
+import {BrowserRouter as Router} from "react-router-dom";
 
-//check for a user login
-if(localStorage.jwtToken) {
-  const currentUser = jwtDecode(localStorage.jwtToken)
-  const timeNow = Date.now();
-  console.log(16)
-  console.log(currentUser.exp * 1000)
-  console.log(timeNow)
-  if(currentUser.exp*1000 > timeNow) {
-    delete localStorage.jwtToken;
-    store.dispatch(logoutUser(currentUser));
-  }
-  else {
-    setAuthToken(localStorage.jwtToken);
-    console.log(currentUser);
-    store.dispatch(setUser(currentUser));
-  }
-}
+
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <Router>
+      <App />
+    </Router>
   </Provider>, 
   document.getElementById("app")
 );

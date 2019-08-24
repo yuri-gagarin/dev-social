@@ -1,9 +1,13 @@
 import React, {Component, Fragment} from "react";
 import {Container, Responsive} from "semantic-ui-react";
 import PropTypes from "prop-types";
+import {withRouter} from "react-router-dom";
 
 import {connect} from "react-redux";
+import {logoutUser} from "../../actions/authActions.js";
+import jwtDecode from "jwt-decode";
 
+import {guestNav, userNav} from "./nav_data/navData.js";
 import NavbarHandheld from "./handheld/NavbarHandheld.jsx";
 import NavbarTablet from "./tablet/NavbarTablet.jsx";
 import NavbarDesktop from "./desktop/NavbarDesktop.jsx";
@@ -28,6 +32,9 @@ class MainNav extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      leftItems: [],
+      innerMainItems: {},
+      rightItems: [],
       pusherVisible: false,
       mainVisible: false,
       innerMainVisible: false,
@@ -36,6 +43,30 @@ class MainNav extends Component {
       rightInnerItems: null,
 
     };
+  }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log("updated");
+    if (prevProps.authState !== this.props.authState) {
+      this.buildNavBar(this.props.authState);
+    }
+  }
+  buildNavBar = (authState) => {
+    console.log("building nav")
+    console.log(authState)
+    if(authState.loggedIn) {
+      this.setState({
+        leftItems: userNav.sideMain,
+        innerMainItems: userNav.innerMain,
+        rightItems: userNav.rightItems,
+      });
+    }
+    else {
+      this.setState({
+        leftItems: guestNav.sideMain,
+        innerMainItems: guestNav.innerMain,
+        rightItems: guestNav.rightItems,
+      })
+    }
   }
   onPusherToggle = () => {
     const {pusherVisible, innerMainVisible, mainVisible, rightVisible} = this.state;
@@ -111,9 +142,14 @@ class MainNav extends Component {
         rightInnerItems: null,
       });
     }
-    
     let inner = event.target.dataset.inner;
     if(inner) inner = inner.toLowerCase();
+    if(inner === "logout") {
+      const user = jwtDecode(localStorage.jwtToken);
+      console.log("Logging out");
+      this.props.logoutUser(user, this.props.history);
+      return;
+    }
     this.setState({
       rightVisible: !this.state.rightVisible,
       rightInnerItems: inner || null,
@@ -126,9 +162,9 @@ class MainNav extends Component {
   //end desktop methods
 
   render() {
-    const {children, leftItems, innerMainItems, rightItems} = this.props;
-    const {pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, rightVisible,rightInnerItems} = this.state;
-    
+    const {children} = this.props;
+    const {leftItems, innerMainItems, rightItems, pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, rightVisible, rightInnerItems} = this.state;
+    console.log("Rendered MainNav")
     return (
       <Fragment>
         <Responsive maxWidth={0} maxWidth={414}>
@@ -197,10 +233,16 @@ MainNav.propTypes = {
   rightVisible: PropTypes.array,
 };
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    logoutUser: (userData, history) => dispatch(logoutUser(userData, history)),
+  }
+};
+
 const mapStateToProps = (state) => {
   return {
     authState: state.auth,
   };
 };
 
-export default connect(mapStateToProps, null)(MainNav); 
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(MainNav)); 

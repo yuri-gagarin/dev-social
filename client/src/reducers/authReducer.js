@@ -28,7 +28,7 @@ export default function(state={}, action) {
       return ({
         ...state,
         message: action.payload.message,
-        loggedIn: false,
+        loggedIn: action.payload.loggedIn,
         user: null,
       });
     default:

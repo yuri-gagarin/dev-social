@@ -1,65 +1,72 @@
 import React, {Component, Fragment} from "react";
+import PropTypes from "prop-types";
 import MainNav from "./components/navbar/MainNav.jsx";
 import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
 import Footer from "./components/footer/Footer.jsx";
 //redux and routing
 import {connect} from "react-redux";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import store from "./store.js";
+import {Route, withRouter } from "react-router-dom";
 
-import axios from "axios";
+
+import jwtDecode from "jwt-decode";
+import {setUser, logoutUser} from "./actions/authActions.js";
+
+//check for a user login
+function setInitialCredentials(jwtToken, store, history) {
+
+  if(jwtToken) {
+    const currentUser = jwtDecode(jwtToken)
+    if (currentUser.exp < Date.now() / 1000) {
+      store.dispatch(logoutUser(currentUser, history));
+    }
+    else {
+      store.dispatch(setUser(currentUser));
+    }
+  }
+  else {
+    store.dispatch(setUser("guest"))
+  }
+}
 
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      leftItems: [],
-      innerMainItems: {},
-      rightItems: [],
-    };
   }
-
   componentDidMount() {
-    this.buildNavBar(this.props.authState);
+    const history = this.props.history;
+    setInitialCredentials(localStorage.jwtToken, store, history);
   }
 
-  buildNavBar = (authState) => {
-    console.log(authState)
-    axios
-      .get("/api/getmainnav", {params: 
-        {loggedIn: authState.loggedIn}
-      })
-      .then((response)=> {
-          this.setState({
-            leftItems: response.data.sideMain,
-            innerMainItems: response.data.innerMain,
-            rightItems: response.data.rightItems,
-          });
-      })
-      .catch((error) => {console.log(error)});
-  }
+  
 
   render() {
-    const {leftItems, innerMainItems, rightItems} = this.state;
     return (
       <Fragment>
-        <Router>
-          <MainNav
-            leftItems = {leftItems}
-            rightItems = {rightItems}
-            innerMainItems = {innerMainItems} >
-                <Route exact path="/" component={WelcomeComponent} />
+          <MainNav>
+            <Route exact path="/" component={WelcomeComponent} />
           </MainNav>
           <Footer></Footer>
-        </Router>
       </Fragment>
     );
   }
 }
+App.propTypes = {
+  history: PropTypes.object.isRequired,
+  authState: PropTypes.object.isRequired,
+};
+
 const mapStateToProps = (state) => {
   return {
     authState: state.auth,
+    testState: state.test,
   };
 };
+const mapDispatchToProps = (dispatch) => {
+  return {
 
-export default connect(mapStateToProps, null)(App);
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App));

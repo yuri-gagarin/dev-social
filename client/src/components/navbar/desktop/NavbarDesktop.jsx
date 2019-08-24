@@ -4,7 +4,35 @@ import {Container, Icon, Image, Sidebar, Responsive, Menu, Segment} from "semant
 import getInnerSidebarOptions from "../helpers/getInnerSidebarOptions.js";
 import buildRightMenu from "../helpers/buildRightMenu.js";
 
+import {connect} from "react-redux";
+
 import style from "../../../assets/stylesheets/navbar/navbarDesktop.scss";
+
+const checkUserLogin = ({authState, rightVisible, onRightToggle, rightInnerItems }) => {
+  if (!authState.loggedIn) {
+    return (
+      <Sidebar
+        as={Container}
+        animation="overlay"
+        visible={rightVisible}
+        direction="top"
+        id = {style.rightDesktopMenu} >
+        <Menu.Item
+          as={Segment}
+          onClick={onRightToggle} >
+          <Icon name="window close outline"></Icon>
+          <div>Close</div>
+        </Menu.Item>
+        { buildRightMenu(rightInnerItems, {closeWindow: onRightToggle}) }
+      </Sidebar>
+    );
+  }
+  else {
+    return (
+      <div></div>
+    );
+  }
+}
 
 const NavbarDesktop = (
   {
@@ -22,8 +50,10 @@ const NavbarDesktop = (
     rightVisible,
     onRightToggle,
     rightInnerItems,
+    authState,
   }
 ) => {
+ 
   return (
     <Fragment>
       <Menu id={style.navbarDesktop} fixed="top">
@@ -95,33 +125,30 @@ const NavbarDesktop = (
               );
             })
           }
-
         </Sidebar>
-        <Sidebar
-          as={Container}
-          animation="overlay"
-          visible={rightVisible}
-          direction="top"
-          id = {style.rightDesktopMenu} >
-          <Menu.Item
-            as={Segment}
-            onClick={onRightToggle} >
-            <Icon name="window close outline"></Icon>
-            <div>Close</div>
-          </Menu.Item>
-          { buildRightMenu(rightInnerItems, {closeWindow: onRightToggle}) }
-        </Sidebar>
+        {checkUserLogin({authState, rightVisible, onRightToggle, rightInnerItems})}
+        
         <Sidebar.Pusher
           dimmed={pusherVisible}
           onClick={onPusherToggle}
-          id={style.mainContent}
-          >         
+          id={style.mainContent}>         
           {children}
         </Sidebar.Pusher>
-        
       </Sidebar.Pushable>
     </Fragment>
   );
 };
+const mapStateToProps = (state) => {
+  return {
+    authState: state.auth,
+    testState: state.test,
+  };
+};
 
-export default NavbarDesktop;
+const mapDispachToProps = (dispatch) => {
+  return {
+
+  };
+};
+
+export default connect(mapStateToProps, null)(NavbarDesktop);

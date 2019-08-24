@@ -111,22 +111,46 @@ export const loginUser = (clientData, history) => {
 
 export const setUser = (userData) => {
   return function(dispatch) {
-    dispatch({
-      type: SET_USER,
-      payload: {
-        message: "User Logged In",
-        data: userData,
-      }
-    });
-  };
+    if(!userData) {
+      dispatch({
+        type: SET_USER,
+        payload: {
+          message: "Welcome Guest",
+          loggedIn: false,
+        }
+      });
+    }
+    else if (typeof userData === "string" && userData === "guest") {
+      dispatch({
+        type: SET_USER,
+        payload: {
+          message: "Welcome Guest",
+          loggedIn: false,
+        }
+      });
+    }
+    else {
+      dispatch({
+        type: SET_USER,
+        payload: {
+          message: "User Logged In",
+          loggedIn: true,
+          data: userData,
+        }
+      });
+    };
+  }
 };
 
-export const logoutUser = (useToken) => {
+export const logoutUser = (userData, history) => {
   return function(dispatch) {
+    delete localStorage.jwtToken;
+    history.push("/");
     dispatch(({
       type: LOGOUT,
       payload: {
-        message: "User Logged Out",
+        message: `Bye ${userData.name}`,
+        loggedIn: false,
       }
     }))
   }
