@@ -7,4 +7,7 @@ export const LOGIN  = "LOGIN";
 export const SET_USER = "SET_USER";
 export const LOGOUT = "LOGOUT";
 
+export const OPEN_DASH = "OPEN_DASH";
+export const CLOSE_DASH = "CLOSE_DASH";
+
 

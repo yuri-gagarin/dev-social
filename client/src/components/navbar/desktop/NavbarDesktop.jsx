@@ -8,6 +8,44 @@ import {connect} from "react-redux";
 
 import style from "../../../assets/stylesheets/navbar/navbarDesktop.scss";
 
+const LogoutButton = (props) => {
+  return (
+    <Button onClick={this.props.logout}>
+      <span>Logout</span>
+    </Button>
+  )
+}
+const AuthorizationsComponents = (props) => {
+  const {loggedIn, toggleLogin, toggleRegister, toggleLogout, toggleDashboard, toggleMyProfile} = this.props;
+  if(loggedIn) {
+    return (
+    <Fragment>
+      <Menu.Item as={Button} onClick={toggleLogout}>
+        <span>Logout</span>
+      </Menu.Item>
+      <Menu.Item as={Button} onClick={toggleMyProfile}>
+        <span>My Profile</span>
+      </Menu.Item>
+      <Menu.item as={Button} onClick={toggleDashboard}>
+        <span>Dashboard</span>
+      </Menu.item>
+    </Fragment>
+    );
+  }
+  else {
+    return(
+      <Fragment>
+        <Menu.Item as={Button} onClick={toggleLogin}>
+          <span>Login</span>
+        </Menu.Item>
+        <Menu.Item as={Button} onClick={toggleRegister}>
+          <span>Register</span>
+        </Menu.Item>
+      </Fragment>
+    );
+  }
+};
+
 const checkUserLogin = ({authState, rightVisible, onRightToggle, rightInnerItems }) => {
   if (!authState.loggedIn) {
     return (

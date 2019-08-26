@@ -4,7 +4,6 @@ import {REGISTER, LIST_ERRORS, LOGIN, LOGOUT, SET_USER} from "../actions/cases.j
 import setAuthToken from "../helpers/setAuthToken.js";
 
 export const registerUserTest = (newUserData) => {
-  console.log(newUserData);
 
   return function(dispatch) {
     const config = {
