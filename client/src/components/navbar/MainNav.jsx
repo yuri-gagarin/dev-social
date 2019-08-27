@@ -32,39 +32,11 @@ class MainNav extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      leftItems: [],
-      innerMainItems: {},
-      rightItems: [],
       pusherVisible: false,
       mainVisible: false,
       innerMainVisible: false,
-      innerMainToOpen: null,
-      rightVisible: false,
-      rightInnerItems: null,
-
+      userDashVisble: false,
     };
-  }
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.authState !== this.props.authState) {
-      this.buildNavBar(this.props.authState);
-    }
-  }
-  buildNavBar = (authState) => {
-   
-    if(authState.loggedIn) {
-      this.setState({
-        leftItems: userNav.sideMain,
-        innerMainItems: userNav.innerMain,
-        rightItems: userNav.rightItems,
-      });
-    }
-    else {
-      this.setState({
-        leftItems: guestNav.sideMain,
-        innerMainItems: guestNav.innerMain,
-        rightItems: guestNav.rightItems,
-      })
-    }
   }
   onPusherToggle = () => {
     const {pusherVisible, innerMainVisible, mainVisible, rightVisible} = this.state;
