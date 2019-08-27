@@ -32,7 +32,6 @@ class LoginComponent extends Component {
       },
       errors: null,
     };
-    console.log(props)
     this.toValidate = ["email", "password"];
   }
   //lifecycle methods
@@ -179,7 +178,6 @@ class LoginComponent extends Component {
 
 LoginComponent.propTypes = {
   loginUser: PropTypes.func.isRequired,
-  closeWindow: PropTypes.func.isRequired,
   authState: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,

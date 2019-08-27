@@ -1,23 +1,30 @@
 import React from "react";
+import PropTypes from "prop-types";
+
+import style from "../../../assets/stylesheets/navbar/userDashboard.scss";
+import {Menu} from "semantic-ui-react";
+
+import {connect} from "react-redux";
+import {closeDashboard} from "../../../actions/navActions.js"; 
+
 
 //returns a sidebar with a dashboard for logged in users
-const Dashboard = (props) => {
-  const {isLoggedIn,rightVisible, onRightToggle} = props;
-  if (isLoggedIn) {
+const UserDashboard = (props) => {
+  const {authState, navState, closeDashboard} = props;
+  if (authState.isLoggedIn) {
     return(
       <Sidebar
         as={Container}
         animation="overlay"
-        visible={rightVisible}
+        visible={navState.dashOpen}
         direction="top"
-        id = {style.rightDesktopMenu} >
+        id = {""} >
         <Menu.Item
-          as={Segment}
-          onClick={onRightToggle} >
+          as={"a"}
+          onClick={closeDashboard} >
           <Icon name="window close outline"></Icon>
           <div>Close</div>
         </Menu.Item>
-        { buildRightMenu(rightInnerItems, {closeWindow: onRightToggle}) }
       </Sidebar>
     )
   }
@@ -25,3 +32,23 @@ const Dashboard = (props) => {
     return null;
   }
 };
+
+UserDashboard.propTypes = {
+  navState: PropTypes.object.isRequired,
+  authState: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = (state) => {
+  return {
+    navState: state.nav,
+    authState: state.auth,
+  }
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    closeDashboard: () => dispatch(closeDashboard()),
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserDashboard);
+

@@ -19,12 +19,10 @@ export const openDashboard = () => {
   }
 };
 
-export const closeDasboard = () => {
-  return function(dispatch) {
-    dispatch({
-      type: CLOSE_DASH, 
-      payload: null,
-    })
+export const closeDashboard = () => {
+  return {
+    type: CLOSE_DASH, 
+    payload: null,
   }
 };
 

@@ -45,14 +45,12 @@ class MainNav extends Component {
     };
   }
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log("updated");
     if (prevProps.authState !== this.props.authState) {
       this.buildNavBar(this.props.authState);
     }
   }
   buildNavBar = (authState) => {
-    console.log("building nav")
-    console.log(authState)
+   
     if(authState.loggedIn) {
       this.setState({
         leftItems: userNav.sideMain,

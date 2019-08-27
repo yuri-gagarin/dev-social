@@ -6,19 +6,20 @@ import {Menu, Button} from "semantic-ui-react";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 import {logoutUser} from "../../../actions/authActions.js";
-import {openDashboard, closeDasboard} from "../../../actions/navActions.js"; 
+import {openDashboard, closeDashboard} from "../../../actions/navActions.js"; 
 
 import jwtDecode from "jwt-decode";
 
 const NavAuthComponent = (props) => {
-  const {authState, history, toggleMyProfile, openDashboard, closeDasboard} = props;
-  const toggleLogin = (history) => {
+  const {authState, history, toggleMyProfile, openDashboard, toggleLogin, toggleRegister} = props;
+  
+  const toggleLogin = () => {
     history.push("/login");
   };
   const toggleRegister = () => {
     history.push("/register")
   };
-  const toggleLogout = (history) => {
+  const toggleLogout = () => {
     const currentUser = jwtDecode(localStorage.jwtToken);
     logoutUser(currentUser, history)
   };
@@ -54,10 +55,10 @@ const NavAuthComponent = (props) => {
 
 NavAuthComponent.propTypes = {
   authState: PropTypes.object.isRequired,
-  navsState: PropTypes.object.isRequired,
+  navState: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
   openDashboard: PropTypes.func.isRequired,
-  closeDasboard: PropTypes.func.isRequired,
+  closeDashboard: PropTypes.func.isRequired,
 
 };
 
@@ -69,9 +70,9 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggleMyProfile: () => {},
+    toggleMyProfile: () => dispatch(closeDashboard()),
     openDashboard: () => dispatch(openDashboard()),
-    closeDasboard: () => dispatch(closeDasboard()),
+    closeDashboard: () => dispatch(closeDashboard()),
   };
 };
 

@@ -8,69 +8,8 @@ import {connect} from "react-redux";
 
 import style from "../../../assets/stylesheets/navbar/navbarDesktop.scss";
 
-const LogoutButton = (props) => {
-  return (
-    <Button onClick={this.props.logout}>
-      <span>Logout</span>
-    </Button>
-  )
-}
-const AuthorizationsComponents = (props) => {
-  const {loggedIn, toggleLogin, toggleRegister, toggleLogout, toggleDashboard, toggleMyProfile} = this.props;
-  if(loggedIn) {
-    return (
-    <Fragment>
-      <Menu.Item as={Button} onClick={toggleLogout}>
-        <span>Logout</span>
-      </Menu.Item>
-      <Menu.Item as={Button} onClick={toggleMyProfile}>
-        <span>My Profile</span>
-      </Menu.Item>
-      <Menu.item as={Button} onClick={toggleDashboard}>
-        <span>Dashboard</span>
-      </Menu.item>
-    </Fragment>
-    );
-  }
-  else {
-    return(
-      <Fragment>
-        <Menu.Item as={Button} onClick={toggleLogin}>
-          <span>Login</span>
-        </Menu.Item>
-        <Menu.Item as={Button} onClick={toggleRegister}>
-          <span>Register</span>
-        </Menu.Item>
-      </Fragment>
-    );
-  }
-};
-
-const checkUserLogin = ({authState, rightVisible, onRightToggle, rightInnerItems }) => {
-  if (!authState.loggedIn) {
-    return (
-      <Sidebar
-        as={Container}
-        animation="overlay"
-        visible={rightVisible}
-        direction="top"
-        id = {style.rightDesktopMenu} >
-        <Menu.Item
-          as={Segment}
-          onClick={onRightToggle} >
-          <Icon name="window close outline"></Icon>
-          <div>Close</div>
-        </Menu.Item>
-        { buildRightMenu(rightInnerItems, {closeWindow: onRightToggle}) }
-      </Sidebar>
-    );
-  }
-  else {
-    return (
-      <div></div>
-    );
-  }
-}
+import NavAuthComponent from "../nav_components/NavAuthComponent.jsx";
+import UserDashboard from "../nav_components/UserDashboard.jsx";
 
 const NavbarDesktop = (
   {
@@ -84,11 +23,6 @@ const NavbarDesktop = (
     innerMainToOpen,
     onInnerMainToggle,
     innerMainItems,
-    rightItems,
-    rightVisible,
-    onRightToggle,
-    rightInnerItems,
-    authState,
   }
 ) => {
  
@@ -103,14 +37,7 @@ const NavbarDesktop = (
           <span id={style.mainMenuBtn}>Main Menu</span>
         </Menu.Item>
         <Menu.Menu position="right">
-        { rightItems.map((item) => {
-            return( 
-            <Menu.Item {...item} onClick={onRightToggle}
-              data-inner={item.content}>
-            </Menu.Item>
-            )
-          })
-        }
+        <NavAuthComponent />
         </Menu.Menu>
       </Menu>
       <Sidebar.Pushable id={style.sidebarPushable}>
@@ -164,8 +91,8 @@ const NavbarDesktop = (
             })
           }
         </Sidebar>
-        {checkUserLogin({authState, rightVisible, onRightToggle, rightInnerItems})}
-        
+
+        <UserDashboard />
         <Sidebar.Pusher
           dimmed={pusherVisible}
           onClick={onPusherToggle}

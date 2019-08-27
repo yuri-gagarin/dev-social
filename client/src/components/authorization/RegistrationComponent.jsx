@@ -51,7 +51,6 @@ class RegistrationComponent extends Component {
         value: false,
       }
     };
-    console.log(props)
     this.toValidate = ["email", "firstName", "lastName", "password", "passwordConfirm"];
   }
   //lifecycle methods
