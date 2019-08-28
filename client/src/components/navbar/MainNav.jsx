@@ -5,9 +5,7 @@ import {withRouter} from "react-router-dom";
 
 import {connect} from "react-redux";
 import {logoutUser} from "../../actions/authActions.js";
-import jwtDecode from "jwt-decode";
-
-import {guestNav, userNav} from "./nav_data/navData.js";
+import {openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash} from "../../actions/navActions.js";
 import NavbarHandheld from "./handheld/NavbarHandheld.jsx";
 import NavbarTablet from "./tablet/NavbarTablet.jsx";
 import NavbarDesktop from "./desktop/NavbarDesktop.jsx";
@@ -31,164 +29,73 @@ const NavbarChildren = ({ children }) => {
 class MainNav extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      pusherVisible: false,
-      mainVisible: false,
-      innerMainVisible: false,
-      userDashVisble: false,
-    };
   }
   onPusherToggle = () => {
-    const {pusherVisible, innerMainVisible, mainVisible, rightVisible} = this.state;
+    const {pusherVisible, mainVisible, innerMainVisible, dashOpen} = this.props.navState;
     if (pusherVisible && mainVisible && !innerMainVisible) {
-      this.setState({
-        pusherVisible: false,
-        mainVisible: false,
-      });
+      this.props.closeMain();
+    }
+    else if (pusherVisible && dashOpen) {
+      this.props.closeDash();
     }
     else if (pusherVisible && innerMainVisible) {
       setTimeout(() => {
-        this.setState({
-          pusherVisible: false,
-          mainVisible: false,
-        });
+        this.props.closeMain();
       }, 500);
-      this.setState({
-        innerMainVisible: false,
-      });
+      this.props.closeInnerMain();
     }
-    else if (pusherVisible && rightVisible) {
-      this.setState({
-        pusherVisible: false,
-        rightVisible: false,
-      })
-    }
-  }
-  //handheld methods
-  onMainToggle = (event) => {
-    const {mainVisible, innerMainVisible} = this.state;
-    if (mainVisible && innerMainVisible) {
-      setTimeout(() => {
-        this.setState({
-          mainVisible: false,
-        });
-      },500);
-      this.setState({
-        pusherVisible: false,
-        innerMainVisible: false,
-      });
-    }
-    else {
-      this.setState({
-        mainVisible: !this.state.mainVisible,
-        pusherVisible: !this.state.pusherVisible,
-      });
-    }
-  }
-  onMainInnerHandheldToggle = (event) => {
-    let toOpen = event.target.getAttribute("value");
-    if(toOpen) toOpen = toOpen.toLowerCase();
-    this.setState({
-      innerMainVisible: !this.state.innerMainVisible,
-      innerMainToOpen: toOpen || null
-    });
-  }
+  };
+  //main menu functions
+  openMain = () => {
+    this.props.openMain(this.props.authState);
+  };
+  closeMain = () => {
+    this.props.closeMain();
+  };
+  openInnerMain = (event, {content}) => { 
+    this.props.openInnerMain(this.props.authState, content);
+  };
+  closeInnerMain = () => {
+    this.props.closeInnerMain();
+  };
+  //dashboard functions
+  openDash = () => {
+    this.props.openDash(this.props.authState);
+  };
+  closeDash = () => {
+    this.props.closeDash();
+  };
+  //logout function
+  logoutUser = () => {
 
-  // end handheld methods
-
-  //tablet methods
-  onInnerMainToggle = (event) => {
-    let toOpen = event.target.dataset.inner;
-    if(toOpen) toOpen = toOpen.toLowerCase();
-    this.setState({
-      innerMainVisible: !this.state.innerMainVisible,
-      innerMainToOpen: toOpen || null,
-    })
-  }
-  onRightToggle = (event) => {
-    if(!event) {
-      return this.setState({
-        rightVisible: !this.state.rightVisible,
-        rightInnerItems: null,
-      });
-    }
-    let inner = event.target.dataset.inner;
-    if(inner) inner = inner.toLowerCase();
-    if(inner === "logout") {
-      const user = jwtDecode(localStorage.jwtToken);
-      console.log("Logging out");
-      this.props.logoutUser(user, this.props.history);
-      return;
-    }
-    this.setState({
-      rightVisible: !this.state.rightVisible,
-      rightInnerItems: inner || null,
-    });
-  }
-  //end tablet methods
-
-  //desktop methods
-
-  //end desktop methods
+  };
 
   render() {
-    const {children} = this.props;
-    const {leftItems, innerMainItems, rightItems, pusherVisible, mainVisible, innerMainVisible, innerMainToOpen, rightVisible, rightInnerItems} = this.state;
-    console.log("Rendered MainNav")
     return (
       <Fragment>
         <Responsive maxWidth={0} maxWidth={414}>
-          <NavbarHandheld
-            pusherVisible={false}
-            mainVisible={mainVisible}
-            onMainToggle={this.onMainToggle}
-            mainItems={leftItems}
-            innerMainVisible={innerMainVisible}
-            innerMainToOpen={innerMainToOpen}
-            onInnerMainToggle={this.onInnerMainToggle}
-            innerMainItems={innerMainItems}
-            rightItems={rightItems}
-            rightVisible={rightVisible}
-            onRightToggle={this.onRightToggle}
-            rightInnerItems={rightInnerItems} >
+          <NavbarHandheld>
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarHandheld>
         </Responsive>
 
         <Responsive minWidth={415} maxWidth={1024}>
-          <NavbarTablet
-            pusherVisible={pusherVisible}
-            onPusherToggle={this.onPusherToggle}
-            mainVisible={mainVisible}
-            onMainToggle={this.onMainToggle}
-            mainItems={leftItems}
-            innerMainVisible={innerMainVisible}
-            innerMainToOpen={innerMainToOpen}
-            onInnerMainToggle={this.onInnerMainToggle}
-            innerMainItems={innerMainItems}
-            rightItems={rightItems}
-            rightVisible={rightVisible}
-            onRightToggle={this.onRightToggle}
-            rightInnerItems={rightInnerItems} >
+          <NavbarTablet>
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarTablet>
 
         </Responsive>
         <Responsive minWidth={1025} className="">
-          <NavbarDesktop 
-            pusherVisible={pusherVisible}
-            onPusherToggle={this.onPusherToggle}
-            mainVisible={mainVisible}
-            onMainToggle={this.onMainToggle}
-            mainItems={leftItems}
-            innerMainVisible={innerMainVisible}
-            innerMainToOpen={innerMainToOpen}
-            onInnerMainToggle={this.onInnerMainToggle}
-            innerMainItems={innerMainItems}
-            rightItems={rightItems}
-            rightVisible={rightVisible}
-            onRightToggle={this.onRightToggle}
-            rightInnerItems={rightInnerItems} >
+          <NavbarDesktop
+            onPusherToggle
+            openMain
+            closeMain
+            openInnerMain
+            closeInnerMain
+            openDash
+            closeDash
+            logoutUser
+          >
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarDesktop>
         </Responsive>
@@ -198,20 +105,26 @@ class MainNav extends Component {
 }
 
 MainNav.propTypes = {
-  leftItems: PropTypes.array,
-  innerMainItems: PropTypes.object,
-  rightVisible: PropTypes.array,
+  authState: PropTypes.object.isRequired,
+  navState: PropTypes.object.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    logoutUser: (userData, history) => dispatch(logoutUser(userData, history)),
-  }
+    openMain: (authState) => dispatch(openMain(authState)),
+    closeMain: () => dispatch(closeMain()),
+    openInnerMain: (authState, content) => dispatch(openInnerMain(authState, content)),
+    closeInnerMain: () => dispatch(closeInnerMain()),
+    openDash: (authState) => dispatch(openDash(authState)),
+    closeDash: () => dispatch(closeDash()),
+    logoutUser: () => dispatch(logoutUser()),
+  };
 };
 
 const mapStateToProps = (state) => {
   return {
     authState: state.auth,
+    navState: state.ui.navBar,
   };
 };
 

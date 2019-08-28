@@ -17,6 +17,7 @@ export const  navReducer = (state=initialState, action) =>{
         navBar: {
           ...state.navBar,
           mainVisible: true,
+          mainData: action.payload.mainData,
         }
       };
     case CLOSE_MAIN:
@@ -33,6 +34,7 @@ export const  navReducer = (state=initialState, action) =>{
         navBar: {
           ...state.navBar,
           innerMainVisible: true,
+          innerMainData: action.payload.innerMainData,
         }
       };
     case CLOSE_INNER_MAIN: 
@@ -49,6 +51,7 @@ export const  navReducer = (state=initialState, action) =>{
         navBar: {
           ...state.navBar,
           dashOpen: true,
+          dashData: [],
         }
       };
     case  CLOSE_DASH: 

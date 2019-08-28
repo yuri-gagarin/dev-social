@@ -1,10 +1,12 @@
 export const guestNav = {
-  sideMain: [
-    {as: "a", content: "News", key: "news",},
-    {as: "a", content: "Topics", key: "topics" },
-    {as: "a", content: "Posts", key: "posts" },
-    {as: "a", content: "Users", key: "users"},
-  ],
+  main: {
+    data: [
+      {as: "a", content: "News", key: "news",},
+      {as: "a", content: "Topics", key: "topics" },
+      {as: "a", content: "Posts", key: "posts" },
+      {as: "a", content: "Users", key: "users"},
+    ],
+  },
   innerMain: {
     news: [
       { as: "a", content: "Newest", key: "newest"},
@@ -34,12 +36,14 @@ export const guestNav = {
 };
 
 export const userNav = {
-  sideMain: [
-    {as: "a", content: "News", key: "news",},
-    {as: "a", content: "Topics", key: "topics" },
-    {as: "a", content: "Posts", key: "posts" },
-    {as: "a", content: "Users", key: "users"},
-  ],
+  main: {
+    data: [
+      {as: "a", content: "News", key: "news",},
+      {as: "a", content: "Topics", key: "topics" },
+      {as: "a", content: "Posts", key: "posts" },
+      {as: "a", content: "Users", key: "users"},
+    ],
+  },
   innerMain: {
     news: [
       { as: "a", content: "Newest", key: "newest"},
