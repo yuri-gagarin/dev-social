@@ -1,11 +1,12 @@
 import React, {Component, Fragment} from "react";
-import {Container, Responsive} from "semantic-ui-react";
+import {Responsive} from "semantic-ui-react";
 import PropTypes from "prop-types";
 import {withRouter} from "react-router-dom";
-
+//redux imports
 import {connect} from "react-redux";
-import {logoutUser} from "../../actions/authActions.js";
-import {openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash} from "../../actions/navActions.js";
+import {logoutUser} from "../../redux/actions/authActions.js";
+import {openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash} from "../../redux/actions/navActions.js";
+
 import NavbarHandheld from "./handheld/NavbarHandheld.jsx";
 import NavbarTablet from "./tablet/NavbarTablet.jsx";
 import NavbarDesktop from "./desktop/NavbarDesktop.jsx";
@@ -67,10 +68,12 @@ class MainNav extends Component {
   };
   //logout function
   logoutUser = () => {
-
+    this.props.logoutUser();
   };
 
   render() {
+    const children = this.props.children;
+    console.log(this.props);
     return (
       <Fragment>
         <Responsive maxWidth={0} maxWidth={414}>
@@ -87,14 +90,16 @@ class MainNav extends Component {
         </Responsive>
         <Responsive minWidth={1025} className="">
           <NavbarDesktop
-            onPusherToggle
-            openMain
-            closeMain
-            openInnerMain
-            closeInnerMain
-            openDash
-            closeDash
-            logoutUser
+            onPusherToggle={this.onPusherToggle}
+            openMain={this.openMain}
+            closeMain={this.closeMain}
+            openInnerMain={this.openInnerMain}
+            closeInnerMain={this.closeInnerMain}
+            openDash={this.openDash}
+            closeDash={this.closeDash}
+            logoutUser={this.logoutUser}
+            navState={this.props.navState}
+            authState={this.props.authState}
           >
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarDesktop>
@@ -102,11 +107,19 @@ class MainNav extends Component {
       </Fragment>
     );
   }
-}
+};
+
 
 MainNav.propTypes = {
   authState: PropTypes.object.isRequired,
   navState: PropTypes.object.isRequired,
+  openMain: PropTypes.func.isRequired,
+  closeMain: PropTypes.func.isRequired,
+  openInnerMain: PropTypes.func.isRequired,
+  closeInnerMain: PropTypes.func.isRequired,
+  openDash: PropTypes.func.isRequired,  
+  closeDash: PropTypes.func.isRequired,
+  logoutUser: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -124,7 +137,7 @@ const mapDispatchToProps = (dispatch) => {
 const mapStateToProps = (state) => {
   return {
     authState: state.auth,
-    navState: state.ui.navBar,
+    navState: state.nav,
   };
 };
 

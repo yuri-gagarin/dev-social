@@ -1,17 +1,21 @@
 import React, {Fragment} from "react";
 import {Icon, Image, Sidebar, Menu} from "semantic-ui-react";
 
-import style from "../../../assets/stylesheets/navbar/navbarDesktop.scss";
+import style from "../../../assets/stylesheets/navbar/navbar.scss";
 import {withRouter} from "react-router-dom";
+
+import MainMenu from "../nav_components/MainMenu.jsx";
+import InnerMainMenu from "../nav_components/InnerMainMenu.jsx";
+
 import NavAuthComponent from "../nav_components/NavAuthComponent.jsx";
+import DashComponent from "../nav_components/DashComponent.jsx";
 import UserDashboard from "../nav_components/UserDashboard.jsx";
 
 const NavbarDesktop = (props) => {
-  const { history, authState, navState, onPusherToggle, openMain, 
-          closeMain, openInnerMain, closeinnerMain, openDash, closeDash } = props;
-  goHome = (history) => {
-    history.push("/");
-  };
+  const { history, authState, navState, children} = props;
+  const { openMain, closeMain, openInnerMain, closeinnerMain, openDash, closeDash, onPusherToggle} = props;
+
+  const goHome = (history) => {history.push("/")};
 
   return (
     <Fragment>
@@ -25,7 +29,9 @@ const NavbarDesktop = (props) => {
           <span id={style.mainMenuBtn}>Main Menu</span>
         </Menu.Item>
         <Menu.Menu position="right">
-          <NavAuthComponent authState={authState} />
+          <NavAuthComponent 
+            authState={authState} 
+          />
           <DashComponent 
             authState={authState}
             openDash={openDash} 
@@ -51,7 +57,7 @@ const NavbarDesktop = (props) => {
           closeDash={closeDash}
         />
         <Sidebar.Pusher
-          dimmed={pusherVisible}
+          dimmed={navState.pusherVisible}
           onClick={onPusherToggle}
           id={style.mainContent}>         
           {children}

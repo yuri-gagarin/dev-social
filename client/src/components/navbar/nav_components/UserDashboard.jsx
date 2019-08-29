@@ -1,16 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import style from "../../../assets/stylesheets/navbar/userDashboard.scss";
 import {Menu} from "semantic-ui-react";
 
-import {connect} from "react-redux";
-import {closeDashboard} from "../../../actions/navActions.js"; 
 
 
 //returns a sidebar with a dashboard for logged in users
 const UserDashboard = (props) => {
-  const {authState, navState, closeDashboard} = props;
+  const {authState, navState, closeDash} = props;
   if (authState.isLoggedIn) {
     return(
       <Sidebar
@@ -21,7 +18,7 @@ const UserDashboard = (props) => {
         id = {""} >
         <Menu.Item
           as={"a"}
-          onClick={closeDashboard} >
+          onClick={closeDash} >
           <Icon name="window close outline"></Icon>
           <div>Close</div>
         </Menu.Item>
@@ -36,19 +33,8 @@ const UserDashboard = (props) => {
 UserDashboard.propTypes = {
   navState: PropTypes.object.isRequired,
   authState: PropTypes.object.isRequired,
+  closeDash: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => {
-  return {
-    navState: state.nav,
-    authState: state.auth,
-  }
-};
-const mapDispatchToProps = (dispatch) => {
-  return {
-    closeDashboard: () => dispatch(closeDashboard()),
-  }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(UserDashboard);
+export default UserDashboard;
 

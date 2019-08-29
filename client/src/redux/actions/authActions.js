@@ -1,7 +1,7 @@
 import axios from "axios";
 import jwtDecode from "jwt-decode";
-import {REGISTER, LIST_ERRORS, LOGIN, LOGOUT, SET_USER} from "../actions/cases.js";
-import setAuthToken from "../helpers/setAuthToken.js";
+import {REGISTER, LIST_ERRORS, LOGIN, LOGOUT, SET_USER} from "../cases.js";
+import setAuthToken from "../../helpers/setAuthToken.js";
 
 export const registerUserTest = (newUserData) => {
 

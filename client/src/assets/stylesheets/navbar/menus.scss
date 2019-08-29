@@ -1,0 +1,16 @@
+$information-phone: "only screen and (max-width : 414px)";
+$information-tablet: "only screen and (max-width :  1024)";
+$information-desktop: "only screen and (min-with : 1025)";
+
+#mainMenu {
+  height: 100%;
+  @media #{$information-phone} {
+    width: 100%;
+  }
+  @media #{$information-tablet} {
+    width: 33%;
+  }
+  @media #{$information-desktop} {
+    width: 20%;
+  }
+}

@@ -1,5 +1,5 @@
-import {REGISTER, LOGIN, LOGOUT, SET_USER} from "../actions/cases.js";
-import isEmpty from "../helpers/validators/isEmpty.js";
+import {REGISTER, LOGIN, LOGOUT, SET_USER} from "../cases.js";
+import isEmpty from "../../helpers/validators/isEmpty.js";
 
 export default function(state={}, action) {
   switch(action.type){

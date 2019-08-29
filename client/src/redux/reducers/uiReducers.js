@@ -1,4 +1,4 @@
-import {OPEN_DASH, CLOSE_DASH} from "../actions/cases.js";
+import {OPEN_MAIN, CLOSE_MAIN, OPEN_INNER_MAIN, CLOSE_INNER_MAIN, OPEN_DASH, CLOSE_DASH} from "../cases.js";
 
 const initialState = {
   navBar: {
@@ -6,19 +6,18 @@ const initialState = {
     mainVisible: false,
     innerMainVisible: false,
     dashOpen: false,
+    mainItems: [],
+    innerMainItems: [],
   },
 };
 
-export const  navReducer = (state=initialState, action) =>{
+export const navReducer = (state=initialState.navBar, action) =>{
   switch(action.type) {
     case OPEN_MAIN:
       return {
         ...state,
-        navBar: {
-          ...state.navBar,
-          mainVisible: true,
-          mainData: action.payload.mainData,
-        }
+        mainVisible: true,
+        mainItems: [...action.payload],
       };
     case CLOSE_MAIN:
       return {
@@ -34,7 +33,7 @@ export const  navReducer = (state=initialState, action) =>{
         navBar: {
           ...state.navBar,
           innerMainVisible: true,
-          innerMainData: action.payload.innerMainData,
+          innerMainData: [...action.payload.innerMainData],
         }
       };
     case CLOSE_INNER_MAIN: 

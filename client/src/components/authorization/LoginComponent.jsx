@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import {withRouter} from "react-router-dom";
 //redux imports
 import {connect} from "react-redux";
-import {loginUser} from "../../actions/authActions.js";
+import {loginUser} from "../../redux/actions/authActions.js";
 //form helpers
 import displayFormErrors from "./helper_methods/displayFormErrors.js";
 import {setTypingTimeout, checkTyping, checkForFormCompletion, 

@@ -1,10 +1,10 @@
-import {OPEN_MAIN, CLOSE_MAIN, OPEN_INNER_MAIN, CLOSE_INNER_MAIN, OPEN_DASH, CLOSE_DASH} from "./cases.js";
-import {guestNav, userNav} from "../components/navbar/nav_data/navData.js";
+import {OPEN_MAIN, CLOSE_MAIN, OPEN_INNER_MAIN, CLOSE_INNER_MAIN, OPEN_DASH, CLOSE_DASH} from "../cases.js";
+import {guestNav, userNav} from "../../components/navbar/nav_data/navData.js";
 
 
 
 const openMain = (authState) => {
-  const mainData = {};
+  let mainData;
   if(authState.loggedIn) {
     mainData = userNav.main.data;
   }
@@ -13,7 +13,7 @@ const openMain = (authState) => {
   }
   return function(dispatch) {
     dispatch({
-      action: OPEN_MAIN,
+      type: OPEN_MAIN,
       payload: mainData,
     });
   };
@@ -21,13 +21,13 @@ const openMain = (authState) => {
 const closeMain = () => {
   return function(dispatch) {
     dispatch({
-      action: CLOSE_MAIN,
+      type: CLOSE_MAIN,
       payload: null,
     })
   };
 };
 const openInnerMain = (authState, content) => {
-  const innerMainData = {};
+  let innerMainData;
   if (authState.loggedIn) {
     innerMainData = userNav.innerMain[content];
   }
@@ -36,7 +36,7 @@ const openInnerMain = (authState, content) => {
   }
   return function(dispatch) {
     dispatch({
-      action: OPEN_INNER_MAIN,
+      type: OPEN_INNER_MAIN,
       payload: innerMainData,
     });
   };
@@ -44,7 +44,7 @@ const openInnerMain = (authState, content) => {
 const closeInnerMain = () => {
   return function(dispatch) {
     dispatch({
-      action: CLOSE_INNER_MAIN,
+      type: CLOSE_INNER_MAIN,
       payload: null, 
     });
   };

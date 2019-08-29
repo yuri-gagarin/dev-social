@@ -1,4 +1,4 @@
-import {LIST_ERRORS} from "../actions/cases.js";
+import {LIST_ERRORS} from "../cases.js";
 
 export default function(state={}, action) {
   switch(action.type) {

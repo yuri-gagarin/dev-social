@@ -6,12 +6,12 @@ import AuthorizationComponent from "./components/authorization/AuthorizationComp
 import Footer from "./components/footer/Footer.jsx";
 //redux and routing
 import {connect} from "react-redux";
-import store from "./store.js";
+import store from "./redux/store.js";
 import {Route, withRouter } from "react-router-dom";
 
 
 import jwtDecode from "jwt-decode";
-import {setUser, logoutUser} from "./actions/authActions.js";
+import {setUser, logoutUser} from "./redux/actions/authActions.js";
 
 //check for a user login
 function setInitialCredentials(jwtToken, store, history) {

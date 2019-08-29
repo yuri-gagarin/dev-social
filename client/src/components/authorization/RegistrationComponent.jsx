@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import style from "../../assets/stylesheets/authorization/registration.scss";
 //redux imports
 import {connect} from "react-redux";
-import {registerUser} from "../../actions/authActions.js";
+import {registerUser} from "../..//redux/actions/authActions.js";
 //validator imports
 import emailValidator from "../../helpers/emailValidator.js";
 import nameValidator from "../../helpers/nameValidator.js";

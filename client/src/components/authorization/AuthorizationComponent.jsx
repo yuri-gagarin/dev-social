@@ -9,7 +9,6 @@ import LoginComponent from "./LoginComponent.jsx";
 
 import {connect} from "react-redux";
 
-import {Route, Link} from "react-router-dom";
 
 class AuthorizationComponent extends Component {
   constructor(props){

@@ -1,28 +1,33 @@
 import React from 'react';
 
-const MainMenu = (props) => {
+import {Sidebar, Menu, Segment, Icon} from "semantic-ui-react";
+import style from "../../../assets/stylesheets/navbar/menus.scss";
 
+const MainMenu = (props) => {
+  const {authState, navState, closeMain, openInnerMain} = props;
+  console.log("main props")
+  console.log(props);
   return(
     <Sidebar
       as={Menu}
       animation="overlay"
-      visible={mainVisible}
+      visible={navState.mainVisible}
       direction="left"
       vertical
       id={style.mainMenu}>
       <Menu.Item
         as={Segment}
-        onClick={onMainToggle}
+        onClick={closeMain}
         className={""} >
         <div><Icon name={"arrow left"}></Icon></div>
         <div>Back</div>
       </Menu.Item>
       {
-        mainItems.map((item) => {
+        navState.mainItems.map((item) => {
           return (
             <Menu.Item
             {...item}
-              onClick={onInnerMainToggle}
+              onClick={openInnerMain}
               data-inner={item.content}>
             </Menu.Item>
           );
