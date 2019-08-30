@@ -13,7 +13,7 @@ import UserDashboard from "../nav_components/UserDashboard.jsx";
 
 const NavbarDesktop = (props) => {
   const { history, authState, navState, children} = props;
-  const { openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash, onPusherToggle} = props;
+  const { openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash, onPusherToggle, logoutUser} = props;
 
   const goHome = (history) => {history.push("/")};
 
@@ -31,6 +31,7 @@ const NavbarDesktop = (props) => {
         <Menu.Menu position="right">
           <NavAuthComponent 
             authState={authState} 
+            logoutUser={logoutUser}
           />
           <DashComponent 
             authState={authState}

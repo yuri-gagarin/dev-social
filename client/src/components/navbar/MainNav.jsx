@@ -77,8 +77,8 @@ class MainNav extends Component {
     this.props.closeDash();
   };
   //logout function
-  logoutUser = () => {
-    this.props.logoutUser();
+  logoutUser = (userData, history) => {
+    this.props.logoutUser(userData, history);
   };
 
   render() {
@@ -139,7 +139,7 @@ const mapDispatchToProps = (dispatch) => {
     closeInnerMain: () => dispatch(closeInnerMain()),
     openDash: (authState) => dispatch(openDash(authState)),
     closeDash: () => dispatch(closeDash()),
-    logoutUser: () => dispatch(logoutUser()),
+    logoutUser: (userData, history) => dispatch(logoutUser(userData, history)),
   };
 };
 

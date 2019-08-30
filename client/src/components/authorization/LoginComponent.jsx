@@ -66,7 +66,7 @@ class LoginComponent extends Component {
           value: true,
         },
         typingTimeout: {
-          value: setTypingTimeout(this, 2000),
+          value: setTypingTimeout(this, 500),
         }
       });
     }
@@ -80,7 +80,7 @@ class LoginComponent extends Component {
           value: true,
         },
         typingTimeout: {
-          value: setTypingTimeout(this, 2000),
+          value: setTypingTimeout(this, 500),
         }
       })
     }
@@ -100,7 +100,7 @@ class LoginComponent extends Component {
           value: true,
         },
         typingTimeout: {
-          value: setTypingTimeout(this, 2000),
+          value: setTypingTimeout(this, 500),
         }
       });
     }
@@ -114,7 +114,7 @@ class LoginComponent extends Component {
           value: true,
         },
         typingTimeout: {
-          value: setTypingTimeout(this, 2000),
+          value: setTypingTimeout(this, 500),
         }
       });
     }
@@ -129,7 +129,7 @@ class LoginComponent extends Component {
   }
 
   render() {
-    const {errors} = this.state;
+    const {errors} = this.props;
     return (
       <Container>
         <h3 className={""}>Login</h3>

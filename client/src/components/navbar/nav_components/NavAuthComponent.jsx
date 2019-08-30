@@ -7,13 +7,21 @@ import {withRouter} from "react-router-dom";
 
 
 const NavAuthComponent = (props) => {
-  const {authState, history} = props;
+  const {authState, history, logoutUser} = props;
+  console.log(authState);
   
   const toggleLogin = () => {
     history.push("/login");
   };
   const toggleRegister = () => {
     history.push("/register")
+  };
+  const toggleLogout = () => {
+    const userData = authState.user;    
+    logoutUser(userData, history);
+  };
+  const toggleMyProfile = () => {
+
   };
 
   if(authState.loggedIn) {
@@ -45,6 +53,7 @@ const NavAuthComponent = (props) => {
 NavAuthComponent.propTypes = {
   authState: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
+  logoutUser: PropTypes.func.isRequired,
 };
 
 

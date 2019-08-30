@@ -143,6 +143,9 @@ export const setUser = (userData) => {
 };
 
 export const logoutUser = (userData, history) => {
+  console.log(146)
+  console.log(userData)
+  console.log(history)
   return function(dispatch) {
     delete localStorage.jwtToken;
     history.push("/");
