@@ -15,7 +15,6 @@ import {setTypingTimeout, setEmailTimeout, checkTyping,
 class RegistrationComponent extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.state = {
       email: {
         value: null,
@@ -90,11 +89,11 @@ class RegistrationComponent extends Component {
       this.setState({
         email: {
           value: event.target.value,
-          emailTimeout: setEmailTimeout(this, 2000),
+          emailTimeout: setEmailTimeout(this, 1000),
           error: {content: "Invalid Email", pointing: "below"},
         },
         typingTimeout: {
-          value: setTypingTimeout(this),
+          value: setTypingTimeout(this, 500),
         },
         typing: {
           value: true,
@@ -105,11 +104,11 @@ class RegistrationComponent extends Component {
       this.setState({
         email: {
           value: event.target.value,
-          emailTimeout: setEmailTimeout(this, 2000),
+          emailTimeout: setEmailTimeout(this, 500),
           error: null,
         },
         typingTimeout: {
-          value: setTypingTimeout(this),
+          value: setTypingTimeout(this, 500),
         },
         typing: {
           value: true,
@@ -131,7 +130,7 @@ class RegistrationComponent extends Component {
           error: {content: error, pointing: "below"},
         },
         typingTimeout: {
-          value: setTypingTimeout(this),
+          value: setTypingTimeout(this, 500),
         },
         typing: {
           value: true,
@@ -145,7 +144,7 @@ class RegistrationComponent extends Component {
           error: null,
         },
         typingTimeout: {
-          value: setTypingTimeout(this),
+          value: setTypingTimeout(this, 500),
         },
         typing: {
           value: true,
@@ -167,7 +166,7 @@ class RegistrationComponent extends Component {
           error: {content: error, pointing: "below"},
         },
         typingTimeout: {
-          value: setTypingTimeout(this),
+          value: setTypingTimeout(this, 500),
         },
         typing: {
           value: true,
@@ -181,7 +180,7 @@ class RegistrationComponent extends Component {
           error: null
         },
         typingTimeout: {
-          value: setTypingTimeout(this),
+          value: setTypingTimeout(this, 500),
         },
         typing: {
           value: true,
@@ -207,7 +206,7 @@ class RegistrationComponent extends Component {
         error: error,
       },
       typingTimeout: {
-        value: setTypingTimeout(this),
+        value: setTypingTimeout(this, 500),
       },
       typing: {
         value: true,
@@ -230,7 +229,7 @@ class RegistrationComponent extends Component {
           error: {content: "Passwords do not match", pointing: "below"},
         },
         typingTimeout: {
-          value: setTypingTimeout(this),
+          value: setTypingTimeout(this, 500),
         },
         typing: {
           value: true,
@@ -244,7 +243,7 @@ class RegistrationComponent extends Component {
           error: null,
         },
         typingTimeout: {
-          value: setTypingTimeout(this),
+          value: setTypingTimeout(this, 500),
         },
         typing: {
           value: true,
@@ -262,8 +261,7 @@ class RegistrationComponent extends Component {
       password: this.state.password.value,
       passwordConfirm: this.state.passwordConfirm.value,
     };
-    this.props.handleRegister(newUserInfo, this.props.history);
-    
+    this.props.handleRegister(newUserInfo, this.props.history); 
   }
 
 

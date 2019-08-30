@@ -8,7 +8,6 @@ import {withRouter} from "react-router-dom";
 
 const NavAuthComponent = (props) => {
   const {authState, history, logoutUser} = props;
-  console.log(authState);
   
   const toggleLogin = () => {
     history.push("/login");
