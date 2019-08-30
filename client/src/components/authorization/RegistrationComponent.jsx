@@ -1,10 +1,7 @@
 import React, {Component} from "react";
 import {Container, Form, Button} from "semantic-ui-react";
 import PropTypes from "prop-types";
-import style from "../../assets/stylesheets/authorization/registration.scss";
-//redux imports
-import {connect} from "react-redux";
-import {registerUser} from "../..//redux/actions/authActions.js";
+import style from "../../assets/stylesheets/authorization/authorization.scss";
 //validator imports
 import emailValidator from "../../helpers/emailValidator.js";
 import nameValidator from "../../helpers/nameValidator.js";
@@ -60,9 +57,6 @@ class RegistrationComponent extends Component {
   }
 
   componentDidUpdate() {
-    if(this.props.authState.isRegistered) {
-      this.props.closeWindow();
-    }
     if(!checkTyping(this)) {
       if(checkForFormCompletion(this, this.toValidate)) {
         enableButton("registerButton");
@@ -260,7 +254,6 @@ class RegistrationComponent extends Component {
   }
 
   handleSubmit(event) {
-    event.preventDefault();
     const {registerUser} = this.props;
     const newUserInfo = {
       name: this.state.firstName.value,
@@ -269,7 +262,7 @@ class RegistrationComponent extends Component {
       password: this.state.password.value,
       passwordConfirm: this.state.passwordConfirm.value,
     };
-    registerUser(newUserInfo);
+    this.props.handleRegister(newUserInfo, this.props.history);
     
   }
 
@@ -316,7 +309,7 @@ class RegistrationComponent extends Component {
             placeholder="Confirm Password"
             onChange={ (e) => {this.handlePasswordConfirm(e)} }
           />
-          <Button className="registerButton" type="submit" onClick={ (e) => this.handleSubmit(e) }>Submit</Button>
+          <Button className="registerButton" onClick={ (e) => this.handleSubmit(e) }>Submit</Button>
         </Form>
       </Container>
     )
@@ -325,23 +318,9 @@ class RegistrationComponent extends Component {
 
 //validate props
 RegistrationComponent.propTypes = {
-  registerUser: PropTypes.func.isRequired,
-  history: PropTypes.object.isRequired,
-  authState: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired,
-}
-
-const mapStateToProps = (state) => {
-  return {
-    authState: state.auth,
-    errors: state.error,
-  };
+  handleRegister: PropTypes.func.isRequired,
 };
-const mapDispatchToProps = (dispatch) => {
-  return {
-    registerUser: (newUserData) =>  dispatch(registerUser(newUserData)),
-  }
-}
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(RegistrationComponent);
+export default RegistrationComponent;

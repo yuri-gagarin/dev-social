@@ -1,10 +1,6 @@
 import React, {Component} from "react";
 import {Container, Form, Button, Message} from "semantic-ui-react";
 import PropTypes from "prop-types";
-import {withRouter} from "react-router-dom";
-//redux imports
-import {connect} from "react-redux";
-import {loginUser} from "../../redux/actions/authActions.js";
 //form helpers
 import displayFormErrors from "./helper_methods/displayFormErrors.js";
 import {setTypingTimeout, checkTyping, checkForFormCompletion, 
@@ -34,23 +30,9 @@ class LoginComponent extends Component {
     };
     this.toValidate = ["email", "password"];
   }
-  //lifecycle methods
-  static getDerivedStateFromProps(props, state) {
-    if(props.authState.loggedIn) {
-      props.closeWindow();
-    }
-    
-    if(props.errors) {
-      return {
-        errors: props.errors
-      }
-    }
-    return null;
-  }
   componentDidMount() {
     disableButton("loginButton");
   }
-  
   componentDidUpdate() {
     if(!checkTyping(this)) {
       if(checkForFormCompletion(this, this.toValidate)) {
@@ -69,7 +51,7 @@ class LoginComponent extends Component {
   }
 
   //component methods
-  handleEmail(event) {
+  handleEmail = (event) => {
     if (this.state.typingTimeout.value) {
       clearTimeout(this.state.typingTimeout.value);
     }
@@ -103,7 +85,7 @@ class LoginComponent extends Component {
       })
     }
   }
-  handlePassword(event) {
+  handlePassword = (event) => {
     if (this.state.typingTimeout.value) {
       clearTimeout(this.state.typingTimeout.value);
     }
@@ -138,13 +120,12 @@ class LoginComponent extends Component {
     }
   }
 
-  handleLogin(event) {
-    event.preventDefault();
-    const clientData =  {
+  handleLogin = () => {
+    const userData =  {
       email: this.state.email.value,
       password: this.state.password.value,
     };
-    this.props.loginUser(clientData, this.props.history);
+    this.props.handleLogin(userData, this.props.history);
   }
 
   render() {
@@ -158,7 +139,7 @@ class LoginComponent extends Component {
             fluid
             label="Email"
             placeholder="Email"
-            onChange={ (e) => {this.handleEmail(e)} }
+            onChange={(e) => this.handleEmail(e)}
           />
           <Form.Input 
             error={this.state.password.error}
@@ -166,7 +147,7 @@ class LoginComponent extends Component {
             label="Password"
             placeholder="Password"
             type="password"
-            onChange={ (e) => {this.handlePassword(e)} }
+            onChange={(e) => this.handlePassword(e)}
           />
           {displayFormErrors(errors)}
           <Button className="loginButton" onClick={ (e) => {this.handleLogin(e)} }>Login</Button>
@@ -177,22 +158,9 @@ class LoginComponent extends Component {
 };
 
 LoginComponent.propTypes = {
-  loginUser: PropTypes.func.isRequired,
-  authState: PropTypes.object.isRequired,
+  handleLogin: PropTypes.func.isRequired,
   errors: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => {
-  return {
-    authState: state.auth,
-    errors: state.error,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    loginUser: (clientData, history) => dispatch(loginUser(clientData, history)),
-  };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(LoginComponent));
+export default LoginComponent;

@@ -33,7 +33,7 @@ export const registerUserTest = (newUserData) => {
   }
 };
 
-export const registerUser = (newUserData) => {
+export const registerUser = (newUserData, history) => {
   return function(dispatch) {
     const config = {
       method: "POST",
@@ -42,6 +42,7 @@ export const registerUser = (newUserData) => {
     };
     axios(config)
       .then((response) => {
+        history.push("/login");
         dispatch({
           type: REGISTER,
           payload:  {
@@ -62,12 +63,12 @@ export const registerUser = (newUserData) => {
   };
 };
 
-export const loginUser = (clientData, history) => {
+export const loginUser = (userData, history) => {
   return function(dispatch) {
     const config = {
       method: "POST",
       url: "/api/users/login",
-      data: clientData,
+      data: userData,
     };
     axios(config)
       .then((response) => {

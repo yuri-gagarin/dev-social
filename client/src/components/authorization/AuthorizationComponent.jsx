@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import {Container, Grid, GridColumn, Image, Menu} from "semantic-ui-react";
 import PropTypes from "prop-types";
+import style from "../../assets/stylesheets/authorization/authorization.scss";
 
 import {withRouter} from "react-router-dom";
 
@@ -8,98 +9,94 @@ import RegistrationComponent from "./RegistrationComponent.jsx";
 import LoginComponent from "./LoginComponent.jsx";
 
 import {connect} from "react-redux";
+import {registerUser, loginUser} from "../../redux/actions/authActions.js";
 
 
-class AuthorizationComponent extends Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      activeItem: props.history.location.pathname,
-    };
-
-  };
-  renderForm = (route) => {
-    if(route === "/login") {
+const AuthorizationComponent = (props) => {
+  //redux state
+  const {authState, errors, history} = props;
+  //auhtorization handlers
+  const {handleLogin, handleRegister} = props;
+  //location and activeItem for Menu within component
+  const currentRoute = props.location.pathname;
+  const activeItem = currentRoute.slice(1);
+  
+  const renderAuthForm = (currentRoute, props) => {
+    if(currentRoute === "/login") {
       return (
-        <LoginComponent />
+        <LoginComponent
+          {...props}
+         />
       )
     }
-    else if(route === "/register") {
+    else if(currentRoute === "/register") {
       return (
-        <RegistrationComponent />
+        <RegistrationComponent
+          {...props}
+         />
       )
     }
   };
-  switchForm = (event, {name}) => {
-    this.setState({
-      activeItem: name,
-    },
-    () => {
-      this.props.history.push(`/${name}`);
-    });
+  //switch handler for components menu bar
+  const switchForm = (event, name, history) => {
+    if(name !== activeItem) {
+      history.push(`/${name}`)
+    }
   };
 
-  handleLogin = () => {
-
-  };
-  handleRegister = () => {
-
-  };
-
-  render() {
-    const {history} = this.props;
-    const {activeItem} = this.state;
-    const currentRoute = history.location.pathname;
-
-    
-
-    return (
-      <Container>
-        <Grid centered columns={2}>
-          <GridColumn>
-            <Image src="/assets/images/logo.jpg" size="medium" centered/>
-          </GridColumn>
-        </Grid>
-        <Grid centered columns={2}>
-          <GridColumn>
-            <Menu pointing>
+  return (
+    <Container className={style.authorizationComponent}>
+      <Grid centered columns={2}>
+        <GridColumn>
+          <Image src="/assets/images/logo.jpg" size="medium" centered/>
+        </GridColumn>
+      </Grid>
+      <Grid centered columns={2}>
+        <GridColumn>
+          <Menu pointing>
+            <Menu.Item
+              as="a"
+              name="login"
+              active={activeItem === "login"}
+              onClick={(e, {name}) => switchForm(e, name, history)}
+            />
               <Menu.Item
-                as="a"
-                name="login"
-                active={activeItem === "login"}
-                onClick={this.switchForm}
-              />
-               <Menu.Item
-                as="a"
-                name="register"
-                active={activeItem === "register"}
-                onClick={this.switchForm}
-              />
-            </Menu>
-          </GridColumn>
-        </Grid>
-        <Grid centered columns={2}>
-          <GridColumn>
-            {this.renderForm(currentRoute)}
-          </GridColumn>
-        </Grid>
-      </Container>
-    );
-  }
+              as="a"
+              name="register"
+              active={activeItem === "register"}
+              onClick={(e, {name}) => switchForm(e, name, history)}
+            />
+          </Menu>
+        </GridColumn>
+      </Grid>
+      <Grid centered columns={2}>
+        <GridColumn>
+          {renderAuthForm(currentRoute, {history, errors, handleLogin, handleRegister})}
+        </GridColumn>
+      </Grid>
+    </Container>
+  )
 };
 
 AuthorizationComponent.propTypes = {
+  authState: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  handleLogin: PropTypes.func.isRequired,
+  handleRegister: PropTypes.func.isRequired,
 };
+
 const mapStateToProps = (state) => {
   return {
     authState: state.auth,
+    errors: state.error,
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    handleLogin: () => dispatch(),
-    handleRegister: () => dispatch(),
+    handleLogin: (userData, history) => dispatch(loginUser(userData, history)),
+    handleRegister: (userData, history) => dispatch(registerUser(userData, history)),
   };
 };
 
