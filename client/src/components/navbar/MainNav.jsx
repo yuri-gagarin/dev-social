@@ -51,10 +51,20 @@ class MainNav extends Component {
     this.props.openMain(this.props.authState);
   };
   closeMain = () => {
-    this.props.closeMain();
+    const {innerMainVisible} = this.props.navState;
+    //this is for larger devices to close both menus smoothly
+    if (innerMainVisible) {
+      setTimeout(() => {
+        this.props.closeMain();
+      }, 500);
+      this.props.closeInnerMain();
+    }
+    else {
+      this.props.closeMain();
+    }
   };
   openInnerMain = (event, {content}) => { 
-    this.props.openInnerMain(this.props.authState, content);
+    this.props.openInnerMain(this.props.authState, content.toLowerCase());
   };
   closeInnerMain = () => {
     this.props.closeInnerMain();
@@ -73,7 +83,6 @@ class MainNav extends Component {
 
   render() {
     const children = this.props.children;
-    console.log(this.props);
     return (
       <Fragment>
         <Responsive maxWidth={0} maxWidth={414}>

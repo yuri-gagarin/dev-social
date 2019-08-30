@@ -1,9 +1,12 @@
 $information-phone: "only screen and (max-width : 414px)";
-$information-tablet: "only screen and (max-width :  1024)";
-$information-desktop: "only screen and (min-with : 1025)";
+$information-tablet: "only screen and (max-width : 1024px)";
+$information-desktop: "only screen and (min-width : 1025px)";
 
 #mainMenu {
-  height: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0px;
   @media #{$information-phone} {
     width: 100%;
   }
@@ -11,6 +14,22 @@ $information-desktop: "only screen and (min-with : 1025)";
     width: 33%;
   }
   @media #{$information-desktop} {
-    width: 20%;
+    width: 10%;
+  }
+}
+
+#innerMainMenu {
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  @media #{$information-phone} {
+    width: 100%;
+  }
+  @media #{$information-tablet} {
+    width: 33%;
+  }
+  @media #{$information-desktop} {
+    width: 10%;
+    left: 10%;
   }
 }

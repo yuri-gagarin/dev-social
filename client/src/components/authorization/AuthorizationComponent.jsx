@@ -16,7 +16,6 @@ class AuthorizationComponent extends Component {
     this.state = {
       activeItem: props.history.location.pathname,
     };
-    console.log(props)
 
   };
   renderForm = (route) => {

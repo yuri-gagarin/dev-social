@@ -13,7 +13,7 @@ import UserDashboard from "../nav_components/UserDashboard.jsx";
 
 const NavbarDesktop = (props) => {
   const { history, authState, navState, children} = props;
-  const { openMain, closeMain, openInnerMain, closeinnerMain, openDash, closeDash, onPusherToggle} = props;
+  const { openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash, onPusherToggle} = props;
 
   const goHome = (history) => {history.push("/")};
 
@@ -39,17 +39,17 @@ const NavbarDesktop = (props) => {
         </Menu.Menu>
       </Menu>
 
-      <Sidebar.Pushable>
+      <Sidebar.Pushable style={{transform: "none"}}>
+        <InnerMainMenu
+          authState={authState}
+          navState={navState}
+          closeInnerMain={closeInnerMain}
+        />
         <MainMenu
           authState={authState}
           navState={navState}
           closeMain={closeMain}
           openInnerMain={openInnerMain}
-        />
-        <InnerMainMenu
-          authState={authState}
-          navState={navState}
-          closeinnerMain={closeinnerMain}
         />
         <UserDashboard 
           authState={authState}

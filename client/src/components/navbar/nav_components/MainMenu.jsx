@@ -5,8 +5,6 @@ import style from "../../../assets/stylesheets/navbar/menus.scss";
 
 const MainMenu = (props) => {
   const {authState, navState, closeMain, openInnerMain} = props;
-  console.log("main props")
-  console.log(props);
   return(
     <Sidebar
       as={Menu}
