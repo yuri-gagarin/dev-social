@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import MainNav from "./components/navbar/MainNav.jsx";
 import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
 import AuthorizationComponent from "./components/authorization/AuthorizationComponent.jsx";
+import PostsComponent from "./components/posts/PostsComponent.jsx";
 import Footer from "./components/footer/Footer.jsx";
 //redux and routing
 import {connect} from "react-redux";
@@ -48,6 +49,7 @@ class App extends Component {
           <MainNav>
             <Route exact path="/" component={WelcomeComponent} />
             <Route path="/(login|register)/" component={AuthorizationComponent} />
+            <Route path="/posts" component={PostsComponent} />
           </MainNav>
           <Footer></Footer>
       </Fragment>
