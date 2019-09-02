@@ -8,6 +8,13 @@ const handleClick = (e, {name}) => {
       axios.get("/api/posts")
   }
 }
+//function should extract info from the clicked item and reroute to the specific location
+function handleNewsClick(event, {name}) {
+  const namedEvent = name.split("_");
+  const firstArg = namedEvent[0], secondArg = namedEvent[1];
+  let route = `/${secondArg}/${firstArg}`;
+  window.location.pathname = route;  
+}
 
 export const guestNav = {
   main: {
@@ -20,10 +27,10 @@ export const guestNav = {
   },
   innerMain: {
     news: [
-      { as: "a", content: "All", name: "all_news", key: "all_news"},
-      { as: "a", content: "Newest", name: "new_news", key: "newe_news"},
-      { as: "a", content: "Popular", name: "popular_news", key: "popular_news"},
-      { as: "a", content: "Controversial", name: "controversial_news", key: "controversial_news"},
+      { as: "a", content: "All", name: "all_news", key: "all_news", onClick: handleNewsClick},
+      { as: "a", content: "Newest", name: "new_news", key: "new_news", onClick: handleNewsClick},
+      { as: "a", content: "Popular", name: "popular_news", key: "popular_news", onClick: handleNewsClick},
+      { as: "a", content: "Controversial", name: "controversial_news", key: "controversial_news", onClick: handleNewsClick},
     ],
     topics: [
       { as: "a", content: "All", name: "all_topics", key: "all_topics", onClick: handleClick},
