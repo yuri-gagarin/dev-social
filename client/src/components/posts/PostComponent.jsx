@@ -2,7 +2,7 @@ import React from "react";
 import {Item, Icon} from "semantic-ui-react";
 
 
-const Post = (props) => {
+const PostComponent = (props) => {
   const {authState, postState} = this.props;
 
   //should be a function to set the image for the post item or use default from server
@@ -27,3 +27,5 @@ const Post = (props) => {
     </Item>
   )
 }
+
+export default PostComponent;
