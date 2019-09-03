@@ -32,6 +32,9 @@ passportStrategy(passport);
 routes(router);
 app.use(router);
 
+//serve static files and default images
+app.use(express.static("public"));
+
 app.get("/", (req, res) => {
   if(process.env.NODE_ENV !== "production") {
     res.sendFile(path.resolve(__dirname, "client", "src", "index.html"));

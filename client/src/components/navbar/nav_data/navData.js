@@ -1,20 +1,3 @@
-import axios from "axios";
-const handleClick = (e, {name}) => {
-  console.log(e);
-  console.log(name);
-  switch(name) {
-    case "all_posts":
-      console.log("get all posts")
-      axios.get("/api/posts")
-  }
-}
-//function should extract info from the clicked item and reroute to the specific location
-function handleNewsClick(event, {name}) {
-  const namedEvent = name.split("_");
-  const firstArg = namedEvent[0], secondArg = namedEvent[1];
-  let route = `/${secondArg}/${firstArg}`;
-  window.location.pathname = route;  
-}
 
 export const guestNav = {
   main: {
@@ -27,27 +10,27 @@ export const guestNav = {
   },
   innerMain: {
     news: [
-      { as: "a", content: "All", name: "all_news", key: "all_news", onClick: handleNewsClick},
-      { as: "a", content: "Newest", name: "new_news", key: "new_news", onClick: handleNewsClick},
-      { as: "a", content: "Popular", name: "popular_news", key: "popular_news", onClick: handleNewsClick},
-      { as: "a", content: "Controversial", name: "controversial_news", key: "controversial_news", onClick: handleNewsClick},
+      { as: "a", content: "All", name: "news_all", key: "all_news"},
+      { as: "a", content: "Newest", name: "news_new", key: "new_news"},
+      { as: "a", content: "Popular", name: "news_popular", key: "popular_news"},
+      { as: "a", content: "Controversial", name: "news_controversial", key: "controversial_news"},
     ],
     topics: [
-      { as: "a", content: "All", name: "all_topics", key: "all_topics", onClick: handleClick},
-      { as: "a", content: "Newest", name: "new_topics", key: "new_topics"},
-      { as: "a", content: "Popular", name: "popular_topis", key: "popular_topics"},
-      { as: "a", content: "Controversial", name: "controversial_topics", key: "controversial_topics"},
+      { as: "a", content: "All", name: "topics_all", key: "all_topics"},
+      { as: "a", content: "Newest", name: "topics_new", key: "new_topics"},
+      { as: "a", content: "Popular", name: "topics_popular", key: "popular_topics"},
+      { as: "a", content: "Controversial", name: "topics_controversial", key: "controversial_topics"},
     ],
     posts: [
-      { as: "a", content: "All", name: "all_posts", key: "all_posts", onClick: handleClick},
-      { as: "a", content: "Newest", name: "new_posts", key: "new_posts"},
-      { as: "a", content: "Popular", name: "popular_posts", key: "popular_posts"},
-      { as: "a", content: "Controversial", name: "controversial_posts", key: "controversial_posts"},
+      { as: "a", content: "All", name: "posts_all", key: "all_posts"},
+      { as: "a", content: "Newest", name: "posts_new", key: "new_posts"},
+      { as: "a", content: "Popular", name: "posts_popular", key: "popular_posts"},
+      { as: "a", content: "Controversial", name: "posts_controversial", key: "controversial_posts"},
     ],
     users: [
-      { as: "a", content: "Followed Users", name: "followed_users",  key: "followed_users"},
-      { as: "a", content: "Following Users", name: "following_users", key: "following_users"},
-      { as: "a", content: "Active Recently", name: "active_recently", key: "active_recently"},
+      { as: "a", content: "Followed Users", name: "users_followed",  key: "followed_users"},
+      { as: "a", content: "Following Users", name: "users_following", key: "following_users"},
+      { as: "a", content: "Active Recently", name: "users_active", key: "active_recently"},
     ],
   },
   rightItems: [

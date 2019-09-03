@@ -44,7 +44,9 @@ const NavbarDesktop = (props) => {
         <InnerMainMenu
           authState={authState}
           navState={navState}
+          history={history}
           closeInnerMain={closeInnerMain}
+          closeMain={closeMain}
         />
         <MainMenu
           authState={authState}
