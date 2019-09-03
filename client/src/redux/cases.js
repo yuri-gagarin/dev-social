@@ -17,3 +17,6 @@ export const OPEN_DASH = "OPEN_DASH";
 export const CLOSE_DASH = "CLOSE_DASH";
 
 
+//Post action constants
+export const LIKE_POST = "LIKE_POST";
+export const UNLIKE_POST = "UNLIKE_POST";

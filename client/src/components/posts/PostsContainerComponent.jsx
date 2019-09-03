@@ -4,7 +4,7 @@ import {Container} from "semantic-ui-react";
 import PostComponent from "./PostComponent.jsx";
 import axios from "axios";
 
-import connect from "react-redux";
+import {connect} from "react-redux";
 
 const fetchPosts = (options={}) => {
   const sortOption = options.sortOption || "new";
@@ -48,7 +48,7 @@ class PostsContainerComponent extends Component {
               <PostComponent
                 key={post.id}
                 title={post.title}
-                
+
                />
             );
           })
