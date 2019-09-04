@@ -1,6 +1,7 @@
 export const TEST = "TEST";
 export const CANCEL_TEST = "CANCEL_TEST";
 export const LIST_ERRORS = "LIST_ERRORS";
+export const CLEAR_ERRORS = "CLEAR_ERRORS";
 
 //authotization action constants
 export const REGISTER = "REGISTER";
@@ -18,5 +19,8 @@ export const CLOSE_DASH = "CLOSE_DASH";
 
 
 //Post action constants
+export const FETCH_POSTS = "FETCH_POSTS";
+export const CREATE_POST = "CREATE_POST";
+export const DELETE_POST = "DELETE_POST";
 export const LIKE_POST = "LIKE_POST";
 export const UNLIKE_POST = "UNLIKE_POST";

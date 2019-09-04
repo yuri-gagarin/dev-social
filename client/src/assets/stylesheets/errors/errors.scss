@@ -1,0 +1,12 @@
+#generalErrorMessage {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translate(-50%);
+}
+
+#errorDismissButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}

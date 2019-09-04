@@ -1,4 +1,4 @@
-import {LIST_ERRORS} from "../cases.js";
+import {LIST_ERRORS, CLEAR_ERRORS} from "../cases.js";
 
 export default function(state={}, action) {
   switch(action.type) {
@@ -9,6 +9,8 @@ export default function(state={}, action) {
         statusText: action.payload.statusText,
         message: action.payload.message,
       }
+    case CLEAR_ERRORS: 
+      return {};
     default: 
       return state;
   };

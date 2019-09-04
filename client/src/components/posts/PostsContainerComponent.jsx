@@ -2,34 +2,13 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {Container} from "semantic-ui-react";
 import PostComponent from "./PostComponent.jsx";
-import axios from "axios";
 
+import {fetchPosts} from "../../redux/actions/postActions.js";
+import {clearErrors} from "../../redux/actions/errorActions.js";
 import {connect} from "react-redux";
+import displayErrorMessage from "../../helpers/displayErrorMessage.js";
 
-const fetchPosts = (options={}) => {
-  const sortOption = options.sortOption || "new";
-  const fetchLimit = options.fetchLimit || 10;
-  axios({
-    method: "GET",
-    url: `/api/posts/${sortOption}`,
-    data: {
-      fetchLimit: fetchLimit,
-    }
-  })
-    .then((response) => {
-      const postState = {
-        message: response.message,
-        posts: response.posts,
-      };
-      return postState;
-    })
-    .catch((error) => {
-      const postState = {
-        message: error.message,
-      }
-      return postState;
-    });
-};
+
 
 //propbably will have a local state as well as redux state
 class PostsContainerComponent extends Component {
@@ -37,10 +16,14 @@ class PostsContainerComponent extends Component {
   constructor(props) {
     super(props);
   }
-
+  componentDidMount() {
+    console.log(this.props);
+    this.props.fetchPosts();
+  }
   render () {
-    const posts = this.props.posts; //should be fetched from API
+    const {errorState, clearErrors} = this.props;
     return (
+      /*
       <Container style={{marginTop: "100px"}}>
         {
           posts.map((post) => {
@@ -54,28 +37,35 @@ class PostsContainerComponent extends Component {
           })
         }
       </Container>
-    );
+    */
+    <Container style={{marginTop: "100px"}}>
+      {displayErrorMessage(errorState, clearErrors)}
+      <div style={{marginTop: "200px"}}>POSTS</div>
+    </Container>
+    )
   }
 };
 
 PostsContainerComponent.propTypes = {
   authState: PropTypes.object.isRequired,
   postsState: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired,
+  errorState: PropTypes.object.isRequired,
   fetchPosts: PropTypes.func.isRequired,
-}
+  clearErrors: PropTypes.func.isRequired,
+};
 
 const mapStateToProps = (state) => {
   return {
     authState: state.auth,
-    postsState: state.posts, //need to create posts actions and reducer//
-    errors: state.errors,
+    postsState: state.post, //need to create posts actions and reducer//
+    errorState: state.error,
   }
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchPosts: dispatch(fetchPosts()), //needs creating
+    fetchPosts: () => dispatch(fetchPosts()), //needs creating
+    clearErrors: () => dispatch(clearErrors()),
   }
 };
 export default connect(mapStateToProps, mapDispatchToProps)(PostsContainerComponent);
