@@ -4,7 +4,6 @@ import {Container} from "semantic-ui-react";
 import PostComponent from "./PostComponent.jsx";
 
 import {fetchPosts} from "../../redux/actions/postActions.js";
-import {clearErrors} from "../../redux/actions/errorActions.js";
 import {connect} from "react-redux";
 import displayErrorMessage from "../../helpers/displayErrorMessage.js";
 
@@ -39,7 +38,6 @@ class PostsContainerComponent extends Component {
       </Container>
     */
     <Container style={{marginTop: "100px"}}>
-      {displayErrorMessage(errorState, clearErrors)}
       <div style={{marginTop: "200px"}}>POSTS</div>
     </Container>
     )
@@ -65,7 +63,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchPosts: () => dispatch(fetchPosts()), 
-    clearErrors: () => dispatch(clearErrors()),
   }
 };
 export default connect(mapStateToProps, mapDispatchToProps)(PostsContainerComponent);

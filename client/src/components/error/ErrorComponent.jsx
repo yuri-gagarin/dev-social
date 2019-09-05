@@ -1,16 +1,15 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {Message, Icon} from "semantic-ui-react";
-import style from "../assets/stylesheets/errors/errors.scss";
-import isEmpty from "./validators/isEmpty.js";
+import style from "../../assets/stylesheets/errors/errors.scss";
+import isEmpty from "../../helpers/validators/isEmpty.js";
 
-/**
- * Displays a fixed error message on screen.
- * @param {Object} errorState Redux error state.
- * @param {function} clearErrors Clear Error functon.
- * @returns {Object} React Component with an error message or NULL if no error.
- */
-export default function(errorState, clearErrors) {
+import {connect} from "react-redux";
+import {clearErrors} from "../../redux/actions/errorActions.js";
 
+const ErrorComponent = (props) => {
+
+  const {errorState, clearErrors} = props;
   //should dismiss the error and set error state to null
   const dismissMessage = () => {
     clearErrors();
@@ -36,3 +35,21 @@ export default function(errorState, clearErrors) {
     return null;
   }
 };
+ 
+const mapStateToProps = (state) => {
+  return {
+    errorState: state.error,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    clearErrors: () => dispatch(clearErrors()),
+  };
+};
+ErrorComponent.propTypes = {
+  errorState: PropTypes.object.isRequired,
+};
+
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorComponent);

@@ -1,6 +1,7 @@
 import React, {Component, Fragment} from "react";
 import PropTypes from "prop-types";
 import MainNav from "./components/navbar/MainNav.jsx";
+import ErrorComponent from "./components/error/ErrorComponent.jsx";
 import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
 import AuthorizationComponent from "./components/authorization/AuthorizationComponent.jsx";
 import PostsContainerComponent from "./components/posts/PostsContainerComponent.jsx";
@@ -47,6 +48,7 @@ class App extends Component {
     return (
       <Fragment>
           <MainNav>
+            <ErrorComponent />
             <Route exact path="/" component={WelcomeComponent} />
             <Route path="/(login|register)/" component={AuthorizationComponent} />
             <Route path="/posts" component={PostsContainerComponent} />
@@ -69,8 +71,7 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-
-  }
+  };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App));
