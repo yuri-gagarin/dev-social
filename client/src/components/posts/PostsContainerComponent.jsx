@@ -17,7 +17,7 @@ class PostsContainerComponent extends Component {
     super(props);
   }
   componentDidMount() {
-    console.log(this.props);
+    console.log("mounted");
     this.props.fetchPosts();
   }
   render () {
@@ -64,7 +64,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchPosts: () => dispatch(fetchPosts()), //needs creating
+    fetchPosts: () => dispatch(fetchPosts()), 
     clearErrors: () => dispatch(clearErrors()),
   }
 };

@@ -17,6 +17,9 @@ const handleInnerClick = (event, name, history) => {
   const namedEvent = name.split("_");
   const firstArg = namedEvent[0], secondArg = namedEvent[1];
   const route = `/${firstArg}/${secondArg}`;
+  //populate redux state with the appropriate api call
+  const apiRoute = "api" + route;
+  //fetchData(apiRoute)
   history.push(route);
 };
 
@@ -25,6 +28,9 @@ const innerMainMenu = (props) => {
 
   const handleClick = (event, {name}) => {
     handleInnerClick(event, name, history);
+
+    //d a custom apo fetch here
+    console.log(name);
     closeMain();
   };
 
