@@ -16,12 +16,14 @@ class PostsContainerComponent extends Component {
   }
   componentDidMount() {
     console.log("mounted")
+    console.log(this.props.history);
   }
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.postsState !== nextProps.postsState;
   }
   render () {
     const posts = this.props.postsState.posts;
+    const {authState, errorState} = this.props;
     console.log(posts);
     return (
       <Container style={{marginTop: "100px"}}>
@@ -30,12 +32,15 @@ class PostsContainerComponent extends Component {
             return (
               <PostComponent
                 key={post.id}
-                title={post.name}
+                title={post.title}
                 text={post.text}
                 created={post.createdAt}
                 edited={post.editedAt}
+                likes={post.likes}
                 user={post.user}
                 slug={post.slug}
+                authState={authState}
+                errorState={errorState}
                />
             );
           })
