@@ -1,10 +1,13 @@
 import {FETCH_POSTS, LIKE_POST, UNLIKE_POST} from "../cases.js";
-
-const postReducer = (state={}, action) => {
+const initialState = {
+  posts: [],
+};
+const postReducer = (state=initialState, action) => {
   switch(action.type) {
     case FETCH_POSTS: 
       return {
         ...state,
+        posts: [...action.payload],
       }
     case LIKE_POST:
       return {

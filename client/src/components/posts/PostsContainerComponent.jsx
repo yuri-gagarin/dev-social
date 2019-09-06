@@ -14,27 +14,33 @@ class PostsContainerComponent extends Component {
   constructor(props) {
     super(props);
   }
+  componentDidMount() {
+    console.log("mounted")
+  }
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.props.postsState !== nextProps.postsState;
+  }
   render () {
-    const {errorState, clearErrors} = this.props;
+    const posts = this.props.postsState.posts;
+    console.log(posts);
     return (
-      /*
       <Container style={{marginTop: "100px"}}>
         {
           posts.map((post) => {
             return (
               <PostComponent
                 key={post.id}
-                title={post.title}
-
+                title={post.name}
+                text={post.text}
+                created={post.createdAt}
+                edited={post.editedAt}
+                user={post.user}
+                slug={post.slug}
                />
             );
           })
         }
       </Container>
-    */
-    <Container style={{marginTop: "100px"}}>
-      <div style={{marginTop: "200px"}}>POSTS</div>
-    </Container>
     )
   }
 };
@@ -49,7 +55,7 @@ PostsContainerComponent.propTypes = {
 const mapStateToProps = (state) => {
   return {
     authState: state.auth,
-    postsState: state.post, //need to create posts actions and reducer//
+    postsState: state.posts,
     errorState: state.error,
   }
 };

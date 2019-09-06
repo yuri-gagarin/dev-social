@@ -8,7 +8,7 @@ import errorReducer from "./errorReducer.js";
 export default combineReducers({
   auth: authReducer,
   nav: navReducer,
-  post: postReducer,
+  posts: postReducer,
   test: testReducer,
   error: errorReducer
 });

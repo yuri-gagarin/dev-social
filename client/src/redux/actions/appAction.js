@@ -15,10 +15,11 @@ const capitalize = (string) => {
     throw new TypeError("Expected fist argument to be a {String}");
   }
   return string.charAt(0).toUpperCase() + string.slice(1);
-};
+}
 const getModelAction = (dataModel) => {
-  switch (dataModel) {
-    case "posts":
+  const model = dataModel.toLowerCase();
+  switch (model) {
+    case "post":
       return FETCH_POSTS;
     default:
       return MODEL_ERROR;
@@ -49,7 +50,7 @@ export const cancelTest = () => {
 
 export const fetchData = (options) => {
   const dataModel = options.model;
-  const modelName = dataModel ? capitalize(pluralize.singular(dataModel)) : null;
+  const modelName = dataModel ? pluralize.singular(dataModel) : null;
   const dispatchType = getModelAction(modelName);
 
   return function(dispatch) {
@@ -76,15 +77,17 @@ export const fetchData = (options) => {
         url: options.appRoute,
       })
         .then((response) => {
-          const data = response[dataModel];
-          console.log(data)
+          const data = response.data[dataModel];
           dispatch({
             type: dispatchType,
             payload: data,
-          })
+          });
         })
         .catch((error) => {
-          console.log(error);
+          dispatch({
+            type: LIST_ERRORS,
+            payload: error,
+          });
         });
     }
   }

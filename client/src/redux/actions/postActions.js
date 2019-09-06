@@ -19,7 +19,6 @@ export const fetchPosts = (options={}) => {
           message: response.message,
           posts: response.posts,
         };
-        console.log(postState);
         dispatch({
           type: FETCH_POSTS,
           payload: postState,
