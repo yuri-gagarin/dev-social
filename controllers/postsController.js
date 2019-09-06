@@ -92,14 +92,16 @@ export default {
   createPost: (req, res) => {
 
     const {errors, isValid} = postValidator(req.body);
-
+    const author = `${req.user.name} ${req.user.lastName}`;
     if (isValid) {
       const newPost = new Post({
+        author: author,
+        title: req.body.title,
         text: req.body.text,
-        name: req.body.name,
         avatar: req.body.avatar,
         user: req.user.id,
-        slug: makeRouteSlug(req.body.name)
+        slug: makeRouteSlug(req.body.name),
+        likeCount: 0,
       });
 
       newPost.save()
