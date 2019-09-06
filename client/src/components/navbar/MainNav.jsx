@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import {withRouter} from "react-router-dom";
 //redux imports
 import {connect} from "react-redux";
+import {fetchData} from "../../redux/actions/appAction.js";
 import {logoutUser} from "../../redux/actions/authActions.js";
 import {openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash} from "../../redux/actions/navActions.js";
 
@@ -76,6 +77,10 @@ class MainNav extends Component {
   closeDash = () => {
     this.props.closeDash();
   };
+  //fetch data from the inner menu click
+  fetchData = (options) => {
+    this.props.fetchData(options);
+  }
   //logout function
   logoutUser = (userData, history) => {
     this.props.logoutUser(userData, history);
@@ -107,6 +112,7 @@ class MainNav extends Component {
             openDash={this.openDash}
             closeDash={this.closeDash}
             logoutUser={this.logoutUser}
+            fetchData={this.fetchData}
             navState={this.props.navState}
             authState={this.props.authState}
           >
@@ -129,6 +135,7 @@ MainNav.propTypes = {
   openDash: PropTypes.func.isRequired,  
   closeDash: PropTypes.func.isRequired,
   logoutUser: PropTypes.func.isRequired,
+  fetchData: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -140,6 +147,7 @@ const mapDispatchToProps = (dispatch) => {
     openDash: (authState) => dispatch(openDash(authState)),
     closeDash: () => dispatch(closeDash()),
     logoutUser: (userData, history) => dispatch(logoutUser(userData, history)),
+    fetchData: (options) => dispatch(fetchData(options)),
   };
 };
 

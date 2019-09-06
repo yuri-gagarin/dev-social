@@ -5,7 +5,6 @@ import PostComponent from "./PostComponent.jsx";
 
 import {fetchPosts} from "../../redux/actions/postActions.js";
 import {connect} from "react-redux";
-import displayErrorMessage from "../../helpers/displayErrorMessage.js";
 
 
 
@@ -14,10 +13,6 @@ class PostsContainerComponent extends Component {
 
   constructor(props) {
     super(props);
-  }
-  componentDidMount() {
-    console.log("mounted");
-    this.props.fetchPosts();
   }
   render () {
     const {errorState, clearErrors} = this.props;
@@ -49,7 +44,6 @@ PostsContainerComponent.propTypes = {
   postsState: PropTypes.object.isRequired,
   errorState: PropTypes.object.isRequired,
   fetchPosts: PropTypes.func.isRequired,
-  clearErrors: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {

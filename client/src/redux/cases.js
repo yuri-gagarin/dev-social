@@ -1,7 +1,11 @@
 export const TEST = "TEST";
 export const CANCEL_TEST = "CANCEL_TEST";
 export const LIST_ERRORS = "LIST_ERRORS";
+export const MODEL_ERROR = "MODEL_ERROR";
 export const CLEAR_ERRORS = "CLEAR_ERRORS";
+
+//app wide actions
+export const FETCH_DATA = "FETCH_DATA";
 
 //authotization action constants
 export const REGISTER = "REGISTER";

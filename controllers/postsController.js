@@ -29,6 +29,43 @@ export default {
         });
       });
   },
+  index: (req, res) => {
+    console.log(req.query)
+    const queryOption = req.query.q;
+    const limit = req.query.limit || 15;
+    const queryParams = (queryOption) => {
+      switch(queryOption) {
+        case "all":
+          return {
+            date: "DESC",
+          };
+        case "new":
+          return {
+            date: "DESC",
+          };
+        case "popular":
+          return {
+            comments: "DESC",
+          };
+        default: 
+          return {
+            date: "DESC",
+          };
+      }
+    }
+    Post.find({}).sort(queryParams(queryOption)).limit(limit)
+      .then((posts) => {
+        console.log(typeof posts)
+        return res.json({
+          message: "Success",
+          posts: posts,
+        })
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    
+  },  
 
   viewBySlug: (req, res) => {
     Post.findOne({_id: req.params.id})
