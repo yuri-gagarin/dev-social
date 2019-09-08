@@ -1,6 +1,7 @@
 import UsersController from "../controllers/usersController.js";
 import passport from "passport";
 import accessController from "../controllers/access_control/accessController.js";
+import usersController from "../controllers/usersController.js";
 
 export default function(router) {
 
@@ -66,5 +67,10 @@ export default function(router) {
   router
     .route("/users/current_user")
     .get(passport.authenticate("jwt", { session: false }), UsersController.currentUser);
+  
+  // @route DELETE /api/users/:id
+  router 
+    .route("/api/users/:id")
+    .delete(passport.authenticate("jwt", {session: false}), usersController.deleteUser);
 };
 

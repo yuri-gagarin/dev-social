@@ -511,6 +511,30 @@ export default  {
         });
       });
     
+  },
+  //is not protected by user roles yet
+  deleteUser: (req, res) => {
+    const currentUserId = req.user.id;
+    User.findOneAndDelete({_id: currentUserId})
+      .then((user) => {
+        if (user) {
+          return res.status(200).json({
+            message: "Deleted user",
+            user: user,
+          });
+        }
+        else {
+          return res.status(204).json({
+            message: "Seems no user was found with that id",
+          })
+        }
+      })
+      .catch((error) => {
+        response.status(500).json({
+          message: error.message,
+          error: error,
+        });
+      });
   }
-  
+
 };
