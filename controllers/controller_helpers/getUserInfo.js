@@ -1,9 +1,9 @@
 import fetch from "node-fetch";
 /**
  * Build an object which contains some user info.
- * @param {string} ipAddress User's IP Adress
- * @param {function} cb Optional callback function
- * @returns {promise} A promise which resolves to an an object containing response and user data
+ * @param {string} ipAddress User's IP Adress.
+ * @param {function} cb Optional callback function.
+ * @returns {promise} A promise which resolves to an an object containing response and user data.
  */
 export default function(ipAddress, cb) {
 
@@ -17,6 +17,13 @@ export default function(ipAddress, cb) {
     else {
       throw error;
     }
+  }
+  //don't execute in testing emvironment --- for now..
+  if(process.env.NODE_ENV === "test") {
+    return Promise.resolve({
+      sucess: false,
+      reason: "Testing Environment",
+    });
   }
   //maybe add more providers as a fallback later
   let providers = [`https://ipapi.co/${ipAddress}/json/`];

@@ -1,85 +1,128 @@
 import chai, {expect} from "chai";
 import chaiHttp from "chai-http";
 import app from "../server.js";
+import mongoose, { mongo } from "mongoose";
 import User from "../models/User.js";
-
+import KEYS from "../config/keys.js";
 //configure
 chai.use(chaiHttp);
 chai.should();
 
-describe("Authorization", () => {
+
+//connect to test db
+describe("User Registration", () => {
   const validUser = {
-    name: "Test",
+    name: "User",
     lastName: "User",
-    email: "test@test.com",
+    email: "user@user.com",
     password: "Password1",
     passwordConfirm: "Password1",
   };
-  before("clear user if registered", () => {
+
+  before("connect to the database", async() => {
+    const DB = KEYS.mongoURI;
     try {
-      chai.request(app)
-        .delete("/api/users/:id")
-        .send(validUser)
+      const database = await mongoose.connect(DB, {useNewUrlParser: true, useFindAndModify: false});
+      const response  = await User.deleteMany({});
     }
-    catch (error) {
-      cosnsole.log(error);
+    catch(error) {
+      console.error(error);
     }
-  })
+  });
+
   describe("POST /api/register", () => {
-    it("should Register a user", (done) => {
+    it("Should register a user", (done) => {
       chai.request(app)
         .post("/api/users/register")
         .send(validUser)
         .end((error, response) => {
           expect(error).to.be.null;
           expect(response).to.have.status(200);
-        })
-    });
-  });
-
-  describe("POST /api/login", () => {
-    it("should Login a user", (done) => {
-
-      const user = { 
-        email: "user@user.com",
-        password: "Password1",
-      };
-
-      chai.request(app)
-        .post("/api/users/login")
-        .send(user)
-        .end((error, response) => {
-          expect(error).to.be.null;
-          expect(response).to.have.status(200);
-          done();
         });
+        done();
     });
-    it("should not login a user with an incorrect password", (done) => {
 
-      const user = {
-        email: "user@user.com",
-        password: "wrongpassword",
-      };
-
+    it("Should not register an invalid user", (done) => {
+      const invalidUser = {name: null, firstName: null,  email: null, password: null};
       chai.request(app)
-        .post("/api/users/login")
-        .send(user)
+        .post("/api/users/register")
+        .send(invalidUser)
         .end((error, response) => {
           expect(response).to.have.status(400);
-          //console.log(response.error.text);
-          const errorResponse = JSON.parse(response.error.text);
-          expect(errorResponse).to.be.an("object");
-          expect(errorResponse.message).to.not.be.null;
-          done();
         });
+        done();
     });
-    it("should not login a user with an incorrect email", (done) => {
-      const user = {
-        email: "wrongemail@wrong.com",
-      };
 
-      done()
-    })
+    it("Should not register a user without a name", (done) => {
+      const invalidUser = {...validUser, name: null};
+      chai.request(app)
+        .post("/api/users/register")
+        .send(invalidUser)
+        .end((error, response) => {
+          const responseText = JSON.parse(response.text);
+          expect(response).to.have.status(400);
+          expect(responseText.errors).to.not.be.null;
+          expect(responseText.errors.name).to.not.be.null;
+        });
+        done();
+    });
+
+    it("Should not register a user without a last name", (done) => {
+      const invalidUser = {...validUser, lastName: null};
+      chai.request(app)
+        .post("/api/user/register")
+        .send(invalidUser)
+        .end((error, response)  => {
+          const responseText = JSON.parse(response.text);
+          expect(response).to.have.status(400);
+          expect(responseText.errors).to.not.be.null;
+          expect(responseText.errors.name).to.not.be.null;
+        });
+        done();
+    });
+
+    it("Should not register a user without email", (done) => {
+      const invalidUser = {...validUser, email: null};
+      chai.request(app)
+        .post("/api/users/register")
+        .send(invalidUser)
+        .end((error, response) => {
+          const responseText = JSON.parse(response.text);
+          expect(response).to.have.status(400);
+          expect(responseText.errors).to.not.be.null;
+          expect(responseText.errors.email).to.not.be.null;
+        });
+        done();
+    });
+
+    it("Should not register a user mismatching passwords", (done) => {
+      const invalidUser = {...validUser, passwordConfirm: "NotThePassword"};
+      chai.request(app)
+        .post("/api/users/register")
+        .send(invalidUser)
+        .end((error, response) => {
+          const responseText = JSON.parse(response.text);
+          expect(response).to.have.status(400);
+          expect(responseText.errors).to.not.be.null;
+          expect(responseText.errors.password).to.not.be.null;
+        });
+        done();
+    });
+
+    it("Should not register a user with invalid password", (done) => {
+      const invalidUser = {...validUser, password: null, passwordConfirm: null};
+      chai.request(app)
+        .post("/api/users/register")
+        .send(invalidUser)
+        .end((error, response) => {
+          const responseText = JSON.parse(response.text);
+          expect(response).to.have.status(400);
+          expect(responseText.errors).to.not.be.null;
+          expect(responseText.errors.password).to.not.be.null;
+        });
+        done();
+    });
+
   });
 });
 

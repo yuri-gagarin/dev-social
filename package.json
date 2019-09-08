@@ -5,11 +5,11 @@
   "main": "server.js",
   "scripts": {
     "client-install": "npm install --prefix client",
-    "server": "NODE_ENV=development nodemon --exec babel-node server.js",
+    "server": "NODE_ENV=test nodemon --exec babel-node server.js",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "start": "node server.js",
-    "test": "mocha --require @babel/register --require @babel/polyfill ./test/test.js",
+    "test": "NODE_ENV=test mocha --require @babel/register --require @babel/polyfill ./test/test.js",
     "debug_server": "nodemon --inspect --exec babel-node server.js"
   },
   "author": "yuri-gagarin",

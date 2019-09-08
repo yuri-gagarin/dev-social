@@ -15,6 +15,5 @@ export default function(request) {
   else {
     ipAddress = request.connection.remoteAddress || request.socket.remoteAddress || request.connection.socket.remoteAddress;
   }
-  console.log(ipAddress);
   return ipAddress;
 };

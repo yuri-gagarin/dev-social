@@ -15,7 +15,10 @@ const DB = keys.mongoURI;
 
 mongoose
   .connect(DB, {useNewUrlParser: true,  useFindAndModify: false})
-  .then(() => console.log("Database connected"))
+  .then((data) => {
+    console.log("Database connected");
+    console.log("Database name: " + data.connection.name);
+  })
   .catch((err) => console.log(err));
 
 //bodyparser middleware
