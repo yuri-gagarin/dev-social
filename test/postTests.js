@@ -7,6 +7,7 @@ import Post from "../models/Post.js";
 
 chai.use(chaiHttp);
 
+
 /**
  * Makes an array of users.
  * @param {number} count How many users to make.
@@ -155,6 +156,19 @@ describe("Post Tests", function() {
   });
   //regular user
   describe("User logged in and owns Post", function(done) {
+    let user, post, jwtToken;
+    before("Find user and post", async function() {
+      user = User.findOne({email: users[0].email});
+      post = Post.findOne({user: user._id});
+    })
+    before("Login User", async function() {
+      chai.request(app)
+        .post("/api/users/login")
+        .send({email: users[0].email, password: users[0].password})
+        .end((error, response) => {
+
+        })
+    })
     it("Should be able to read a post", function(done) {
 
     });
