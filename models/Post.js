@@ -27,6 +27,7 @@ const PostSchema = new Schema({
   likeCount: {
     type: Number,
     required: true,
+    default: 0,
   },
   comments: [
     { 

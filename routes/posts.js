@@ -36,7 +36,7 @@ export default function(router) {
   // @desc Edits a post
   // @access Private
   router
-    .route("/posts/:id")
+    .route("api/posts/:id")
     .patch([passport.authenticate("jwt", {session: false}), accessController("post", "edit_post")], postsController.editPost);
   
   // @route DELETE /posts/:id
