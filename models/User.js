@@ -22,11 +22,13 @@ const UserSchema = new Schema({
   },
   role: {
     type: String,
-    required: true
+    required: true,
+    default: "user",
   },
   banned: {
     type: Boolean,
     required: true,
+    default: false,
   },
   password: {
     type: String,

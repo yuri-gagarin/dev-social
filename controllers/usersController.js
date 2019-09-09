@@ -133,7 +133,7 @@ export default  {
       User.findOne({email: email})
         .then((user) => {
           if(user) {
-            return res.status(400).json({message: "email already exists"});
+            return Promise.reject(new Error("Email already exists"));
           }
           else {
             newUser = new User({
@@ -176,9 +176,11 @@ export default  {
           });
         })
         .catch((error) => {
-          console.error(error);
           return res.status(400).json({
-            message: "An error occured"
+            message: "Invalid user input",
+            errors: {
+              message: error.message,
+            },
           });
         });
     }

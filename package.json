@@ -9,7 +9,7 @@
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "start": "node server.js",
-    "test": "NODE_ENV=test mocha --require @babel/register --require @babel/polyfill ./test/test.js",
+    "test": "NODE_ENV=test mocha --require @babel/register --require @babel/polyfill ",
     "debug_server": "nodemon --inspect --exec babel-node server.js"
   },
   "author": "yuri-gagarin",

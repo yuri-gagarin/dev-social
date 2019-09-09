@@ -16,8 +16,8 @@ const DB = keys.mongoURI;
 mongoose
   .connect(DB, {useNewUrlParser: true,  useFindAndModify: false})
   .then((data) => {
-    console.log("Database connected");
-    console.log("Database name: " + data.connection.name);
+    //console.log("Database connected");
+    //console.log("Database name: " + data.connection.name);
   })
   .catch((err) => console.log(err));
 
@@ -56,7 +56,6 @@ app.use(function(err, req, res, next) {
 
 app.listen(PORT, () => {
   console.log(`App listening at PORT: ${PORT}`);
-  console.log(process.env.NODE_ENV);
 });
 
 export default app;
