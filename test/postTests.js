@@ -5,6 +5,8 @@ import User from "../models/User.js";
 import faker from "faker";
 import Post from "../models/Post.js";
 
+import axios from "axios";
+
 chai.use(chaiHttp);
 
 
@@ -76,8 +78,9 @@ async function createUsers(users, route) {
 };
 
 describe("Post Tests", function() {
-  let users;
-  before("Clean database", async function() {
+  let usersArr, firstUser, secondUser, thirdUser, fourthUser;
+  //clean any leftover data
+  before("Clean", async function() {
     try {
       await User.deleteMany({});
       await Post.deleteMany({});
@@ -86,17 +89,20 @@ describe("Post Tests", function() {
       console.log(error);
     }
   })
-  before("Create Users", async function() {
-    users = generateUserData(4);
+  //create users and posts
+  before("Populate DB", async function() {
+    usersArr = generateUserData(4);
+    [firstUser, secondUser, thirdUser, fourthUser] = usersArr;
     try {
-      const userResult = await createUsers(users, "/api/users/register");
-      const postUser = await User.findOne({email: users[0].email});
+      const userResult = await createUsers(usersArr, "/api/users/register");
+      const postUser = await User.findOne({email: firstUser.email});
       const postResult = await createPosts(2, postUser);
     }
     catch (error) {
       console.error(error);
     }
   });
+  //clean up data and exit
   after("Clean database and close", async function() {
     try {
       await User.deleteMany({});
@@ -108,13 +114,14 @@ describe("Post Tests", function() {
       process.exit(0);
     }
   })
-  describe("User not logged in", function() {
+  //guest or not logged in//
+  describe("A guest User", function() {
     const invalidPost = generatePost();
     let post, user;
     before("Get Post", async function() {
-      user = await User.find({email: users[3].email});
       post = await Post.find({}).sort({createdAt: "DESC"}).limit(1);
     });
+
     it("Should be able to read all posts", function(done) {
       chai.request(app)
         .get("/api/posts")
@@ -136,7 +143,7 @@ describe("Post Tests", function() {
           done();
         });
     });
-    it("Should not be able to edit a post", function(done) {
+    it("Should not be able to EDIT a post", function(done) {
       chai.request(app)
         .patch("/api/posts/" + post._id)
         .send({title: "A new title"})
@@ -154,31 +161,109 @@ describe("Post Tests", function() {
         });
     });
   });
-  //regular user
-  describe("User logged in and owns Post", function(done) {
-    let user, post, jwtToken;
-    before("Find user and post", async function() {
-      user = User.findOne({email: users[0].email});
-      post = Post.findOne({user: user._id});
-    })
-    before("Login User", async function() {
-      chai.request(app)
-        .post("/api/users/login")
-        .send({email: users[0].email, password: users[0].password})
-        .end((error, response) => {
 
-        })
+  //regular logged in user
+  describe("Logged in User", function(done) {
+    let postUser, usersPost, otherUser, otherPost, postUserToken, otherUserToken, mockPost;
+
+    before("Set test data", async function() {
+      mockPost = {
+        title: faker.lorem.word,
+        text: faker.lorem.paragraphs(2),
+      };
+      postUser = await User.findOne({email: firstUser.email});
+      usersPost = await Post.findOne({user: postUser._id});
+      otherUser = await User.findOne({email: secondUser.email});
+      otherPost = await Post.findOne({user: otherUser._id});
     })
+    before("Login Users", async function() {
+      const options1 = {
+        url: "/api/users/register",
+        data: {
+          email: postUser.email,
+          password: postUser.password,
+        }
+      };
+      const options2 = {
+        url: "api/users/register",
+        data: {
+          email: otherUser.email,
+          password: otherUser.password,
+        }
+      };
+      const response1 = await axios.post(options1);
+      const response2 = await axios.post(options2);
+      postUserToken = response1.text.token;
+      otherUserToken = response2.text.token;
+    })
+    describe("POST /api/posts", function() {
+      it("Should be able to Create a post", function(done) {
+        chai.request(app)
+          .post("/api/posts")
+          .headers({'Authorization': postUserToken})
+          .send(mockPost)
+          .end((error, response) => {
+            expect(response).to.have.status(200);
+            done();
+          })
+      })
+    })
+    describe("PATCH /api/posts/:id", function () {
+      it("Should be able to EDIT own Post", function(done) {
+        chai.request(app)
+          .patch("/api/posts/" + usersPost._id)
+          .headers({"Authorization": postUserToken})
+          .send({text: faker.paragraphs(1)})
+          .end((error, response) => {
+            expect(response).to.have.status(200);
+            done();
+          });
+      });
+      it("Should NOT be able to EDIT other User's Post", function(done) {
+        chai.request(app)
+          .patch("/api/posts/" + otherPost._id)
+          .headers({"Authorizaton": postUserToken})
+          .send({text: faker.paragraphs(1)})
+          .end((error, response) => {
+            expect(response).to.have.status(401);
+            done();
+          })
+      })
+    });
+    describe("DELETE /api/posts/:id", function() {
+      it("Should be able to DELETE own Post", function(done) {
+        chai.request(app)
+          .delete("/api/posts/" + usersPost._id)
+          .headers({"Authorization": postUserToken})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            done()
+          })
+      })
+      it("Should not be able to DELETE other User's Post", function(done) {
+        chai.request(app)
+          .delete("/api/posts/" + otherPost._id)
+          .headers({"Authorization": postUserToken})
+          .end((error, response) =>{
+            expect(response).to.have.status(401);
+            done();
+          })
+      })
+    })
+    describe("Other User's Post", function () {
+
+    });
     it("Should be able to read a post", function(done) {
 
     });
     it("Should be able to create a post", function(done) {
 
     });
-    it("Should be able to edit own post", function(done) {
+    it("Should be able to EDIT own post", function(done) {
 
     });
-    it("Should not be able to edit someones post", function(done) {
+    it("Should not be able to EDIT someones post", function(done) {
 
     });
     it("Should be able to delete own post", function(done) {
@@ -196,10 +281,10 @@ describe("Post Tests", function() {
     it("Should be able to create a post", function(done) {
 
     });
-    it("Should be able to edit own post", function(done) {
+    it("Should be able to EDIT own post", function(done) {
 
     });
-    it("Should not be able to edit someones post", function(done) {
+    it("Should not be able to EDIT someones post", function(done) {
 
     });
     it("Should be able to delete own post", function(done) {
