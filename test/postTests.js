@@ -127,10 +127,9 @@ describe("Post Tests", function() {
         chai.request(app)
           .get("/api/posts")
           .end((error, response) => {
-            const postResponse = JSON.parse(response.text);
             expect(error).to.be.null;
             expect(response).to.have.status(200);
-            expect(postResponse.posts).to.not.be.null;
+            expect(response.body.posts).to.not.be.null;
             done();
           })
       });
@@ -171,7 +170,7 @@ describe("Post Tests", function() {
       });
     });
   });
-  //end guest user
+  //end guest user tests
   //regular logged in user
   describe("User Logged in", function(done) {
     let postUser, usersPost, otherUser, otherPost, postUserToken, mockPost;
@@ -263,43 +262,47 @@ describe("Post Tests", function() {
   //end Logged in User
 
   //moderator Logged in
-  /*
-  describe("Logged in Moderator", function () {
+  describe("Moderator Logged in", function () {
     let moderator, user, post, moderatorToken;
     before("Set Test Data", async function() {
       moderator = await User.findOne({email: thirdUser.email})
       moderator.role = "moderator";
       moderator = await moderator.save();
       user = await User.findOne({email: firstUser.email});
-      post = Post.findOne({user: user._id});
+      post = await Post.findOne({user: user._id});
     })
-    before("Log in Moderator", async function() {
-      const options = {email: thirdUser.email, password: thirdUser.password};
-      moderatorResponse = await axios.post(options)
-      moderatorToken = moderatorToken.text.token;
+    before("Log in Moderator", function(done) {
+      chai.request(app)
+        .post("/api/users/login")
+        .send({email: thirdUser.email, password: thirdUser.password})
+        .end((error, response) => {
+          if (error) console.error(error);
+          moderatorToken = response.body.token
+          done();
+        });
     });
     describe("DELETE /api/posts/:id", function() {
       it("Should not be able to EDIT another User's Post", function(done) {
         chai.request(app)
           .patch("/api/posts/" + post._id)
-          .headers({"Authorization": moderatorToken})
+          .set({"Authorization": moderatorToken})
           .end((error, response) => {
+            expect(error).to.be.null;
             expect(response).to.have.status(401);
-            end();
+            done();
           })
       })
       it("Should be able to DELETE another User's Post", function(done) {
         chai.request(app)
-          .post("/api/posts/" + post._id)
-          .headers({"Authorization": moderatorToken})
+          .delete("/api/posts/" + post._id)
+          .set({"Authorization": moderatorToken})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
-            end();
+            done();
           });
       });
     });
   });
   //end moderator tests
-  */
 });
