@@ -6,12 +6,15 @@ import passport from "passport";
 import keys from  "./config/keys.js";
 import passportStrategy from "./config/passportConfig.js";
 import path from "path";
+import detailedLog from "./helpers/APIhelpers/detailledLog.js";
 
 const app = express();
 const router = express.Router();
 const PORT = process.env.PORT || 3000;
 const DB = keys.mongoURI;
 
+//find them pesky console.log statements;
+detailedLog("log", "warn");
 
 mongoose
   .connect(DB, {useNewUrlParser: true,  useFindAndModify: false})

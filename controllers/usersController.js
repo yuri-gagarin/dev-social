@@ -14,7 +14,6 @@ import jwtSignPromise from "./controller_helpers/jwtSignPromise.js";
 export default  {
   
   registerTest: (req, res) => {
-    console.log(req.body.name);
     if (req.body.name === "yuriy") {
       return res.status(400).json({
         message: "an error occured",

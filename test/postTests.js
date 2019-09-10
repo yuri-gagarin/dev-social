@@ -5,8 +5,6 @@ import User from "../models/User.js";
 import faker from "faker";
 import Post from "../models/Post.js";
 
-import axios from "axios";
-
 chai.use(chaiHttp);
 
 
@@ -82,8 +80,8 @@ describe("Post Tests", function() {
   //clean any leftover data
   before("Clean", async function() {
     try {
-      await User.deleteMany({});
-      await Post.deleteMany({});
+      const users = await User.deleteMany({});
+      const posts = await Post.deleteMany({});
     }
     catch(error) {
       console.log(error);
@@ -95,8 +93,10 @@ describe("Post Tests", function() {
     [firstUser, secondUser, thirdUser, fourthUser] = usersArr;
     try {
       const userResult = await createUsers(usersArr, "/api/users/register");
-      const postUser = await User.findOne({email: firstUser.email});
-      const postResult = await createPosts(2, postUser);
+      const postUser1 = await User.findOne({email: firstUser.email});
+      const postUser2 = await User.findOne({email: secondUser.email});
+      const postResult1 = await createPosts(2, postUser1);
+      const postResult2 = await createPosts(2, postUser2);
     }
     catch (error) {
       console.error(error);
@@ -119,179 +119,187 @@ describe("Post Tests", function() {
     const invalidPost = generatePost();
     let post, user;
     before("Get Post", async function() {
-      post = await Post.find({}).sort({createdAt: "DESC"}).limit(1);
+      const postResponse = await Post.find({}).sort({createdAt: "DESC"}).limit(1);
+      post = postResponse[0];
     });
-
-    it("Should be able to read all posts", function(done) {
-      chai.request(app)
-        .get("/api/posts")
-        .end((error, response) => {
-          const postResponse = JSON.parse(response.text);
-          expect(error).to.be.null;
-          expect(response).to.have.status(200);
-          expect(postResponse.posts).to.not.be.null;
-          done();
-        })
+    describe("GET /api/posts", function() {
+      it("Should be able to read all posts", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .end((error, response) => {
+            const postResponse = JSON.parse(response.text);
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(postResponse.posts).to.not.be.null;
+            done();
+          })
+      });
     });
-    it("Should not be able to create a new post", function(done) {
-      chai.request(app)
-        .post("/api/posts")
-        .send(invalidPost)
-        .end((error, response) => {
-          //const postResponse = JSON.parse(response.text);
-          expect(response).to.have.status(401);
-          done();
-        });
+    describe("POST /api/posts", function() {
+      it("Should not be able to create a new post", function(done) {
+        chai.request(app)
+          .post("/api/posts")
+          .send(invalidPost)
+          .end((error, response) => {
+            expect(response).to.have.status(401);
+            expect(response.text).to.equal("Unauthorized");
+            done();
+          });
+      });
     });
-    it("Should not be able to EDIT a post", function(done) {
-      chai.request(app)
-        .patch("/api/posts/" + post._id)
-        .send({title: "A new title"})
-        .end((error, response) => {
-          expect(response).to.have.status(401);
-          done();
-        })
+    describe("PATCH /api/posts/:id", function() {
+      it("Should not be able to EDIT a post", function(done) {
+        chai.request(app)
+          .patch("/api/posts/" + post._id)
+          .send({title: "A new title"})
+          .end((error, response) => {
+            expect(response).to.have.status(401);
+            expect(response.text).to.equal("Unauthorized");
+            done();
+          })
+      });
     });
-    it("Should not be able to delete a post", function(done) {
-      chai.request(app)
-        .delete("/api/posts/" + post._id)
-        .end((error, respose) => {
-          expect(response).to.have.status(401);
-          done();
-        });
+    describe("DELETE /api/posts/:id", function() {
+      it("Should not be able to delete a post", function(done) {
+        chai.request(app)
+          .delete("/api/posts/" + post._id)
+          .end((error, response) => {
+            expect(response).to.have.status(401);
+            expect(response.text).to.equal("Unauthorized");
+            done();
+          });
+      });
     });
   });
-
+  //end guest user
   //regular logged in user
-  describe("Logged in User", function(done) {
-    let postUser, usersPost, otherUser, otherPost, postUserToken, otherUserToken, mockPost;
-
+  describe("User Logged in", function(done) {
+    let postUser, usersPost, otherUser, otherPost, postUserToken, mockPost;
     before("Set test data", async function() {
       mockPost = {
-        title: faker.lorem.word,
+        title: faker.lorem.word(),
         text: faker.lorem.paragraphs(2),
       };
       postUser = await User.findOne({email: firstUser.email});
-      usersPost = await Post.findOne({user: postUser._id});
       otherUser = await User.findOne({email: secondUser.email});
+      usersPost = await Post.findOne({user: postUser._id});
       otherPost = await Post.findOne({user: otherUser._id});
     })
-    before("Login Users", async function() {
-      const options1 = {
-        url: "/api/users/register",
-        data: {
-          email: postUser.email,
-          password: postUser.password,
-        }
-      };
-      const options2 = {
-        url: "api/users/register",
-        data: {
-          email: otherUser.email,
-          password: otherUser.password,
-        }
-      };
-      const response1 = await axios.post(options1);
-      const response2 = await axios.post(options2);
-      postUserToken = response1.text.token;
-      otherUserToken = response2.text.token;
+    before("Login User", function(done) {
+      chai.request(app)
+        .post("/api/users/login")
+        .send({email: firstUser.email, password: firstUser.password})
+        .end((error, response) => {
+          const userResponse = JSON.parse(response.text);
+          postUserToken = userResponse.token;
+          done();
+        })
+  
     })
     describe("POST /api/posts", function() {
       it("Should be able to Create a post", function(done) {
         chai.request(app)
           .post("/api/posts")
-          .headers({'Authorization': postUserToken})
+          .set({'Authorization': postUserToken})
           .send(mockPost)
           .end((error, response) => {
+            const postResponse = JSON.parse(response.text);
+            expect(error).to.be.null;
             expect(response).to.have.status(200);
+            expect(postResponse.post).to.not.be.null;
             done();
-          })
-      })
+          });
+      });
     })
     describe("PATCH /api/posts/:id", function () {
       it("Should be able to EDIT own Post", function(done) {
         chai.request(app)
           .patch("/api/posts/" + usersPost._id)
-          .headers({"Authorization": postUserToken})
-          .send({text: faker.paragraphs(1)})
+          .set({"Authorization": postUserToken})
+          .send({text: mockPost.text})
           .end((error, response) => {
+            const postResponse = JSON.parse(response.text);
+            expect(error).to.be.null;
             expect(response).to.have.status(200);
+            expect(postResponse.post).to.not.be.null;
             done();
           });
       });
       it("Should NOT be able to EDIT other User's Post", function(done) {
         chai.request(app)
           .patch("/api/posts/" + otherPost._id)
-          .headers({"Authorizaton": postUserToken})
-          .send({text: faker.paragraphs(1)})
+          .set({"Authorizaton": postUserToken})
+          .send({text: mockPost.text})
           .end((error, response) => {
-            expect(response).to.have.status(401);
+            expect(error).to.be.null;
+            expect(response).to.have.status(401); 
             done();
-          })
-      })
+          });
+      });
     });
     describe("DELETE /api/posts/:id", function() {
       it("Should be able to DELETE own Post", function(done) {
         chai.request(app)
           .delete("/api/posts/" + usersPost._id)
-          .headers({"Authorization": postUserToken})
+          .set({"Authorization": postUserToken})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
-            done()
-          })
-      })
+            done();
+          });
+      });
       it("Should not be able to DELETE other User's Post", function(done) {
         chai.request(app)
           .delete("/api/posts/" + otherPost._id)
-          .headers({"Authorization": postUserToken})
+          .set({"Authorization": postUserToken})
           .end((error, response) =>{
+            expect(error).to.be.null;
             expect(response).to.have.status(401);
             done();
-          })
-      })
-    })
-    describe("Other User's Post", function () {
-
-    });
-    it("Should be able to read a post", function(done) {
-
-    });
-    it("Should be able to create a post", function(done) {
-
-    });
-    it("Should be able to EDIT own post", function(done) {
-
-    });
-    it("Should not be able to EDIT someones post", function(done) {
-
-    });
-    it("Should be able to delete own post", function(done) {
-
-    });
-    it("Should not be able to delete someones post", function(done) {
-
+          });
+      });
     });
   });
-  //moderator
-  describe("User logged in and is Moderator", function() {
-    it("Should be able to read a post", function(done) {
+  //end Logged in User
 
+  //moderator Logged in
+  /*
+  describe("Logged in Moderator", function () {
+    let moderator, user, post, moderatorToken;
+    before("Set Test Data", async function() {
+      moderator = await User.findOne({email: thirdUser.email})
+      moderator.role = "moderator";
+      moderator = await moderator.save();
+      user = await User.findOne({email: firstUser.email});
+      post = Post.findOne({user: user._id});
+    })
+    before("Log in Moderator", async function() {
+      const options = {email: thirdUser.email, password: thirdUser.password};
+      moderatorResponse = await axios.post(options)
+      moderatorToken = moderatorToken.text.token;
     });
-    it("Should be able to create a post", function(done) {
-
+    describe("DELETE /api/posts/:id", function() {
+      it("Should not be able to EDIT another User's Post", function(done) {
+        chai.request(app)
+          .patch("/api/posts/" + post._id)
+          .headers({"Authorization": moderatorToken})
+          .end((error, response) => {
+            expect(response).to.have.status(401);
+            end();
+          })
+      })
+      it("Should be able to DELETE another User's Post", function(done) {
+        chai.request(app)
+          .post("/api/posts/" + post._id)
+          .headers({"Authorization": moderatorToken})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            end();
+          });
+      });
     });
-    it("Should be able to EDIT own post", function(done) {
-
-    });
-    it("Should not be able to EDIT someones post", function(done) {
-
-    });
-    it("Should be able to delete own post", function(done) {
-
-    });
-    it("Should be able to delete someones post", function(done) {
-
-    });
-  })
+  });
+  //end moderator tests
+  */
 });

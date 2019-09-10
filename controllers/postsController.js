@@ -30,7 +30,6 @@ export default {
       });
   },
   index: (req, res) => {
-    console.log(req.query)
     const queryOption = req.query.q;
     const limit = req.query.limit || 15;
     const queryParams = (queryOption) => {
@@ -55,7 +54,6 @@ export default {
     }
     Post.find({}).sort(queryParams(queryOption)).limit(limit)
       .then((posts) => {
-        console.log(typeof posts)
         return res.json({
           message: "Success",
           posts: posts,
@@ -90,7 +88,6 @@ export default {
   },
 
   createPost: (req, res) => {
-
     const {errors, isValid} = postValidator(req.body);
     const author = `${req.user.name} ${req.user.lastName}`;
     if (isValid) {
@@ -100,7 +97,7 @@ export default {
         text: req.body.text,
         avatar: req.body.avatar,
         user: req.user.id,
-        slug: makeRouteSlug(req.body.name),
+        slug: makeRouteSlug(req.body.title),
         likeCount: 0,
       });
 

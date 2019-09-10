@@ -22,7 +22,7 @@ export default function(router) {
   // @desc Gets a post by its slug
   // @access Public
   router  
-    .route("/posts/:id/:slug")
+    .route("/api/posts/:id/:slug")
     .get(postsController.viewBySlug);
 
   // @route POST /posts
@@ -36,13 +36,13 @@ export default function(router) {
   // @desc Edits a post
   // @access Private
   router
-    .route("api/posts/:id")
+    .route("/api/posts/:id")
     .patch([passport.authenticate("jwt", {session: false}), accessController("post", "edit_post")], postsController.editPost);
   
   // @route DELETE /posts/:id
   // @desc Deletes a post
   // @access Private
   router
-    .route("/posts/:id")
+    .route("/api/posts/:id")
     .delete([passport.authenticate("jwt", {session: false}), accessController( "post", "delete_post")], postsController.deletePost);
 };
