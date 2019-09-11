@@ -4,76 +4,9 @@ import app from "../server.js";
 import User from "../models/User.js";
 import faker from "faker";
 import Post from "../models/Post.js";
-
+import {generateUserData, createUsers} from "./helpers/authHelpers.js";
+import {generatePost, createPosts} from "./helpers/postHelpers.js";
 chai.use(chaiHttp);
-
-
-/**
- * Makes an array of users.
- * @param {number} count How many users to make.
- * @returns {array} An array with generated users.
- */
-function generateUserData(count) {
-  const users = []
-  for (let i = 1; i <= count; i++) {
-    const user = {
-      name: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-      email: faker.internet.email(),
-      password: "Password1",
-      passwordConfirm: "Password1",
-    }
-    users.push(user);
-  }
-  return users;
-};
-
-function generatePost() {
-  const post = {
-    author: faker.name.findName(),
-    title: faker.lorem.word(),
-    text: faker.lorem.paragraphs(2),
-    likes: 0,
-  };
-  return post;
-};
-
-async function createPosts(count, user) {
-  const posts = [];
-  for (let i = 1; i <= count; i++) {
-    const post = {
-      user: user._id,
-      author: user.name + " " + user.lastName,
-      title: faker.lorem.word(),
-      text: faker.lorem.paragraphs(2),
-      likes: 0,
-    };
-    posts.push(post);
-  }
-  try {
-    await Post.insertMany(posts);
-    return true;
-  }
-  catch(err) {
-    console.log(err);
-    return false;
-  }
-};
-
-
-async function createUsers(users, route) {
-  const requester = chai.request(app).keepOpen();
-  try {
-    await Promise.all( users.map(user => requester.post(route).send(user)) );
-    requester.close();
-    return true;
-  }
-  catch(error) {
-    console.log(error)
-    requester.close();
-    return false;
-  }
-};
 
 describe("Post Tests", function() {
   let usersArr, firstUser, secondUser, thirdUser, fourthUser;
@@ -92,7 +25,7 @@ describe("Post Tests", function() {
     usersArr = generateUserData(4);
     [firstUser, secondUser, thirdUser, fourthUser] = usersArr;
     try {
-      const userResult = await createUsers(usersArr, "/api/users/register");
+      const userResult = await createUsers(usersArr, app, "/api/users/register");
       const postUser1 = await User.findOne({email: firstUser.email});
       const postUser2 = await User.findOne({email: secondUser.email});
       const postResult1 = await createPosts(2, postUser1);
