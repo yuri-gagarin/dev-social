@@ -1,43 +1,22 @@
 import Post from "../models/Post.js";
-import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
+import PostLike from "../models/PostLike.js";
 
 export default {
   createLike: (req, res) => {
     const userId = req.user._id;
     const postId = req.params.postId;
 
-    Post.findOne({_id: postId})
-      .then((post) => {
-        if(post) {
-          //loop post likes
-          //if user already liked break out early and reject
-          let likesLength = post.likes.length;
-          for (let i = 0; i < likesLength; i++) {
-            if (post.likes[i].user.equals(userId)) {
-              return rejectionPromise("Already Liked!");
-            }
-          }
-          post.likes.push({user: userId});
-          return post.save();
+    PostLike.find({postId: postId}, {userId: userId})
+      .then((result) => {
+        if (result) {
 
         }
-        //in case no such post
         else {
-          return rejectionPromise("No post found");
+
         }
       })
-      .then((post) => {
-        return res.json({
-          message: "Liked",
-          likeCount: post.likes.length
-        });
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          message: "An error occured",
-          errors: err
-        });
-      });
+      
+
   },
 
   removeLike: (req, res) => {

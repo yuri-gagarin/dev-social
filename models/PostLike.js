@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
+//have to think about additional indexes...
+//
 const PostLikeSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
@@ -12,4 +14,4 @@ const PostLikeSchema = new Schema({
   }
 });
 
-export default mongoose.model("Like", PostLikeSchema);
+export default mongoose.model("PostLike", PostLikeSchema);

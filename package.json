@@ -10,7 +10,8 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "start": "node server.js",
     "test": "NODE_ENV=test mocha --require @babel/register --require @babel/polyfill ",
-    "debug_server": "nodemon --inspect --exec babel-node server.js"
+    "debug_server": "nodemon --inspect --exec babel-node server.js",
+    "seed": "babel-node ./test/seeds/seedDB.js"
   },
   "author": "yuri-gagarin",
   "license": "ISC",
