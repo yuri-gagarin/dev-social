@@ -16,7 +16,7 @@ describe("PostLike Test", function() {
   before("Create User data", async function() {
     user = generateUserData(1)[0];
     try { 
-      return await createUsers(user, app, "/api/users/register");
+      let res = await createUsers(user, app, "/api/users/register");
     }
     catch(error) {
       console.error(error);
@@ -26,10 +26,10 @@ describe("PostLike Test", function() {
   before("Login User", function(done) {
     chai.request(app)
       .post("/api/users/login")
-      .send({email: firstUser.email, password: user.password})
+      .send({email: user.email, password: user.password})
       .end((error, response) => {
         if (error) {
-          console.error(eror);
+          console.error(error);
           done(error);
         }
         userToken = response.body.token;
@@ -46,39 +46,53 @@ describe("PostLike Test", function() {
       process.exit(1);
     }
   })
-  describe("someto", function() {
-    it("passed", function (done) {
-      console.log(user);
-      console.log(userToken)
-      done();
-    })
-  })
-  /*
   describe("A guest User", function() {
-    beforeEach("Find a Post", async function() {
-      firstPost = await Post.findOne()
-    })
+    beforeEach("Create a Post", async function() {
+      post = await createPost(user);
+    });
+    afterEach("Delete the Post", async function() {
+      return await Post.deleteMany({});
+    });
     describe("POST /api/postLikes", function() {
       it("Should not be able to like a Post", function(done) {
+        chai.request(app)
+          .post("/api/postLikes")
+          .send({postId: post._id})
+          .end((error, response) => {
+            expect(response).to.have.status(401);
+            done();
+          });
       });
       it("Should not increment Post.like count", function(done) {
-
+        const postLikeCount = post.likes;
+        chai.request(app)
+          .post("/api/postLikes")
+          .send({postId: post._id})
+          .end((error, response) => {
+            expect(response).to.have.status(401);
+            expect(response.body.postLikes).to.equal(postLikeCount);
+          })
       });
     });
     describe("DELETE, /api/postLikes", function() {
-      it("Should Delete a PostLike", function(done) {
-
-      })
-      it("Should decrement Post.like count", function(done) {
-
-      })
-    })
+      it("Should not DELETE a PostLike", function(done) {
+        chai.request(app)
+          .delete("/api/postLikes")
+          .send({postId: post._id})
+          .end((error, response) => {
+            expect(response).to.have.status(401);
+            end();
+          });
+      });
+      it("Should not decrement Post.like count", function(done) {
+        chai.request(app)
+          .delete("/api/postLikes")
+          .send({postId: post._id})
+          .end((error, response) => {
+            expect(response).to.have.status(401);
+            end();
+          });
+      });
+    });
   });
-  it("Should not be able to unlike a Post", function(done) {
-
-  })
-  //end guest user
-  describe("A logged in User", function() {
-  })
-  */
 });

@@ -12,6 +12,10 @@ export const generatePost = ()=> {
   };
   return post;
 };
+/**
+ * Creates a a random Post.
+ * @param {object} user User model object.
+ */
 export const createPost = async(user) => {
   const post = {
     user: user._id,

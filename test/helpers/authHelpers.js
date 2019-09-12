@@ -28,7 +28,7 @@ export const generateUserData = (count) => {
  * @param {array | object} users An array of users to insert into database or a user object.
  * @param {function} app The Express server app.
  * @param {string} route The API route to make a POST request.
- * @returns {boolean} True if suceeded, False on error.
+ * @returns {Promise} True if suceeded, False on error.
  */
 export const createUsers = async (users, app, route) => {
   if(typeof users === "string") {
@@ -46,27 +46,18 @@ export const createUsers = async (users, app, route) => {
     try {
       await Promise.all( users.map(user => requester.post(route).send(user)) );
       requester.close();
-      return Promise.resolve(true);
+      return true;
     }
     catch(error) {
       console.log(error)
       requester.close();
-      return Promise.reject(false);
+      return false;
     }
   }
   else if (typeof users === "object") {
-    chai.request(app)
-      .post(route)
-      .send(users)
-      .end(function(err, res) {
-        if(err) {
-          console.error(err);
-          return Promise.reject(err);
-        }
-        return Promise.resolve(true);
-      });
+    return chai.request(app).post(route).send(users)
   }
   else {
-    return Promise.reject(false);
+    return false
   }
 };
