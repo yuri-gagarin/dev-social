@@ -6,62 +6,55 @@ export default {
     const userId = req.user._id;
     const postId = req.params.postId;
 
-    PostLike.find({postId: postId}, {userId: userId})
+    PostLike.findOne({postId: postId}, {userId: userId})
       .then((result) => {
         if (result) {
-
+          return Promise.reject(new Error("Already liked Post"));
         }
         else {
-
+          return PostLike.create({postId: postId, userId: userId});
         }
       })
-      
-
+      .then((response) => {
+        return Post.findOneAndUpdate({id: postId}, {Sinc: {likeCount: 1}}, {new: true});
+      })
+      .then((post) => {
+        return res.status(200).json({
+          message: "Liked Post",
+          post: post,
+        });
+      })
+      .catch((error) => {
+        return res.status(400).json({
+          message: error.message,
+          error: error,
+        });
+      });
   },
 
   removeLike: (req, res) => {
     const userId = req.user._id;
     const postId = req.params.postId;
-    console.log(postId)
 
-    Post.findOne({_id: postId})
-      .then((post) => {
-        if (post) {
-          //find index of a like
-          //if like exists, set the index break the loop early
-          let removeIndex = -1;
-          let likesLength = post.likes.length;
-          for (let i = 0; i < likesLength; i++) {
-            if (post.likes[i].user.equals(userId)) {
-              removeIndex = i;
-              break;
-            }
-          }
-          //if like exists remove like from post and save()          
-          if (removeIndex > -1) {
-            post.likes.splice(removeIndex, 1);
-            return post.save();
-          }
-          else {
-            return rejectionPromise("No like");
-          }
-          
+    PostLike.findOneAndDelete({postId: postId}, {userId: userId})
+      .then((deletedLike) => {
+        if(deletedLike) {
+          return Post.findOneAndUpdate({id: postId}, {$inc: {likeCount: -1}}, {new: true});
         }
         else {
-          return rejectionPromise("No Post Found");
+          return Promise.reject(new Error("No like"));
         }
       })
       .then((post) => {
-        return res.json({
-          message: "Unliked",
-          likeCount: post.likes.length
+        return res.status(200).json({
+          message: "liked a post",
+          post: post,
         });
       })
-      //catch all
-      .catch((err) => {
+      .catch((error) => {
         return res.status(400).json({
-          message: "An error occured",
-          errors: err
+          message: error.message,
+          error: error, 
         });
       });
   }

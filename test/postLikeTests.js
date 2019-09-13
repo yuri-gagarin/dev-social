@@ -7,23 +7,25 @@ import Post from "../models/Post.js";
 
 import {generateUserData, createUsers} from "./helpers/authHelpers.js";
 import {generatePost, createPost} from "./helpers/postHelpers.js";
+import mongoose from "mongoose";
+import seedDB from "./seeds/seedDB.js";
+import { test } from "mocha";
 
 chai.use(chaiHttp);
 
 describe("PostLike Test", function() {
-  let user, post, userToken;
-  
-  before("Create User data", async function() {
-    user = generateUserData(1)[0];
-    try { 
-      let res = await createUsers(user, app, "/api/users/register");
+  let user, bData, userToken, dbData;
+  before("Populate DB", async function() {
+    try {
+      dbData = await seedDB();
+      const testDatabase = dbData;
     }
-    catch(error) {
+    catch (error) {
       console.error(error);
-      return false;
     }
   });
   before("Login User", function(done) {
+    user = dbData.users.firstUser;
     chai.request(app)
       .post("/api/users/login")
       .send({email: user.email, password: user.password})
@@ -36,49 +38,53 @@ describe("PostLike Test", function() {
         done();
       })
   });
-  after("Clean Up", async function() {
-    try {
-      let _ = await User.deleteMany({});
-      process.exit(0);
-    }
-    catch(error) {
-      console.error(error)
-      process.exit(1);
-    }
+  after("Clean Up", function(done) {
+    mongoose.connection.db.dropDatabase
+      .then((response) => {
+        mongoose.connection.close()
+          .then(() => {
+            done(process.exit);
+          })
+      })
   })
   describe("A guest User", function() {
-    beforeEach("Create a Post", async function() {
-      post = await createPost(user);
-    });
-    afterEach("Delete the Post", async function() {
-      return await Post.deleteMany({});
-    });
-    describe("POST /api/postLikes", function() {
+    describe("POST /api/posts/like_post", function() {
+      let testPost;
+      beforeEach("Create a Post", async function() {
+        console.log("Creating Post")
+        testPost = await createPost(user);
+      });
+      afterEach("Delete the Post", async function() {
+        console.log("Deleting Post")
+        return await Post.findOneAndDelete({id: testPost._id});
+      });
       it("Should not be able to like a Post", function(done) {
         chai.request(app)
-          .post("/api/postLikes")
-          .send({postId: post._id})
+          .post("/api/posts/like_post/" + testPost._id)
           .end((error, response) => {
             expect(response).to.have.status(401);
             done();
           });
       });
       it("Should not increment Post.like count", function(done) {
-        const postLikeCount = post.likes;
+        const postLikeCount = testPost.likes;
         chai.request(app)
-          .post("/api/postLikes")
-          .send({postId: post._id})
+          .post("/api/posts/like_post/" + testPost._id)
           .end((error, response) => {
-            expect(response).to.have.status(401);
-            expect(response.body.postLikes).to.equal(postLikeCount);
-          })
+            console.log("Still running second test")
+            Post.findOne({id: testPost._id})
+              .then((post) => {
+                expect(response).to.have.status(401);
+                expect(post.likes).to.equal(testPost.likes);
+                done();
+              });
+          });
       });
     });
-    describe("DELETE, /api/postLikes", function() {
+    describe("DELETE, /api/posts/unlike_post", function() {
       it("Should not DELETE a PostLike", function(done) {
         chai.request(app)
-          .delete("/api/postLikes")
-          .send({postId: post._id})
+          .delete("/api/posts/unlike_post/" + post._id)
           .end((error, response) => {
             expect(response).to.have.status(401);
             end();
@@ -86,8 +92,7 @@ describe("PostLike Test", function() {
       });
       it("Should not decrement Post.like count", function(done) {
         chai.request(app)
-          .delete("/api/postLikes")
-          .send({postId: post._id})
+          .delete("/api/posts/unlike_post/" + post._id)
           .end((error, response) => {
             expect(response).to.have.status(401);
             end();

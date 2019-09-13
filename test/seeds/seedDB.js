@@ -5,10 +5,10 @@ import bcrypt from "bcrypt";
 import {generateUserData} from "../helpers/authHelpers.js";
 import {createPost} from "../helpers/postHelpers.js";
 
-let users;
+let users, testDatabase;
 
 const connectMongoose = async (mongoURI) => {
-  return await mongoose.connect(mongoURI, {useNewUrlParser: true});
+  return mongoose.connect(mongoURI, {useNewUrlParser: true});
 };
 
 const createUsers = async (num) => {
@@ -33,11 +33,11 @@ const createPosts = async (numOfPosts, user) => {
  * @param {null} null No Parameters required.
  * @returns {Promise} A Promise which either resolves to a users object or null;
  */
-const populateDB = async () => {
+const seedDB = async () => {
   console.log("Populating Database");
   try {
     // connect test database //
-    const connection = await connectMongoose(keys.mongoURI);
+    testDatabase = await connectMongoose(keys.mongoURI);
     await createUsers(10);
     // create some posts //
     const firstUser = await User.findOne({email: users[0].email});
@@ -57,10 +57,13 @@ const populateDB = async () => {
     // some other stuff to be added?? //
 
     return {
-      firstUser: users[0],
-      secondUser: users[1],
-      moderator: users[2],
-      administrator: users[3],
+      users: {
+        firstUser: users[0],
+        secondUser: users[1],
+        moderator: users[2],
+        administrator: users[3],
+      },
+      testDatabase: testDatabase,
     };
     //process.exit(0);
   }
@@ -72,4 +75,4 @@ const populateDB = async () => {
 
 
 
-export default populateDB;
+export default seedDB;

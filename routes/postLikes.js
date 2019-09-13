@@ -7,13 +7,13 @@ export default function(router) {
   // @desc Adds a like to a post
   // @access Private
   router
-    .route("/posts/like_post/:postId")
+    .route("/api/posts/like_post/:postId")
     .post(passport.authenticate("jwt", {session: false}), postLikesController.createLike);
   
   // @route DELETE /posts/unlike_post
   // @desc Deletes a like
   // @access Private
   router
-    .route("/posts/unlike_post/:postId")
+    .route("/api/posts/unlike_post/:postId")
     .delete(passport.authenticate("jwt", {session: false}), postLikesController.removeLike);
 }
