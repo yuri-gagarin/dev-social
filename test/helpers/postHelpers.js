@@ -3,7 +3,7 @@ import Post from "../../models/Post.js";
 /**
  * 
  */
-export const generatePost = ()=> {
+export const generatePost = (user)=> {
   const post = {
     author: faker.name.findName(),
     title: faker.lorem.word(),
