@@ -4,11 +4,11 @@ const Schema = mongoose.Schema;
 //have to think about additional indexes...
 //
 const PostLikeSchema = new Schema({
-  user: {
+  userId: {
     type: Schema.Types.ObjectId,
     ref: "User",
   },
-  post: {
+  postId: {
     type: Schema.Types.ObjectId,
     ref: "Post",
   }

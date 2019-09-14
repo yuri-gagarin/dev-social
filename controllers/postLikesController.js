@@ -16,7 +16,7 @@ export default {
         }
       })
       .then((response) => {
-        return Post.findOneAndUpdate({id: postId}, {Sinc: {likeCount: 1}}, {new: true});
+        return Post.findOneAndUpdate({_id: postId}, {$inc: {likeCount: 1}}, {new: true});
       })
       .then((post) => {
         return res.status(200).json({
@@ -39,7 +39,7 @@ export default {
     PostLike.findOneAndDelete({postId: postId}, {userId: userId})
       .then((deletedLike) => {
         if(deletedLike) {
-          return Post.findOneAndUpdate({id: postId}, {$inc: {likeCount: -1}}, {new: true});
+          return Post.findOneAndUpdate({_id: postId}, {$inc: {likeCount: -1}}, {new: true});
         }
         else {
           return Promise.reject(new Error("No like"));
@@ -47,7 +47,7 @@ export default {
       })
       .then((post) => {
         return res.status(200).json({
-          message: "liked a post",
+          message: "Unliked a post",
           post: post,
         });
       })
