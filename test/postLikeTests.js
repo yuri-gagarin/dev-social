@@ -7,12 +7,12 @@ import {createPost} from "./helpers/postHelpers.js";
 import mongoose from "mongoose";
 import seedDB from "./seeds/seedDB.js";
 import PostLike from "../models/PostLike.js";
-import postLikes from "../routes/postLikes.js";
+import { isSymbol } from "util";
 
 chai.use(chaiHttp);
 
 describe("PostLike Tests", function() {
-  let user, bData, userToken, dbData;
+  let user, userToken, dbData;
   before("Populate DB", async function() {
     try {
       dbData = await seedDB();
@@ -48,57 +48,80 @@ describe("PostLike Tests", function() {
   });
   
   describe("A guest User", function() {
-    let testPost;
-    beforeEach("Create a Post", async function() {
-      testPost = await createPost(user);
+    let post, likeCount, PostLikes;
+    before("Create a Post", function(done) {
+      createPost(user)
+        .then((postResponse) => {
+          post = postResponse;
+          likeCount = postResponse.likeCount;
+          return PostLike.create({userId: user._id, postId: post._id});
+        })
+        .then((postLike) => {
+          PostLike.countDocuments({}, (err, count) => {
+            if (err) return Promise.reject(err);
+            PostLikes  = count;
+            return Promise.resolve(done());
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          done(error);
+        });
     });
-    afterEach("Delete the Post", async function() {
-      return await Post.findOneAndDelete({id: testPost._id});
-    });
+    
     describe("POST /api/posts/like_post", function() {
       it("Should NOT be able to like a Post", function(done) {
         chai.request(app)
-          .post("/api/posts/like_post/" + testPost._id)
+          .post("/api/posts/like_post/" + post._id)
           .end((error, response) => {
+            expect(error).to.nested.null;
             expect(response).to.have.status(401);
             done();
           });
       });
-      it("Should NOT increment Post.like count", function(done) {
-        chai.request(app)
-          .post("/api/posts/like_post/" + testPost._id)
-          .end((error, response) => {
-            Post.findOne({_id: testPost._id})
-              .then((post) => {
-                expect(response).to.have.status(401);
-                expect(post.likeCount).to.equal(testPost.likeCount);
-                done();
-              });
-          });
+      it("Should NOT increment Post.likeCount", function(done) {
+        Post.findOne({_id: post._id})
+          .then((post) => {
+            expect(post.likeCount).to.equal(likeCount);
+            done();
+          })
+      });
+      it("Should NOT add a PostLike", function(done) {
+        PostLike.countDocuments({}, (err, count) => {
+          expect(count).to.equal(PostLikes);
+          done();
+        });
       });
     });
     describe("DELETE, /api/posts/unlike_post", function() {
-      it("Should NOT DELETE a PostLike", function(done) {
+      it("Should NOT be able to unlike a Post", function(done) {
         chai.request(app)
-          .delete("/api/posts/unlike_post/" + testPost._id)
+          .delete(("/api/posts/unlike_post" + post._id))
           .end((error, response) => {
+            expect(error).to.be.null;
             expect(response).to.have.status(401);
             done();
           });
-      });
-      it("Should NOT decrement Post.like count", function(done) {
-        chai.request(app)
-          .delete("/api/posts/unlike_post/" + testPost._id)
-          .end((error, response) => {
-            Post.findOne({_id: testPost._id})
-              .then((post) => {
-                expect(response).to.have.status(401);
-                expect(post.likeCount).to.equal(testPost.likeCount);
-                done();
-              })
+      })
+      it("Should NOT decrement Post.likeCount", function(done) {
+          Post.findOne({_id: post._id})
+            .then((post) => {
+              expect(post.likeCount).to.equal(likeCount);
+              done();
+            })
+            .catch((error) => {
+              console.error(error)
+              done();
+            })
           });
       });
-    });
+      it("Should NOT remove a PostLike", function(done) {
+          PostLike.countDocuments({}, (err, count) => {
+            if(err) {console.error(err)};
+            expect(count).to.equal(PostLikes);
+            done();
+          });
+      });
   });
   // end guest user //
   // Logged in User tests //
@@ -120,23 +143,8 @@ describe("PostLike Tests", function() {
       PostLike.countDocuments({}, (err, count) => {
         PostLikes = count;
         done();
-      })
-    })
-    /*
-    after("Delete a Post and PostLikes", function(done) {
-      Post.findOneAndDelete({_id: post._id})
-        .then((deletedPost) => {
-          return PostLike.deleteOne({postId: post._id, userId: user._id});
-        })
-        .then((response) => {
-          done();
-        })
-        .catch((err) => {
-          console.error(err);
-          done();
-        })
-    })
-    */
+      });
+    });
     describe("POST /api/posts/like_post/:postId", function() {
       describe("User liking an unliked Post ", function() {
         it("Should be able to Like a Post", function(done) {
@@ -265,5 +273,4 @@ describe("PostLike Tests", function() {
     });
   });
   // end logged in user tests //
-
 });
