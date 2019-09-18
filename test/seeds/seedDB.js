@@ -4,6 +4,7 @@ import keys from "../../config/keys.js";
 import bcrypt from "bcrypt";
 import {generateUserData} from "../helpers/authHelpers.js";
 import {createPost} from "../helpers/postHelpers.js";
+import commentsController from "../../controllers/commentsController.js";
 
 let users, testDatabase;
 
@@ -38,6 +39,7 @@ const seedDB = async () => {
   try {
     // connect test database //
     testDatabase = await connectMongoose(keys.mongoURI);
+    await testDatabase.connection.dropDatabase();
     await createUsers(10);
     // create some posts //
     const firstUser = await User.findOne({email: users[0].email});

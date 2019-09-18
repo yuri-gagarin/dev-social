@@ -102,6 +102,7 @@ export default  {
           message: "Logged in",
           token: `Bearer ${token}`,
           user: {
+            _id: user._id,
             name: user.name,
             lastName: user.lastName,
             email: user.email,
