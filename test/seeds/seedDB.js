@@ -11,13 +11,24 @@ let users, testDatabase;
 const connectMongoose = async (mongoURI) => {
   return mongoose.connect(mongoURI, {useNewUrlParser: true});
 };
-
+/**
+ * Creates a specified number of Users.
+ * @param {*number} num The number of Users to be created.
+ * @returns {Promise} A promise resolves to TRUE if succeeded.
+ */
 const createUsers = async (num) => {
   users = generateUserData(num);
   for (let i = 0; i < users.length; i++) {
-    let hash = await bcrypt.hash(users[i].password, keys.saltConstant); 
-    let user = {...users[i], password: hash};
-    let _ = await User.create(user);
+    try {
+      let hash = await bcrypt.hash(users[i].password, keys.saltConstant); 
+      let user = {...users[i], password: hash};
+      let createdUser = await User.create(user);
+      users[i]._id = createdUser._id;
+    }
+    catch(error){
+      console.error(error);
+      return false;
+    }
   }
   return true;
 };

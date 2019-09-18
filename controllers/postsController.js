@@ -127,15 +127,12 @@ export default {
     const postId = req.params.id;
     const user = req.user;
 
-    const postText = req.body.text;
-    if (!postText) {
-      return res.status(400).json({
-        message: "You should probably put in some text"
-      });
-    }
     Post.findOne({_id: postId})
       .then((post) => {
+        const postText = req.body.text ? req.body.text : post.text;
+        const postTitle = req.body.title ? req.body.title : post.title;
         if(post) {
+          post.title = postTitle
           post.editedAt = Date.now();
           post.text = `EDITED: ${getDateWithTime({format: "dateAndHour"})}
                        BY: ${user.name || "anonymous"}

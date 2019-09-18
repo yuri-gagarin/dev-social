@@ -77,7 +77,7 @@ export default function (modelName, action) {
       }
     }
     catch (err) {
-      console.log(err);
+      console.error(err.message);
       return res.status(400).json({
         message: "An error occured"
       });

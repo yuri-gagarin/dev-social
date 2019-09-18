@@ -31,7 +31,6 @@ describe("Post Tests", function() {
       .post("/api/users/login")
       .send({email: firstUser.email, password: firstUser.password})
       .end((error, response) => {
-        firstUser._id = response.body.user._id;
         firstUserToken = response.body.token;
         done();
       })
@@ -42,7 +41,6 @@ describe("Post Tests", function() {
       .send({email: moderator.email, password: moderator.password})
       .end((error, response) => {
         if (error) console.error(error);
-        moderator._id = response.body.user._id;
         moderatorToken = response.body.token
         done();
       });
@@ -54,8 +52,8 @@ describe("Post Tests", function() {
         firstUsersPost = posts[0];
         return Post.find({user: secondUser._id})
       })
-      .then((secondPost) => {
-        secondUsersPost = secondPost;
+      .then((posts) => {
+        secondUsersPost = posts[0];
         done();
       })
       .catch((error) => {
@@ -202,7 +200,6 @@ describe("Post Tests", function() {
           .send({title: editedTitle})
           .end((error, response) => {
             expect(error).to.be.null;
-            console.log(response);
             expect(response).to.have.status(200);
             expect(response.body.post).to.not.be.null;
             done();
@@ -221,7 +218,7 @@ describe("Post Tests", function() {
       it("Shoud NOT create a new Post when editing own Post", function(done) {
         Post.countDocuments({}, (err, count) => {
           if (err) {console.error(err)};
-          expect(count).toEqual(postCount);
+          expect(count).to.equal(postCount);
           done();
         })
       })
@@ -237,20 +234,19 @@ describe("Post Tests", function() {
           });
       });
       it("Should NOT edit the other User's Post data", function(done) {
-        let editedText = faker.paragraphs(1);
+        let editedTitle = faker.lorem.sentence();
         chai.request(app)
           .patch("/api/posts/" + secondUsersPost._id)
           .set({"Authorizaton": firstUserToken})
-          .send({text: editedText})
+          .send({title: editedTitle})
           .end((error, response) => {
             Post.findOne({_id: secondUsersPost._id})
               .then((post) => {
-                expect(post.text).to.not.equal(editedText);
+                expect(post.title).to.not.equal(editedTitle);
                 done();
               })
               .catch((error) => {
                 console.error(error);
-                next();
               });
           });
       })
@@ -298,24 +294,38 @@ describe("Post Tests", function() {
   // moderator Logged in //
   describe("Moderator Logged in", function () {
     
-    describe("DELETE /api/posts/:id", function() {
+    describe("PATCH /api/posts/:id", function() {
+      const newTitle = faker.lorem.sentence;
       it("Should NOT be able to EDIT another User's Post", function(done) {
         chai.request(app)
           .patch("/api/posts/" + secondUsersPost._id)
           .set({"Authorization": moderatorToken})
+          .send({title: newTitle})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(401);
             done();
           });
       });
+      it("Should NOT change another User's Post data", function(done) {
+        Post.findOne({_id: secondUsersPost._id})
+          .then((post) => {
+            expect(post.title).to.not.equal(newTitle);
+            done();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      })
       it("Should NOT change the number of Posts(s)", function(done) {
         Post.countDocuments({}, (err, count) => {
           if(err) {console.error(err)};
           expect(count).to.equal(postCount);
           done();
         });
-      })
+      });
+    });
+    describe("DELETE /api/posts/:id", function() {
       it("Should be able to DELETE another User's Post", function(done) {
         chai.request(app)
           .delete("/api/posts/" + secondUsersPost._id)
