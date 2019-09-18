@@ -1,5 +1,6 @@
 import faker from "faker";
 import Post from "../../models/Post.js";
+import PostLike from "../../models/PostLike.js";
 /**
  * 
  */
@@ -32,7 +33,11 @@ export const createPost = async(user) => {
     return false;
   }
 };
-
+/**
+ * Creats a specific number of Post(s).
+ * @param {number} count - A number of Post(s) to create. Default 10.
+ * @param {Object[]} users - An array of User objects to be tied to Posts(s). 
+ */
 export const seedPosts = async (count, users) => {
   const posts = [];
   if(Array.isArray(users)) {
@@ -51,12 +56,40 @@ export const seedPosts = async (count, users) => {
   }
   try {
     const createdPosts = await Post.insertMany(posts);
+    console.log(`Created ${createdPosts.length} Post(s);`)
     return createdPosts;
   }
   catch (error) {
     console.log(error);
     return null;
   }
+};
+/**
+ * Creates a random number of PostLike(s) per Post (the number will always be <= Users).
+ * @param {Object[]} posts - An Array with Post objects. 
+ * @param {Object[]} users - An Array with User objects.
+ * @returns {Promise} A promise which resolves to ether the number of PostLike(s) created or NULL.
+ */
+export const likePosts = async (posts, users) => {
+  let postLikeCount = 0;
+  for (let i = 0; i < posts.length; i++) {
+    // set a random number of max likes;
+    // will always be <= users.length;
+    const numOfLikes = Math.floor(Math.random() * (users.length + 1));
+    for (let j = 0; j < numOfLikes; j++) {
+      try {
+        await PostLike.create({postId: posts[i]._id, userId: users[j]._id,});
+        await Post.findOneAndUpdate({_id: posts[i]._id}, {$inc:{likeCount: 1}});
+        postLikeCount+=1;
+      }
+      catch(error) {
+        console.error(error);
+        return null;
+      }
+    }
+  };
+  console.log(`Created ${postLikeCount} PostLikes(s);`);
+  return postLikeCount;
 };
 
 export const createPosts = async(count, user) => {

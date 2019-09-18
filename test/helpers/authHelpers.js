@@ -26,9 +26,9 @@ export const generateUserData = (count) => {
   return users;
 };
 /**
- * Creates a specified number of Users.
- * @param {*number} num The number of Users to be created.
- * @returns {Promise} A promise resolves to an Array of Users if succeeded otherwise NULL.
+ * Creates a specified number of User(s).
+ * @param {number} num - The number of User(s) to be created.
+ * @returns {Promise} A promise resolves to an Array of User objects if succeeded otherwise NULL.
  */
 export const createUsers = async (num) => {
   if(typeof num !== "number") {
@@ -47,6 +47,6 @@ export const createUsers = async (num) => {
       return null;
     }
   }
-  console.log(`Created ${num} Users`);
+  console.log(`Created ${num} User(s);`);
   return users;
 };

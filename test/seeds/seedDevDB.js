@@ -1,43 +1,25 @@
 import mongoose from "mongoose";
 import keys from "../../config/keys.js";
-// models //
-import User from "../../models/User.js";
-import Post from "../../models/Post.js";
-import PostLike from "../../models/PostLike.js";
-import Comment from "../../models/Comment.js";
 
 
 import {createUsers} from "../helpers/authHelpers.js";
-import {createPost, seedPosts} from "../helpers/postHelpers.js";
+import {seedPosts, likePosts} from "../helpers/postHelpers.js";
+import {seedComments} from "../helpers/commentHelpers.js";
+import User from "../../models/User.js";
 
-let users, testDatabase;
 //mongoose connection function
 const connectMongoose = async (mongoURI) => {
-  return mongoose.connect(mongoURI, {useNewUrlParser: true});
+  return mongoose.connect(mongoURI, {useNewUrlParser: true, useFindAndModify: false});
 };
-//create some users
-
-
-//create some posts
-
-
-//like some posts
-
-
-//create some comments
 
 //options
+//set some options here
 const options = {
   numberOfUsers: 10,
   numberOfPosts: 10,
-  numberOfComments: 10,
+  maxCommentsPerPost: 10,
 }
 //seed the DEV DB
-/**
- * Seeds a development database.
- * @param {object} options An options object.
- * @returns {Promise} A Promise which resolves to True or False.
- */
 const seedDevDB = async (options) => {
   try {
     // connect database //
@@ -45,13 +27,29 @@ const seedDevDB = async (options) => {
     // create some users //
     const usersCreated = await createUsers(options.numberOfUsers);
     // create some posts //
-    const postsCreated = await seedPosts(10, usersCreated);
+    const postsCreated = await seedPosts(options.numberOfPosts, usersCreated);
     // create some comments //
-    const commentsCreated = await seedComments(posts, users);
+    const commentsCreated = await seedComments(usersCreated, postsCreated, options.maxCommentsPerPost);
+    // like some posts //
+    const postLikes = await likePosts(postsCreated, usersCreated);
+    // create a moderator //
+    const moderator = await User.findOneAndUpdate({_id: usersCreated[2]._id}, {$set: {role: "moderator"} });
+    // create an administrator //
+    const administrator = await User.findOneAndUpdate({_id: usersCreated[3]._id}, {$set: {role: "administrator"} });
+
+    return {
+      users: {
+        firstUser: createUsers[0],
+        secondUser: createUsers[1],
+        moderator: createUsers[2],
+        administrator: createUsers[3]
+      }
+    };
   }
   catch (error) {
     console.error(error);
   }
 };
 
-seedDevDB(options);
+seedDevDB(options)
+  .catch(err => console.error(error));
