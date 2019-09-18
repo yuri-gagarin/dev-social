@@ -31,7 +31,33 @@ export const createPost = async(user) => {
     console.error(error);
     return false;
   }
-} ;
+};
+
+export const seedPosts = async (count, users) => {
+  const posts = [];
+  if(Array.isArray(users)) {
+    for(let i = 0; i < users.length; i++) {
+      for(let j = 0; j < count; j++) {
+        const post = {
+          user: users[i]._id,
+          author: users[i].name + " " + users[i].lastName,
+          title: faker.lorem.word(),
+          text: faker.lorem.paragraphs(2),
+          likes: 0,
+        };
+        posts.push(post);
+      }
+    }
+  }
+  try {
+    const createdPosts = await Post.insertMany(posts);
+    return createdPosts;
+  }
+  catch (error) {
+    console.log(error);
+    return null;
+  }
+};
 
 export const createPosts = async(count, user) => {
   const posts = [];

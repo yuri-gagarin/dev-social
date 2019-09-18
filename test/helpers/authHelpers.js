@@ -1,7 +1,9 @@
 import faker from "faker";
 import chai from "chai";
 import chaiHttp from "chai-http";
-
+import bcrypt from "bcrypt";
+import keys from "../../config/keys.js";
+import User from "../../models/User.js";
 chai.use(chaiHttp);
 
 /**
@@ -24,40 +26,27 @@ export const generateUserData = (count) => {
   return users;
 };
 /**
- * Creates a specific number of users in the database.
- * @param {array | object} users An array of users to insert into database or a user object.
- * @param {function} app The Express server app.
- * @param {string} route The API route to make a POST request.
- * @returns {Promise} True if suceeded, False on error.
+ * Creates a specified number of Users.
+ * @param {*number} num The number of Users to be created.
+ * @returns {Promise} A promise resolves to an Array of Users if succeeded otherwise NULL.
  */
-export const createUsers = async (users, app, route) => {
-  if(typeof users === "string") {
-    throw new TypeError("First argument must be an {array} or an {object} ;");
+export const createUsers = async (num) => {
+  if(typeof num !== "number") {
+    throw new TypeError(`Expected first argument to be a {'number'} instead saw {'${typeof num}'};`);
   }
-  if(typeof app !== "function") {
-    throw new TypeError(`Expected the second argument to be a {function} --instead saw: ${typeof app} ;`);
-  }
-  if(typeof route !== "string") {
-    throw new TypeError(`Expected the third argument to be a {string} -- instead saw: ${typeof route} ;`);
-  }
-
-  if(Array.isArray(users)) {
-    const requester = chai.request(app).keepOpen();
+  let users = generateUserData(num);
+  for (let i = 0; i < users.length; i++) {
     try {
-      await Promise.all( users.map(user => requester.post(route).send(user)) );
-      requester.close();
-      return true;
+      let hash = await bcrypt.hash(users[i].password, keys.saltConstant); 
+      let user = {...users[i], password: hash};
+      let createdUser = await User.create(user);
+      users[i]._id = createdUser._id;
     }
-    catch(error) {
-      console.log(error)
-      requester.close();
-      return false;
+    catch(error){
+      console.error(error);
+      return null;
     }
   }
-  else if (typeof users === "object") {
-    return chai.request(app).post(route).send(users)
-  }
-  else {
-    return false
-  }
+  console.log(`Created ${num} Users`);
+  return users;
 };
