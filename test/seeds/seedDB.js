@@ -1,70 +1,57 @@
-import User from "../../models/User.js";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import keys from "../../config/keys.js";
-import bcrypt from "bcrypt";
-import {generateUserData} from "../helpers/authHelpers.js";
-import {createPost} from "../helpers/postHelpers.js";
 
-let users, testDatabase;
 
+import {createUsers} from "../helpers/authHelpers.js";
+import {seedPosts, likePosts} from "../helpers/postHelpers.js";
+import {seedComments} from "../helpers/commentHelpers.js";
+import User from "../../models/User.js";
+
+//mongoose connection function
 const connectMongoose = async (mongoURI) => {
-  return mongoose.connect(mongoURI, {useNewUrlParser: true});
+  return mongoose.connect(mongoURI, {useNewUrlParser: true, useFindAndModify: false});
 };
 
-const createPosts = async (numOfPosts, user) => {
-  const postUser = await User.findOne({email: user.email});
-  for (let i = 0; i < numOfPosts; i ++) {
-    const post = await createPost(postUser);
-  }
-  return true;
-};
-
+//seed the DEV DB
 /**
- * Populates Database.
- * @param {null} null No Parameters required.
- * @returns {Promise} A Promise which either resolves to a users object or null;
+ * Seeds the Database
+ * @param {object} options - An options object.
+ * @param {number} options.numberOfUsers - Number of User(s) to create.
+ * @param {number} options.numberOfPostsPerUser - Number of Post(s) tp create. 
+ * @param {number} options.maxCommentsPerPost - Maximum number of Comment(s) per Post.
+ * @returns {object} An object with {.users} property.
  */
-const seedDB = async () => {
-  console.log("Populating Database");
+const seedDB = async (options) => {
   try {
-    // connect test database //
-    testDatabase = await connectMongoose(keys.mongoURI);
-    await testDatabase.connection.dropDatabase();
-    await createUsers(10);
+    // connect database //
+    const connection = await connectMongoose(keys.mongoURI);
+    // clear database //
+    const response = await mongoose.connection.db.dropDatabase();
+    // create some users //
+    const usersCreated = await createUsers(options.numberOfUsers);
     // create some posts //
-    const firstUser = await User.findOne({email: users[0].email});
-    const secondUser = await User.findOne({email: users[1].email});
-    await createPosts(5, firstUser);
-    await createPosts(5, secondUser);  
-    // create moderator //
-    await User.findOne({email: users[2].email}).then((user) => {
-      user.role = "moderator";
-      return user.save();
-    });
-    // create administrator //
-    await User.findOne({email: users[3].email}).then((user) => {
-      user.role = "administrator";
-      return user.save();
-    });
-    // some other stuff to be added?? //
+    const postsCreated = await seedPosts(options.numberOfPostsPerUser, usersCreated);
+    // create some comments //
+    const commentsCreated = await seedComments(usersCreated, postsCreated, options.maxCommentsPerPost);
+    // like some posts //
+    const postLikes = await likePosts(postsCreated, usersCreated);
+    // create a moderator //
+    const moderator = await User.findOneAndUpdate({_id: usersCreated[2]._id}, {$set: {role: "moderator"} });
+    // create an administrator //
+    const administrator = await User.findOneAndUpdate({_id: usersCreated[3]._id}, {$set: {role: "administrator"} });
 
     return {
       users: {
-        firstUser: users[0],
-        secondUser: users[1],
-        moderator: users[2],
-        administrator: users[3],
-      },
-      testDatabase: testDatabase,
+        firstUser: usersCreated[0],
+        secondUser: usersCreated[1],
+        moderator: usersCreated[2],
+        administrator: usersCreated[3]
+      }
     };
-    //process.exit(0);
   }
   catch (error) {
-    console.log(error);
-    return null;
+    console.error(error);
   }
 };
-
-
 
 export default seedDB;

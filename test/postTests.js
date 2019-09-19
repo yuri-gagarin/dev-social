@@ -1,12 +1,10 @@
 import chai, {expect} from "chai";
 import chaiHttp from "chai-http";
 import app from "../server.js";
-import User from "../models/User.js";
 import faker from "faker";
 import Post from "../models/Post.js";
-import {generateUserData, createUsers} from "./helpers/authHelpers.js";
-import {generatePost, createPosts} from "./helpers/postHelpers.js";
-import seedDB  from "./seeds/seedDB.js";
+import {generatePost} from "./helpers/postHelpers.js";
+import seedDB from "./seeds/seedDB.js";
 import mongoose from "mongoose";
 chai.use(chaiHttp);
 
@@ -16,8 +14,9 @@ describe("Post Tests", function() {
   let firstUserToken, moderatorToken, administratorToken;
   let firstUsersPost, secondUsersPost;
   let postCount;
-  before("Seed DB", function(done) {
-    seedDB()
+  before("Populate DB", function(done) {
+    this.timeout(10000);
+    seedDB({numberOfUsers: 5, numberOfPostsPerUser: 5, maxCommentsPerPost: 5})
       .then((response) => {
         ({firstUser, secondUser, moderator, administrator} = response.users);
         done();

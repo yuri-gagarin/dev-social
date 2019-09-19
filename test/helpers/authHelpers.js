@@ -1,14 +1,12 @@
 import faker from "faker";
-import chai from "chai";
-import chaiHttp from "chai-http";
 import bcrypt from "bcrypt";
 import keys from "../../config/keys.js";
 import User from "../../models/User.js";
-chai.use(chaiHttp);
+import {TEST_PASSWORD} from "../seeds/constants.js";
 
 /**
  * Makes an array of users.
- * @param {number} count How many users to make.
+ * @param {number} count - How many users to make.
  * @returns {array} An array with generated users.
  */
 export const generateUserData = (count) => {
@@ -18,8 +16,8 @@ export const generateUserData = (count) => {
       name: faker.name.firstName(),
       lastName: faker.name.lastName(),
       email: faker.internet.email(),
-      password: "Password1",
-      passwordConfirm: "Password1",
+      password: TEST_PASSWORD,
+      passwordConfirm: TEST_PASSWORD,
     }
     users.push(user);
   }

@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import faker from "faker";
 import keys from "../config/keys.js";
 import User from "../models/User.js";
+import {TEST_PASSWORD} from "./seeds/constants.js";
 //configure
 chai.use(chaiHttp);
 chai.should();
@@ -16,8 +17,8 @@ describe("Auth Tests", function() {
     name: faker.name.firstName(),
     lastName: faker.name.lastName(),
     email: faker.internet.email(),
-    password: "Password1",
-    passwordConfirm: "Password1",
+    password: TEST_PASSWORD,
+    passwordConfirm: TEST_PASSWORD,
   };
   before("Connect to Database", function(done) {
     mongoose.connect(mongoURI, {useNewUrlParser: true})
@@ -180,7 +181,7 @@ describe("Auth Tests", function() {
       it("Should not Login a user with invalid email", function(done) {
         chai.request(app)
           .post("/api/users/login")
-          .send({email: "none@mail.com", password: "Password1"})
+          .send({email: "none@mail.com", password: TEST_PASSWORD})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(400);

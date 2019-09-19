@@ -7,23 +7,23 @@ import {createPost} from "./helpers/postHelpers.js";
 import mongoose from "mongoose";
 import seedDB from "./seeds/seedDB.js";
 import PostLike from "../models/PostLike.js";
-import { isSymbol } from "util";
 
 chai.use(chaiHttp);
 
 describe("PostLike Tests", function() {
-  let user, userToken, dbData;
-  before("Populate DB", async function() {
-    try {
-      dbData = await seedDB();
-      const testDatabase = dbData;
-    }
-    catch (error) {
-      console.error(error);
-    }
-  });
+  let user, userToken;
+  before("Populate DB", function(done) {
+    this.timeout(10000);
+    seedDB({numberOfUsers: 5, numberOfPostsPerUser: 3, maxCommentsPerPost: 3})
+      .then((result) => {
+        user = result.users.firstUser;
+        done();
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+  });;
   before("Login User", function(done) {
-    user = dbData.users.firstUser;
     chai.request(app)
       .post("/api/users/login")
       .send({email: user.email, password: user.password})
@@ -40,11 +40,14 @@ describe("PostLike Tests", function() {
   after("Clean Up", function(done) {
     mongoose.connection.db.dropDatabase()
       .then((response) => {
-        mongoose.connection.close()
-          .then(() => {
-            done();
-          })
+        return mongoose.connection.close();
       })
+      .then(() => {
+        done(); 
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   });
   
   describe("A guest User", function() {
@@ -54,13 +57,10 @@ describe("PostLike Tests", function() {
         .then((postResponse) => {
           post = postResponse;
           likeCount = postResponse.likeCount;
-          return PostLike.create({userId: user._id, postId: post._id});
-        })
-        .then((postLike) => {
           PostLike.countDocuments({}, (err, count) => {
             if (err) return Promise.reject(err);
-            PostLikes  = count;
-            return Promise.resolve(done());
+            PostLikes = count;
+            done();
           });
         })
         .catch((error) => {
@@ -74,7 +74,7 @@ describe("PostLike Tests", function() {
         chai.request(app)
           .post("/api/posts/like_post/" + post._id)
           .end((error, response) => {
-            expect(error).to.nested.null;
+            expect(error).to.be.null;
             expect(response).to.have.status(401);
             done();
           });

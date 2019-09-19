@@ -1,55 +1,55 @@
-import mongoose from "mongoose";
-import keys from "../../config/keys.js";
-
-
-import {createUsers} from "../helpers/authHelpers.js";
-import {seedPosts, likePosts} from "../helpers/postHelpers.js";
-import {seedComments} from "../helpers/commentHelpers.js";
+import seedDB from "./seedDB.js"
 import User from "../../models/User.js";
+import {TEST_PASSWORD} from "../seeds/constants.js";
+import mongoose from "mongoose";
 
-//mongoose connection function
-const connectMongoose = async (mongoURI) => {
-  return mongoose.connect(mongoURI, {useNewUrlParser: true, useFindAndModify: false});
-};
+let firstUser, secondUser, moderator, administrator;
+seedDB({numberOfUsers: 10, numberOfPostsPerUser: 10, maxCommentsPerPost: 10})
+  .then((result) => {
+    //console.log("Seeded Dev DB");
+    ({firstUser, secondUser, moderator, administrator} = result.users);
+    return User.findOneAndUpdate({_id: firstUser._id}, {$set: {email: "firstuser@mail.com"}}, {new: true});
+  })
+  .then((user) => {
+    firstUser = {...user.toObject(), password: TEST_PASSWORD};
+    //console.log(firstUser);
+    return User.findOneAndUpdate({_id: secondUser._id}, {$set: {email: "seconduser@mail.com"}}, {new: true});
+  })
+  .then((user) => {
+    secondUser = {...user.toObject(), password: TEST_PASSWORD};
+    return User.findOneAndUpdate({_id: moderator._id}, {$set: {email: "moderator@mail.com"}}, {new: true});
+  })
+  .then((user) => {
+    moderator = {...user.toObject(), password: TEST_PASSWORD};
+    return User.findOneAndUpdate({_id: administrator._id}, {$set: {email: "administrator@mail.com"}}, {new: true});
+  })
+  .then((user) => {
+    administrator = {...user.toObject(), password: TEST_PASSWORD};
 
-//options
-//set some options here
-const options = {
-  numberOfUsers: 10,
-  numberOfPosts: 10,
-  maxCommentsPerPost: 10,
-}
-//seed the DEV DB
-const seedDevDB = async (options) => {
-  try {
-    // connect database //
-    const connection = await connectMongoose(keys.mongoURI);
-    // create some users //
-    const usersCreated = await createUsers(options.numberOfUsers);
-    // create some posts //
-    const postsCreated = await seedPosts(options.numberOfPosts, usersCreated);
-    // create some comments //
-    const commentsCreated = await seedComments(usersCreated, postsCreated, options.maxCommentsPerPost);
-    // like some posts //
-    const postLikes = await likePosts(postsCreated, usersCreated);
-    // create a moderator //
-    const moderator = await User.findOneAndUpdate({_id: usersCreated[2]._id}, {$set: {role: "moderator"} });
-    // create an administrator //
-    const administrator = await User.findOneAndUpdate({_id: usersCreated[3]._id}, {$set: {role: "administrator"} });
+    //display some login info
+    console.log("Created Database.");
+    console.log(`First User:
+                  email: ${firstUser.email}
+                  password: ${firstUser.password}`
+                );
+    console.log(`Second User: 
+                  email: ${secondUser.email}
+                  password: ${secondUser.password}`
+                );
+    console.log(`Moderator:
+                  email: ${moderator.email}
+                  password: ${moderator.password}`
+                );
+    console.log(`Administrator: 
+                  email: ${administrator.email}
+                  password: ${administrator.password}`
+                );
 
-    return {
-      users: {
-        firstUser: createUsers[0],
-        secondUser: createUsers[1],
-        moderator: createUsers[2],
-        administrator: createUsers[3]
-      }
-    };
-  }
-  catch (error) {
+    return mongoose.connection.close()
+  })
+  .then(() => {
+    process.exit(0);
+  })
+  .catch((error) => {
     console.error(error);
-  }
-};
-
-seedDevDB(options)
-  .catch(err => console.error(error));
+  });
