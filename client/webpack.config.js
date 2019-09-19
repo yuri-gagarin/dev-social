@@ -14,6 +14,7 @@ module.exports = {
     path: path.join(__dirname, "/dist"),
     filename: "appBundle.js"
   },
+  devtool: 'inline-source-map',
   devServer: {
     contentBase: path.join(__dirname, '/src'),
     //compress: true,

@@ -9,15 +9,16 @@ export const fetchPosts = (options={}) => {
   return function(dispatch) {
     axios({
       method: "get",
-      url: `/api/posts/${sortOption}`,
+      url: `/api/posts?q=${sortOption}`,
       data: {
         fetchLimit: fetchLimit,
       }
     })
       .then((response) => {
+        console.log(response.data.posts)
         const postState = {
-          message: response.message,
-          posts: response.posts,
+          message: response.data.message,
+          posts: response.data.posts,
         };
         dispatch({
           type: FETCH_POSTS,
@@ -25,10 +26,11 @@ export const fetchPosts = (options={}) => {
         });
       })
       .catch((error) => {
-        console.log(error.response);
+        console.log("here")
+        console.log(error);
         dispatch({
           type: LIST_ERRORS,
-          payload: error.response,
+          payload: error,
         })
       });
     }

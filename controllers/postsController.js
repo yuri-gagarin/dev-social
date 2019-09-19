@@ -30,29 +30,30 @@ export default {
       });
   },
   index: (req, res) => {
-    const queryOption = req.query.q;
-    const limit = req.query.limit || 15;
+    const queryOption = req.query.q || "new";
+    const limit = req.query.limit || 10;
     const queryParams = (queryOption) => {
       switch(queryOption) {
         case "all":
           return {
-            date: "DESC",
+            createdAt: -1,
           };
         case "new":
           return {
-            date: "DESC",
+            createdAt: -1,
           };
         case "popular":
           return {
-            comments: "DESC",
+            likeCount: -1,
           };
         default: 
           return {
-            date: "DESC",
+            createdAt: -1,
           };
       }
     }
-    Post.find({}).sort(queryParams(queryOption)).limit(limit)
+    console.log(limit);
+    Post.find({}, {}, {sort: queryParams(queryOption), limit: limit})
       .then((posts) => {
         return res.json({
           message: "Success",

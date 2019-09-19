@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {Container} from "semantic-ui-react";
+import {Container, Grid, Item} from "semantic-ui-react";
 import PostComponent from "./PostComponent.jsx";
 
 import {fetchPosts} from "../../redux/actions/postActions.js";
@@ -15,8 +15,7 @@ class PostsContainerComponent extends Component {
     super(props);
   }
   componentDidMount() {
-    console.log("mounted")
-    console.log(this.props.history);
+    this.props.fetchPosts();
   }
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.postsState !== nextProps.postsState;
@@ -24,29 +23,24 @@ class PostsContainerComponent extends Component {
   render () {
     const posts = this.props.postsState.posts;
     const {authState, errorState} = this.props;
-    console.log(posts);
     return (
       <Container style={{marginTop: "100px"}}>
-        {
-          posts.map((post) => {
-            return (
-              <PostComponent
-                key={post.id}
-                title={post.title}
-                text={post.text}
-                created={post.createdAt}
-                edited={post.editedAt}
-                likes={post.likes}
-                user={post.user}
-                slug={post.slug}
-                authState={authState}
-                errorState={errorState}
-               />
-            );
-          })
-        }
+        <Item.Group>
+          {
+            posts.map((post) => {
+              return (
+                <PostComponent
+                  key={post._id}
+                  post={post}
+                  authState={authState}
+                  errorState={errorState}
+                />
+              );
+            })
+          }
+        </Item.Group>
       </Container>
-    )
+    );
   }
 };
 

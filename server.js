@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 const DB = keys.mongoURI;
 
 //find them pesky console.log statements;
-detailedLog("log", "warn");
+detailedLog("warn", "error");
 
 mongoose
   .connect(DB, {useNewUrlParser: true,  useFindAndModify: false})
