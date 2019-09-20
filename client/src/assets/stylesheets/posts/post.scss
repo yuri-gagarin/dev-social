@@ -1,3 +1,32 @@
-.item .postItem {
-  border: 3px solid red;
+.postImage {
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.postItem {
+  position: relative;
+  border: 3px solid red !important;
+  min-height: 200px;
+  padding: 25px !important;
+}
+
+.postTimeStamps {
+  position: relative;
+  height: 50px;
+  width: 100%;
+  border: 4px solid red;
+  //display: block;
+}
+.postCreated {
+  position: absolute;
+  left: 2%;
+  top: 2%;
+}
+.postEdited {
+  position: absolute;
+  right: 2%;
+  top: 2%;
 }

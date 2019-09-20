@@ -1,7 +1,7 @@
 import React from "react";
 
 import PropTypes from "prop-types";
-import {Item, Icon, Grid} from "semantic-ui-react";
+import {Item, Icon, Grid, Image} from "semantic-ui-react";
 import style from "../../assets/stylesheets/posts/post.scss";
 import {likePost, unlikePost} from "../../redux/actions/postActions.js" //need to be finished
 
@@ -36,18 +36,20 @@ const PostComponent = (props) => {
   };
   //blueprint -- not ready
   return (
-    <Item className="postItem">
-      <Item.Image size="small" src={setPostImage()}/>
+    <Item className={style.postItem}>
+      <span className={style.postCreated}>Created At: {post.createdAt}</span>
+      <span className={style.postEdited}>Edited At: {post.editedAt}</span>
+      <Item.Image size="small"style={{border: "3px solid red"}}>
+        <div className={style.postImage} style={{backgroundImage: `url(${setPostImage()}`}}></div>
+      </Item.Image>
       <Item.Content>
-        <Item.Header as="a">Title</Item.Header>
-        <Item.Description as="a">{trimString(post.text, 140)}</Item.Description>
-      </Item.Content>
-      <Item.Content>
-        <span>Created At: {post.createdAt}</span>
-        <span>Edited At: {post.editedAt}</span>
+        <Item.Header as="a">{post.title}</Item.Header>
+        <Item.Extra>By: {post.author}   <Icon name="user circle" link></Icon></Item.Extra>
+        <Item.Description>{trimString(post.text, 140)}</Item.Description>
+        <Item.Extra as="a">More...</Item.Extra>
         <span>Likes: {post.likeCount}</span>
-        <span>By: {post.author}</span>
       </Item.Content>
+      
     </Item>
     
   );

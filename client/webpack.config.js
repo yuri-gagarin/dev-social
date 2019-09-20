@@ -75,7 +75,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpe?g|gif)$/,
+        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
         use: [
           {
             loader: "url-loader",
@@ -89,7 +89,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(svg)$/,
+        test: [/\.eot$/, /\.ttf$/, /\.svg$/, /\.woff$/, /\.woff2$/],
         use: [
           {
             loader: "file-loader",
