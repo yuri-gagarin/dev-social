@@ -31,7 +31,7 @@ export default {
   },
   index: (req, res) => {
     const queryOption = req.query.q || "new";
-    const limit = req.query.limit || 10;
+    const limit = req.query.l ? Number(req.query.l) : 10;
     const queryParams = (queryOption) => {
       switch(queryOption) {
         case "all":
@@ -46,13 +46,20 @@ export default {
           return {
             likeCount: -1,
           };
+        case "hot": 
+          return {
+            likeCount: 1,
+          };
+        case "trending":
+          return {
+            likeCount: -1,
+          };
         default: 
           return {
             createdAt: -1,
           };
       }
     }
-    console.log(limit);
     Post.find({}, {}, {sort: queryParams(queryOption), limit: limit})
       .then((posts) => {
         return res.json({

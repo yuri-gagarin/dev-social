@@ -1,3 +1,8 @@
+.postIndexComponent {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
 .postImage {
   height: 100%;
   width: 100%;
@@ -29,4 +34,14 @@
   position: absolute;
   right: 2%;
   top: 2%;
+}
+
+.postSearchContainer {
+  height: 200px;
+  padding: 0.5em;
+  .postSearchContainerTitle {
+    text-align: left;
+    margin-left: 0.5em;
+    margin-bottom: 1em;
+  }
 }

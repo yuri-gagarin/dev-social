@@ -5,30 +5,12 @@ import {Item, Icon, Grid, Image} from "semantic-ui-react";
 import style from "../../assets/stylesheets/posts/post.scss";
 import {likePost, unlikePost} from "../../redux/actions/postActions.js" //need to be finished
 
-/**
- * Trims the text specified to length value.
- * @param {String} text The text to be trimmed.
- * @param {Number} length How many characters should the string be trimmed.
- * @returns {String} The trimmed string appened with <{String}...>.
- */
-const trimString = (text, length) => {
-  if (typeof text !== "string") {
-    throw new TypeError(`Expected the first argument to be a -- {'string'} instead saw -- {'${typeof text}'} ;`);
-  }
-  if (typeof length !== "number") {
-    throw new TypeError(`Expected the second argument to be a -- 'number' instead saw -- '${typeof length}' ;`);
-  }
-  let trimmed = text.substring(0, length) + "...";
-  return trimmed;
-};
+import {setPostImage} from "../../helpers/rendering/displayHelpers.js";
 const PostComponent = (props) => {
   const {authState, postState, post} = props;
   //should be a function to set the image for the post item or use default from server
   //posts should have images assigned to them
-  const setPostImage = () => {
-    const imagePath = "http://localhost:3000/assets/images/posts/stock_post.jpg";
-    return imagePath;
-  };
+  
 
   //should set a post
   const setPost = () => {
@@ -40,12 +22,12 @@ const PostComponent = (props) => {
       <span className={style.postCreated}>Created At: {post.createdAt}</span>
       <span className={style.postEdited}>Edited At: {post.editedAt}</span>
       <Item.Image size="small"style={{border: "3px solid red"}}>
-        <div className={style.postImage} style={{backgroundImage: `url(${setPostImage()}`}}></div>
+        <div className={style.postImage} style={{backgroundImage: `url(${setPostImage(post)}`}}></div>
       </Item.Image>
       <Item.Content>
         <Item.Header as="a">{post.title}</Item.Header>
         <Item.Extra>By: {post.author}   <Icon name="user circle" link></Icon></Item.Extra>
-        <Item.Description>{trimString(post.text, 140)}</Item.Description>
+        <Item.Description>{post.text}</Item.Description>
         <Item.Extra as="a">More...</Item.Extra>
         <span>Likes: {post.likeCount}</span>
       </Item.Content>

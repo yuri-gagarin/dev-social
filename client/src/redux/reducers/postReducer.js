@@ -1,6 +1,8 @@
-import {FETCH_POSTS, LIKE_POST, UNLIKE_POST} from "../cases.js";
+import {FETCH_POSTS, FETCH_TRENDING_POSTS, LIKE_POST, UNLIKE_POST} from "../cases.js";
+
 const initialState = {
   posts: [],
+  trendingPosts: [],
 };
 const postReducer = (state=initialState, action) => {
   switch(action.type) {
@@ -11,6 +13,12 @@ const postReducer = (state=initialState, action) => {
         posts: [...action.payload.posts],
         message: action.payload.message,
       };
+    case FETCH_TRENDING_POSTS:
+      return {
+        ...state,
+        trendingPosts: [...action.payload.trendingPosts],
+        message: action.payload.message,
+      }
     case LIKE_POST:
       return {
         ...state,

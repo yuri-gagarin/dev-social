@@ -4,7 +4,7 @@ import MainNav from "./components/navbar/MainNav.jsx";
 import ErrorComponent from "./components/error/ErrorComponent.jsx";
 import WelcomeComponent from "./components/welcome_page/WelcomeComponent.jsx";
 import AuthorizationComponent from "./components/authorization/AuthorizationComponent.jsx";
-import PostsContainerComponent from "./components/posts/PostsContainerComponent.jsx";
+import PostIndexComponent from "./components/posts/PostsIndexComponent.jsx";
 import Footer from "./components/footer/Footer.jsx";
 //redux and routing
 import {connect} from "react-redux";
@@ -51,7 +51,7 @@ class App extends Component {
             <ErrorComponent />
             <Route exact path="/" component={WelcomeComponent} />
             <Route path="/(login|register)/" component={AuthorizationComponent} />
-            <Route path="/posts" component={PostsContainerComponent} />
+            <Route path="/posts" component={PostIndexComponent} />
           </MainNav>
           <Footer></Footer>
       </Fragment>
