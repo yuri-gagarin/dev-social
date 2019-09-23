@@ -39,9 +39,29 @@
 .postSearchContainer {
   height: 200px;
   padding: 0.5em;
+  box-shadow: 0.5px 0px 5px 0px rgba(0,0,0,0.75);
+  -webkit-box-shadow: 0.5px 0px 5px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0.5px 0px 5px 0px rgba(0,0,0,0.75);
   .postSearchContainerTitle {
     text-align: left;
     margin-left: 0.5em;
     margin-bottom: 1em;
+  }
+}
+
+.trendingPostsComponent {
+  //border: 1px solid red;
+  padding: 1em;
+  margin-top: 15px;
+  box-shadow: 0.5px 0px 5px 0px rgba(0,0,0,0.75);
+  -webkit-box-shadow: 0.5px 0px 5px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0.5px 0px 5px 0px rgba(0,0,0,0.75);
+  .headerDiv {
+    text-align: center;
+    font-size: 1.25em;
+  }
+  .trendingPost {
+    border-bottom: 1px solid black !important;
+    padding-bottom: 1em !important;
   }
 }

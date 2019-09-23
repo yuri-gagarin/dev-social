@@ -13,7 +13,6 @@ import {fetchTrendingPosts} from "../../redux/actions/postActions.js";
 const PostsIndexComponent = (props) =>{
   const trendingPosts = props.postsState.trendingPosts;
   const fetchTrendingPosts = props.fetchTrendingPosts;
-  console.log(trendingPosts)
   return (
     <div className={style.postIndexComponent}>
       <Grid>
