@@ -5,7 +5,7 @@
  */
 export const setPostImage = (post) => {
 
-  if (post.images) {
+  if (post && post.images) {
     //do something here if has post images
   }
   else {

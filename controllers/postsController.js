@@ -6,26 +6,37 @@ import getDateWithTime from "../helpers/getDateWithTime.js";
 import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
 
 export default {
-  newPosts: (req, res) => {
-
-    let commentOptions = {
-      path: "comments",
-      options: {
-        limit: 5,
-        sort: {date: "desc"}
-      }
-    }
-    Post.find({}).populate(commentOptions).sort({date: "desc"}).limit(25)
-      .then((posts) => {
-        return res.json({
-          message: "Newest Posts",
-          posts: posts
-        });
+  search: (req, res) => {
+    console.log("calling")
+    const pattern = req.query.pattern;
+    const regex = new RegExp(pattern, "i");
+    Post.find({title: {$regex: regex} }).limit(5)
+      .then((results) => {
+        if(results.length > 0) {
+          const searchResults = results.map((post) => {
+            return {
+              _id: post._id,
+              key: post._id,
+              title: post.title,
+              author: post.author,
+            }
+          });
+          return res.status(200).json({
+            message: "Found Posts",
+            searchResults: searchResults,
+          });
+        }
+        else {
+          return res.status(200).json({
+            message: "No posts found",
+            searchResults: [],
+          });
+        }
       })
-      .catch((err) => {
+      .catch((error) => {
+        console.error(error);
         return res.status(400).json({
-          message: "Error retrieving the posts",
-          errors: err
+          message: "error",
         });
       });
   },

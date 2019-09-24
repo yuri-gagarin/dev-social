@@ -1,10 +1,22 @@
 import React, {Component} from "react";
 
-import {Search, Container} from "semantic-ui-react";
+import {Search, Container, Item} from "semantic-ui-react";
 import style from "../../../assets/stylesheets/posts/post.scss";
-
+import {setPostImage} from "../../../helpers/rendering/displayHelpers.js";
 import axios from "axios";
 
+
+const resultRenderer = (props) => {
+  return (
+    <Item>
+      <Item.Image size="tiny" url={setPostImage(props.image)}></Item.Image>
+      <Item.Content>
+        <Item.Header>{props.title}</Item.Header>
+        <Item.Extra>{props.author}</Item.Extra>
+      </Item.Content>
+    </Item>
+  )
+}
 //ok we should have a dynamic, case insensitive search for posts based by title?
 class PostSearchComponent extends Component {
   constructor(props) {
@@ -12,6 +24,7 @@ class PostSearchComponent extends Component {
     this.state = {
       loading: false,
       results: [],
+      message: "",
       value: "",
       isTyping: true,
       typingTimeOut: null,
@@ -20,27 +33,48 @@ class PostSearchComponent extends Component {
   }
   handleSearchChange = (e, {value}) => {
     if (this.state.typingTimeOut) {clearTimeout(this.state.typingTimeOut)};
+    
     const searchTimeout = setTimeout(() => {
       const searchPattern = this.state.value;
-      axios({
-        method: "get",
-        url: "/api/posts/search",
-        data: {
-          searchPattern: searchPattern
-        }
+      if (this.state.value.length < 3) return;
+      this.setState({loading: true}, () => {
+        axios({
+          method: "get",
+          url: "/api/posts/search",
+          params: {
+            pattern: searchPattern,
+          }
+        })
+        .then((response) => {
+          this.setState({
+            loading: false,
+            message: response.data.message,
+            results: [...response.data.searchResults]
+          })
+        })
+        .catch((error) => {
+          console.error(error);
+          this.setState({
+            loading: false,
+            message: "Something went wrong",
+            results: [],
+          })
+        });
       })
-      .then((response) => {
-        console.log(response)
-      })
-      .catch((error) => {
-        console.error(error);
-      });
     }, 2000);
+    
     this.setState({
       value: value,
       typingTimeOut: searchTimeout,
       loading: true,
+    }, () => {
+      if(this.state.value.length < 3) {
+        this.setState({loading: false});
+      }
     });
+
+
+
   }
 
 
@@ -48,10 +82,12 @@ class PostSearchComponent extends Component {
     return (
       <Container className = {style.postSearchContainer} style={{border: "1px solid green", marginTop: "100px"}} >
         <div className={style.postSearchContainerTitle}>Search Posts</div>
-        <Search 
+        <Search style={{textAlign: "center"}}
+          fluid
           onSearchChange={this.handleSearchChange}
           loading={this.state.loading}
-          minCharacters={3}
+          results={this.state.results}
+          resultRenderer={resultRenderer}
         />
       </Container>
     );

@@ -4,19 +4,19 @@ import accessController from "../controllers/access_control/accessController.js"
 
 export default function(router) {
 
-  // @route GET /posts
+  // @route GET /api/posts
   // @desc Gets post
   // @access Public
   router
     .route("/api/posts")
     .get(postsController.index);
   
-  // @route GET /posts/newest
-  // @desc Gets newest posts
+  // @route GET /api/posts/search
+  // @desc Searches Post(s)
   // @access Public
   router
-    .route("/api/posts/newest")
-    .get(postsController.newPosts);
+    .route("/api/posts/search")
+    .get(postsController.search);
   
   // @route GET /posts/:slug
   // @desc Gets a post by its slug
