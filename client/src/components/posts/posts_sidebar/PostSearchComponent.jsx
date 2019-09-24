@@ -1,12 +1,13 @@
 import React, {Component} from "react";
-
+import PropTypes from "prop-types";
 import {Search, Container, Item} from "semantic-ui-react";
 import style from "../../../assets/stylesheets/posts/post.scss";
+
 import {setPostImage} from "../../../helpers/rendering/displayHelpers.js";
 import axios from "axios";
 
 
-const resultRenderer = (props) => {
+const ResultRenderer = (props) => {
   return (
     <Item>
       <Item.Image size="tiny" url={setPostImage(props.image)}></Item.Image>
@@ -16,8 +17,13 @@ const resultRenderer = (props) => {
       </Item.Content>
     </Item>
   )
-}
-//ok we should have a dynamic, case insensitive search for posts based by title?
+};
+ResultRenderer.propTypes = {
+  title: PropTypes.string.isRequired,
+  author: PropTypes.string.isRequired,
+  image: PropTypes.string,
+};
+
 class PostSearchComponent extends Component {
   constructor(props) {
     super(props);
@@ -26,14 +32,12 @@ class PostSearchComponent extends Component {
       results: [],
       message: "",
       value: "",
-      isTyping: true,
       typingTimeOut: null,
     };
-    
   }
+
   handleSearchChange = (e, {value}) => {
     if (this.state.typingTimeOut) {clearTimeout(this.state.typingTimeOut)};
-    
     const searchTimeout = setTimeout(() => {
       const searchPattern = this.state.value;
       if (this.state.value.length < 3) return;
@@ -72,9 +76,6 @@ class PostSearchComponent extends Component {
         this.setState({loading: false});
       }
     });
-
-
-
   }
 
 
@@ -87,7 +88,7 @@ class PostSearchComponent extends Component {
           onSearchChange={this.handleSearchChange}
           loading={this.state.loading}
           results={this.state.results}
-          resultRenderer={resultRenderer}
+          resultRenderer={ResultRenderer}
         />
       </Container>
     );

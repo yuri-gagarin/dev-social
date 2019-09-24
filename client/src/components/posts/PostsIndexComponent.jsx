@@ -1,8 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {Grid, Container} from "semantic-ui-react";
+import {Grid, Container, GridRow} from "semantic-ui-react";
 import style from "../../assets/stylesheets/posts/post.scss";
 //React components
+import PostsNavbar from "./post_navbar/PostsNavbar.jsx";
 import PostsContainerComponent from "./PostsContainerComponent.jsx";
 import PostSearchComponent from "./posts_sidebar/PostSearchComponent.jsx";
 import TrendingPostsComponent from "./posts_sidebar/TrendingPostsComponent.jsx";
@@ -16,6 +17,9 @@ const PostsIndexComponent = (props) =>{
   return (
     <div className={style.postIndexComponent}>
       <Grid>
+        <Grid.Row>
+          <PostsNavbar />
+        </Grid.Row>
         <Grid.Row>
           <Grid.Column width={12}>
             <PostsContainerComponent />
