@@ -2,7 +2,45 @@
   margin-left: 1em;
   margin-right: 1em;
 }
-
+//styles for post navbar
+.postsNavbar {
+  height: 50px;
+  .sortPostsDropdown {
+    margin-top: 1em;
+    margin-left: 3em;
+    > i {
+      padding-left: 0.5em;
+      color: red;
+    }
+    &:hover {
+      color: red;
+    }
+  }
+  .sortPostsTime {
+    margin-top: 1em;
+    margin-left: 3em;
+    > i {
+      padding-left: 0.5em;
+      color: red;
+    }
+    &:hover {
+      color: red;
+    }
+  }
+  .sortValue {
+    margin-top: 0.75em;
+    margin-left: 0.5em;
+    margin-bottom: 1em;
+    border: 0.5px solid red;
+    border-radius: 5px;
+    padding: 0 1em 0 1em;
+    user-select: none;
+  }
+}
+.menuDropdown {
+  background-color: red;
+}
+//styles for a post thumbnail
 .postImage {
   height: 100%;
   width: 100%;
@@ -10,14 +48,12 @@
   background-position: center;
   background-repeat: no-repeat;
 }
-
 .postItem {
   position: relative;
   border: 3px solid red !important;
   min-height: 200px;
   padding: 25px !important;
 }
-
 .postTimeStamps {
   position: relative;
   height: 50px;
