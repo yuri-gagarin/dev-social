@@ -33,9 +33,38 @@ const TrendingPost = (props) => {
 class TrendingPostsComponent extends Component {
   constructor(props) {
     super(props)
+    this.element;
+    this.position;
   }
   componentDidMount() {
     this.props.fetchTrendingPosts();
+    //set element and its position
+    window.addEventListener("scroll", this.listenToScroll);
+    this.mainNavHeight = document.getElementById("navbarDesktop");
+    console.log(this.mainNavHeight);
+    this.element = document.getElementById("trendingPostsComponent");
+    this.position = this.element.getBoundingClientRect();
+  }
+  componentWillUnmount() {
+    window.removeEventListener("scroll");
+  } 
+
+  listenToScroll = () => {
+    const winScroll = window.pageYOffset;
+    const elPosition = this.position.y - 50; //account for the size of navbar;
+    if(winScroll >= elPosition) {
+      if(this.element.style.position !== 'fixed') {
+        this.element.style.position = "fixed";
+        this.element.style.top = "40px";
+        this.element.style.right = "14.5px";
+        this.element.style.width = "244.5px";
+      }
+    }
+    else {
+      if(this.element.style.position === "fixed") {
+        this.element.style.position = "static";
+      }
+    }
   }
   openAuthor = (arg) => {
     console.log(arg);
@@ -45,7 +74,7 @@ class TrendingPostsComponent extends Component {
   }
   render() {
     return (
-      <div className={style.trendingPostsComponent}>
+      <div className={style.trendingPostsComponent} id="trendingPostsComponent">
         <div className={style.headerDiv}>Trending Now</div>
         <Item.Group>
           {

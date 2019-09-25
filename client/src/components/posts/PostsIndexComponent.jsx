@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {Grid, Container, GridRow} from "semantic-ui-react";
 import style from "../../assets/stylesheets/posts/post.scss";
@@ -11,27 +11,34 @@ import TrendingPostsComponent from "./posts_sidebar/TrendingPostsComponent.jsx";
 import {connect} from "react-redux";
 import {fetchTrendingPosts} from "../../redux/actions/postActions.js";
 
-const PostsIndexComponent = (props) =>{
-  const trendingPosts = props.postsState.trendingPosts;
-  const fetchTrendingPosts = props.fetchTrendingPosts;
-  return (
-    <div className={style.postIndexComponent}>
-      <Grid>
-        <Grid.Row>
-          <PostsNavbar />
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Column width={12}>
-            <PostsContainerComponent />
-          </Grid.Column>
-          <Grid.Column width={4}>
-            <PostSearchComponent />
-            <TrendingPostsComponent fetchTrendingPosts={fetchTrendingPosts} trendingPosts={trendingPosts}/>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
-    </div>
-  )
+class PostsIndexComponent extends Component {
+  constructor(props) {
+    super(props);
+  }
+  
+  
+  render () {
+    const trendingPosts = this.props.postsState.trendingPosts;
+    const fetchTrendingPosts = this.props.fetchTrendingPosts;
+    return (
+      <div className={style.postIndexComponent}>
+        <Grid>
+          <Grid.Row>
+            <PostsNavbar />
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column width={12}>
+              <PostsContainerComponent />
+            </Grid.Column>
+            <Grid.Column width={4}>
+              <PostSearchComponent />
+              <TrendingPostsComponent fetchTrendingPosts={fetchTrendingPosts} trendingPosts={trendingPosts}/>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </div>
+    )
+  }
 };
 PostsIndexComponent.propTypes = {
   postsState: PropTypes.object.isRequired,
