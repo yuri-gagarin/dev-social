@@ -46,7 +46,7 @@ class TrendingPostsComponent extends Component {
     this.position = this.element.getBoundingClientRect();
   }
   componentWillUnmount() {
-    window.removeEventListener("scroll");
+    window.removeEventListener("scroll", this.listenToScroll);
   } 
 
   listenToScroll = () => {
@@ -79,18 +79,20 @@ class TrendingPostsComponent extends Component {
         <Item.Group>
           {
             this.props.trendingPosts.map((post) => {
-              return <TrendingPost key={post._id} 
-                                   post={post}
-                                   openAuthor={this.openAuthor}
-                                   openPost={this.openPost} 
-                      /> 
+              return (
+                <TrendingPost 
+                  key={post._id} 
+                  post={post}
+                  openAuthor={this.openAuthor}
+                  openPost={this.openPost} 
+                /> 
+              );
             })
           }
         </Item.Group>
       </div> 
     );
   }
-   
 };
 
 TrendingPostsComponent.propTypes = {

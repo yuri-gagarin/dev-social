@@ -2,15 +2,21 @@ import {FETCH_POSTS,FETCH_TRENDING_POSTS, LIKE_POST, UNLIKE_POST, LIST_ERRORS} f
 import {trimString} from "../../helpers/rendering/displayHelpers.js";
 import axios from "axios";
 
+import {postSearchOptions} from "../searchOptions.js";
+
 export const fetchPosts = (options={}) => {
-  const sortOption = options.sortOption || "new";
+  console.log(options)
+  const filter = options.filter || "new";
   const fetchLimit = options.fetchLimit || 10;
+  const time = options.time || "24hr";
   return function(dispatch) {
     axios({
       method: "get",
-      url: `/api/posts?q=${sortOption}`,
-      data: {
-        fetchLimit: fetchLimit,
+      url: `/api/posts`,
+      params: {
+        filter: filter,
+        time: time,
+        limit: fetchLimit,
       }
     })
     .then((response) => {

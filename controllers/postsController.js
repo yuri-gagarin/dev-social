@@ -5,6 +5,65 @@ import Comment from "../models/Comment.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
 import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
 
+//query opts constants
+import {postSearchOptions} from "./controller_helpers/queryOptions.js";
+
+const getTimeDifference = (option) => {
+  const now = new Date();
+  switch (option) {
+    case(postSearchOptions.time.day):
+      const lastDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 
+                               now.getHours(), now.getMinutes(), now.getSeconds());
+      return lastDay;
+    case(postSearchOptions.time.week):
+      const lastWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7,
+                                now.getHours(), now.getMinutes(), now.getSeconds());
+      return lastWeek;
+    case (postSearchOptions.time.month):
+      const lastMonth = new Date(now.getFullYear(). now.getMonth() - 1, now.getDate(),
+                                 now.getHours(), now.getMinutes(), now.getSeconds());
+      return lastMonth;
+    case (postSearchOptions.time.year):
+      const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate(),
+                                now.getHours(), now.getMinutes(), now.getSeconds());
+      return lastYear;
+    default:
+      return null;
+  } 
+};
+
+
+const makePostQuery = (queryOpts) => {
+  const filter = queryOpts.filter ? queryOpts.filter.toLowerCase() : postSearchOptions.filter.new;
+  const time = queryOpts.time ? queryOpts.time.toLowerCase() : postSearchOptions.time.day;
+  const timeFilter = getTimeDifference(time);
+  switch (filter) {
+    case(postSearchOptions.filter.new):
+      return {
+        createdAt: {$gt: timeFilter}, sort: {createdAt: -1}
+      };
+    case(postSearchOptions.filter.trending): 
+      //probably should be amount of likes in a time period
+      return {
+        createdAt: {$gt: timeFilter} 
+      };
+    case(postSearchOptions.filter.heated): {
+      //probably should be most liked or commented in a time period
+      return {
+        createdAt: {$gt: timeFilter}
+      }
+    }
+    case(postSearchOptions.filter.discussed): 
+    return {
+
+    }
+    default: {
+      return {
+        createdAt: -1,
+      }
+    }
+  }
+}
 export default {
   search: (req, res) => {
     console.log("calling")
@@ -41,6 +100,7 @@ export default {
       });
   },
   index: (req, res) => {
+    console.log(req.query);
     const queryOption = req.query.q || "new";
     const limit = req.query.l ? Number(req.query.l) : 10;
     const queryParams = (queryOption) => {

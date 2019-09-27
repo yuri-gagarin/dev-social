@@ -1,41 +1,52 @@
 import React, {Component} from "react";
+import PropTypes from "prop-types";
+import {postSearchOptions  as options} from "../../../redux/searchOptions.js";
 import { Menu, Dropdown, Icon } from "semantic-ui-react";
 
 import styles from "../../../assets/stylesheets/posts/post.scss";
 
-const options = {
-  filter: {
-    trending: "Trending",
-    heated: "Heated",
-    discussed: "Discussed",
-  },
-  time: {
-    day: "24 Hours",
-    week: "7 Days",
-    month: "30 Days",
-    alltime: "All Time",
-  },
-}
+
 
 class PostsNavbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filter: options.filter.trending,
+      filter: options.filter.new,
       time: options.time.day,
+      filterDisabled: false,
+      timeDisabled: true,
     }
   }
 
   handleSortClick = (e, {value}) => {
-    console.log(value)
-    this.setState({
-      filter: value,
-    });
+    if(value === options.filter.new) {
+      console.log("here")
+      this.setState({filter: value, time: options.time.none, timeDisabled: true}, () => {
+        const fetchOptions = {
+          filter: this.state.filter,
+          time: this.state.time,
+        };
+        this.props.fetchPosts(fetchOptions)
+      });
+    }
+    else {
+      this.setState({filter: value, timeDisabled: false}, () => {
+        const fetchOptions = {
+          filter: this.state.filter,
+          time: this.state.time,
+        };
+        this.props.fetchPosts(fetchOptions);
+      });
+    }
   }
 
   handleTimeClick = (e, {value}) => {
-    this.setState({
-      time: value,
+    this.setState({time: value} , () => {
+      const fetchOptions = {
+        filter: this.state.filter,
+        time: this.state.time,
+      };
+      this.props.fetchPosts(fetchOptions);
     });
   }
 
@@ -50,14 +61,18 @@ class PostsNavbar extends Component {
           labeled
           button >
           <Dropdown.Menu className={styles.menuDropdown} style={{margin: "0em !important"}}>
-            <Dropdown.Header icon='tags' content='Filter by tag' />
+            <Dropdown.Header icon='filter' content='Filter by type' />
             <Dropdown.Divider />
+            <Dropdown.Item onClick={this.handleSortClick} value={options.filter.new}>
+              <Icon name="bullhorn" className="right floated" />
+              {options.filter.new}
+            </Dropdown.Item>
             <Dropdown.Item onClick={this.handleSortClick} value={options.filter.trending}>
-              <Icon name='attention' className='right floated' />
+              <Icon name='heartbeat' className='right floated' />
               {options.filter.trending}
             </Dropdown.Item>
             <Dropdown.Item onClick={this.handleSortClick} value={options.filter.heated}>
-              <Icon name='comment' className='right floated' />
+              <Icon name='fire' className='right floated' />
               {options.filter.heated}
             </Dropdown.Item>
             <Dropdown.Item onClick={this.handleSortClick} value={options.filter.discussed}>
@@ -73,6 +88,7 @@ class PostsNavbar extends Component {
           pointing
           floating
           labeled
+          disabled={this.state.timeDisabled}
           button >
           <Dropdown.Menu>
             <Dropdown.Header content="Filter Time"/>
@@ -83,10 +99,10 @@ class PostsNavbar extends Component {
             <Dropdown.Item onClick={this.handleTimeClick} value={options.time.week}>
               {options.time.week}
             </Dropdown.Item>
-            <Dropdown.Item onClick={this.handleTimeClick} value={options.filter.month}>
+            <Dropdown.Item onClick={this.handleTimeClick} value={options.time.month}>
               {options.time.month}
             </Dropdown.Item>
-            <Dropdown.Item onClick={this.handleTimeClick} value={options.filter.allTime}>
+            <Dropdown.Item onClick={this.handleTimeClick} value={options.time.allTime}>
               {options.time.allTime}
             </Dropdown.Item>
           </Dropdown.Menu>
@@ -95,6 +111,10 @@ class PostsNavbar extends Component {
       </Menu>
     );
   }
+};
+
+PostsNavbar.propTypes = {
+  fetchPosts: PropTypes.func.isRequired,
 };
 
 export default PostsNavbar;

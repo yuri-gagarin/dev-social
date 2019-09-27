@@ -9,7 +9,7 @@ import PostSearchComponent from "./posts_sidebar/PostSearchComponent.jsx";
 import TrendingPostsComponent from "./posts_sidebar/TrendingPostsComponent.jsx";
 //redux imports 
 import {connect} from "react-redux";
-import {fetchTrendingPosts} from "../../redux/actions/postActions.js";
+import {fetchPosts, fetchTrendingPosts} from "../../redux/actions/postActions.js";
 
 class PostsIndexComponent extends Component {
   constructor(props) {
@@ -19,12 +19,12 @@ class PostsIndexComponent extends Component {
   
   render () {
     const trendingPosts = this.props.postsState.trendingPosts;
-    const fetchTrendingPosts = this.props.fetchTrendingPosts;
+    const {fetchPosts, fetchTrendingPosts} = this.props;
     return (
       <div className={style.postIndexComponent}>
         <Grid>
           <Grid.Row>
-            <PostsNavbar />
+            <PostsNavbar fetchPosts={fetchPosts}/>
           </Grid.Row>
           <Grid.Row>
             <Grid.Column width={12}>
@@ -37,13 +37,14 @@ class PostsIndexComponent extends Component {
           </Grid.Row>
         </Grid>
       </div>
-    )
+    );
   }
 };
 PostsIndexComponent.propTypes = {
   postsState: PropTypes.object.isRequired,
   authState: PropTypes.object.isRequired,
   fetchTrendingPosts:  PropTypes.func.isRequired,
+  fetchPosts: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -55,6 +56,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchTrendingPosts: () => dispatch(fetchTrendingPosts()),
+    fetchPosts: (options) => dispatch(fetchPosts(options)),
   };
 };
 
