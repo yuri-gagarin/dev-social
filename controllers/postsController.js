@@ -39,9 +39,9 @@ const makePostQuery = (queryOpts) => {
   const timeFilter = getTimeDifference(time);
   switch (filter) {
     case(postSearchOptions.filter.new):
-      return {
-        createdAt: {$gt: timeFilter}, sort: {createdAt: -1}
-      };
+      return [
+        {createdAt: {$gt: timeFilter}}, {}, {sort: {createdAt: -1}}
+      ];
     case(postSearchOptions.filter.trending): 
       //probably should be amount of likes in a time period
       return {

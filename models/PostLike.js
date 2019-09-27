@@ -11,6 +11,10 @@ const PostLikeSchema = new Schema({
   postId: {
     type: Schema.Types.ObjectId,
     ref: "Post",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   }
 });
 

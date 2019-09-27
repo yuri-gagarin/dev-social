@@ -6,9 +6,10 @@ import faker from "faker";
  * @param {Object[]} users - A User(s) object Array.
  * @param {Object[]} posts - A Post(s) object Array.
  * @param {number} maxComments - Maximum number of Comment(s) per Post to create. Default 5;
+ * @param {Date} createdDate - Date Comment was created (optional).
  * @returns {Promise} A Promise which resolves to an Array of Comment objects or NULL.
  */
-export const seedComments = async (users, posts, maxComments=5) => {
+export const seedComments = async (users, posts, maxComments=5, createdDate=null) => {
   const comments = [];
   for (let i = 0; i < posts.length; i++) {
     const numOfComments  = Math.floor((Math.random() * maxComments) + 1);

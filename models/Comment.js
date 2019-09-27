@@ -32,7 +32,7 @@ const CommentSchema = new Schema({
     type: Number,
     required: true,
   },
-  date: {
+  createdAt: {
     type: Date,
     default: Date.now
   }

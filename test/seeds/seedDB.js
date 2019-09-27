@@ -7,6 +7,7 @@ import {seedPosts, likePosts} from "../helpers/postHelpers.js";
 import {seedComments} from "../helpers/commentHelpers.js";
 import User from "../../models/User.js";
 
+
 //mongoose connection function
 const connectMongoose = async (mongoURI) => {
   return mongoose.connect(mongoURI, {useNewUrlParser: true, useFindAndModify: false});
@@ -19,6 +20,10 @@ const connectMongoose = async (mongoURI) => {
  * @param {number} options.numberOfUsers - Number of User(s) to create.
  * @param {number} options.numberOfPostsPerUser - Number of Post(s) tp create. 
  * @param {number} options.maxCommentsPerPost - Maximum number of Comment(s) per Post.
+ * @param {Date} options.oneDayAgo- Last day Date object (optional).
+ * @param {Date} options.oneWeekAgo - Last week Date object (optional).
+ * @param {Date} options.oneMonthAgo - Last month Date object (optional).
+ * @param {Date} options.oneYearAgo = Last year Date object (optional).
  * @returns {object} An object with {.users} property.
  */
 const seedDB = async (options) => {
@@ -29,12 +34,25 @@ const seedDB = async (options) => {
     const response = await mongoose.connection.db.dropDatabase();
     // create some users //
     const usersCreated = await createUsers(options.numberOfUsers);
-    // create some posts //
+    // create some posts - date today //
     const postsCreated = await seedPosts(options.numberOfPostsPerUser, usersCreated);
+     // like some posts //
+    const postLikes = await likePosts(postsCreated, usersCreated);
+    // create some day old posts //
+    if(options.oneDayAgo) {
+      const dayOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, options.oneDayAgo);
+    }
+    // create some week old posts //
+    if (options.oneWeekAgo) {
+      const weekOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, options.oneWeekAgo);
+    }
+    // create some month old posts //
+    if (options.oneMonthAgo) {
+      const monthOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, options.oneMonthAgo);
+    }
     // create some comments //
     const commentsCreated = await seedComments(usersCreated, postsCreated, options.maxCommentsPerPost);
-    // like some posts //
-    const postLikes = await likePosts(postsCreated, usersCreated);
+   
     // create a moderator //
     const moderator = await User.findOneAndUpdate({_id: usersCreated[2]._id}, {$set: {role: "moderator"} });
     // create an administrator //

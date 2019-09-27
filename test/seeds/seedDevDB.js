@@ -3,8 +3,19 @@ import User from "../../models/User.js";
 import {TEST_PASSWORD} from "../seeds/constants.js";
 import mongoose from "mongoose";
 
+import {goBackOneDay, goBackOneWeek, goBackOneMonth} from "../helpers/timeHelpers.js";
+
+
 let firstUser, secondUser, moderator, administrator;
-seedDB({numberOfUsers: 10, numberOfPostsPerUser: 10, maxCommentsPerPost: 10})
+const options = {
+  numberOfUsers: 10,
+  numberOfPostsPerUser: 5,
+  maxCommentsPerPost: 5,
+  oneDayAgo: goBackOneDay(),
+  oneWeekAgo: goBackOneWeek(),
+  oneMonthAgp: goBackOneMonth(),
+}
+seedDB(options)
   .then((result) => {
     //console.log("Seeded Dev DB");
     ({firstUser, secondUser, moderator, administrator} = result.users);
