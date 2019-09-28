@@ -6,7 +6,7 @@ import faker from "faker";
  * @param {Object[]} users - A User(s) object Array.
  * @param {Object[]} posts - A Post(s) object Array.
  * @param {number} maxComments - Maximum number of Comment(s) per Post to create. Default 5;
- * @param {Date} createdDate - Date Comment was created (optional).
+ * @param {Date | function } createdDate - Date Comment was created or function to created Date (optional).
  * @returns {Promise} A Promise which resolves to an Array of Comment objects or NULL.
  */
 export const seedComments = async (users, posts, maxComments=5, createdDate=null) => {
@@ -16,11 +16,19 @@ export const seedComments = async (users, posts, maxComments=5, createdDate=null
     const userIndex = Math.floor(Math.random() * users.length);
     for(let j = 0; j < numOfComments; j++) {
       try {
+        let createdAt;
+        if (typeof createdDate === "function") {
+          createdAt = createdDate()
+        }
+        else {
+          createdAt = createdDate
+        }
         const comment = await Comment.create({
           user: users[userIndex]._id,
           text: faker.lorem.paragraph(1),
           post: posts[i]._id,
           likeCount: 0,
+          createdAt: createdAt,
         });
         await Post.findOneAndUpdate({_id: posts[i]._id}, {$push:{comments: comment._id}});
         comments.push(comment);
@@ -31,6 +39,5 @@ export const seedComments = async (users, posts, maxComments=5, createdDate=null
       }
     }
   }
-  console.log(`Created ${comments.length} Comment(s);`);
   return comments;
 };

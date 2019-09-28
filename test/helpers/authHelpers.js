@@ -45,6 +45,5 @@ export const createUsers = async (num) => {
       return null;
     }
   }
-  console.log(`Created ${num} User(s);`);
   return users;
 };
