@@ -6,9 +6,9 @@ import {postSearchOptions} from "../searchOptions.js";
 
 export const fetchPosts = (options={}) => {
   console.log(options)
-  const filter = options.filter || "new";
-  const fetchLimit = options.fetchLimit || 10;
-  const time = options.time || "24hr";
+  const filter = options.filter || postSearchOptions.filter.new;
+  const time = options.time || postSearchOptions.time.day;
+  const limit = options.fetchLimit || 10;
   return function(dispatch) {
     axios({
       method: "get",
@@ -16,7 +16,7 @@ export const fetchPosts = (options={}) => {
       params: {
         filter: filter,
         time: time,
-        limit: fetchLimit,
+        limit: limit,
       }
     })
     .then((response) => {

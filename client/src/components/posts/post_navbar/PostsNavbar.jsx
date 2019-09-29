@@ -20,7 +20,6 @@ class PostsNavbar extends Component {
 
   handleSortClick = (e, {value}) => {
     if(value === options.filter.new) {
-      console.log("here")
       this.setState({filter: value, time: options.time.none, timeDisabled: true}, () => {
         const fetchOptions = {
           filter: this.state.filter,

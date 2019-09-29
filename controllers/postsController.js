@@ -32,35 +32,43 @@ const getTimeDifference = (option) => {
   } 
 };
 
-
-const makePostQuery = (queryOpts) => {
-  const filter = queryOpts.filter ? queryOpts.filter.toLowerCase() : postSearchOptions.filter.new;
-  const time = queryOpts.time ? queryOpts.time.toLowerCase() : postSearchOptions.time.day;
+/**
+ * Creates a post query from Post navbar options.
+ * @param {object} queryOptions - Options for the Mongo query.
+ * @param {string} queryOptions.filter - A filter constant for the query (default - new).
+ * @param {string} queryOptions.time - A time filter for the Post query (default - one day).
+ * @returns {Array} An array with the mongo query (default returns sort by createdAt DESC).
+*/
+const makePostQuery = (queryOptions) => {
+  const filter = queryOptions.filter ? queryOptions.filter : postSearchOptions.filter.new;
+  const time = queryOptions.time ? queryOptions.time : postSearchOptions.time.day;
   const timeFilter = getTimeDifference(time);
+  console.log(filter)
+  console.log(typeof timeFilter)
   switch (filter) {
     case(postSearchOptions.filter.new):
+      console.log("here")
       return [
-        {createdAt: {$gt: timeFilter}}, {}, {sort: {createdAt: -1}}
+        {createdAt: {$gt: timeFilter}}, {}, {sort: {createdAt: -1}, limit: 10 }
       ];
     case(postSearchOptions.filter.trending): 
       //probably should be amount of likes in a time period
-      return {
-        createdAt: {$gt: timeFilter} 
-      };
-    case(postSearchOptions.filter.heated): {
+      return [
+        {createdAt: {$gt: timeFilter}}, {}, {sort: {createdAt: 1}, limit: 5} 
+      ];
+    case(postSearchOptions.filter.heated): 
       //probably should be most liked or commented in a time period
-      return {
-        createdAt: {$gt: timeFilter}
-      }
-    }
+      return [
+        {createdAt: {$gt: timeFilter}}, {}, {}
+      ];
     case(postSearchOptions.filter.discussed): 
-    return {
+    return [
 
-    }
+    ]
     default: {
-      return {
-        createdAt: -1,
-      }
+      return [
+        {}, {}, {sort: {createdAt: -1}, limit: 10}
+      ]
     }
   }
 }
@@ -100,39 +108,14 @@ export default {
       });
   },
   index: (req, res) => {
-    console.log(req.query);
-    const queryOption = req.query.q || "new";
-    const limit = req.query.l ? Number(req.query.l) : 10;
-    const queryParams = (queryOption) => {
-      switch(queryOption) {
-        case "all":
-          return {
-            createdAt: -1,
-          };
-        case "new":
-          return {
-            createdAt: -1,
-          };
-        case "popular":
-          return {
-            likeCount: -1,
-          };
-        case "hot": 
-          return {
-            likeCount: 1,
-          };
-        case "trending":
-          return {
-            likeCount: -1,
-          };
-        default: 
-          return {
-            createdAt: -1,
-          };
-      }
-    }
-    Post.find({}, {}, {sort: queryParams(queryOption), limit: limit})
+    console.log("Searching posts")
+    const filter = req.query.filter;
+    const time  = req.query.time;
+    const limit = req.query.limit;
+    Post.find(...makePostQuery({filter: filter, time: time}) )
       .then((posts) => {
+        console.log(116)
+        console.log(posts)
         return res.json({
           message: "Success",
           posts: posts,
