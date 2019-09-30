@@ -10,7 +10,7 @@ import {createUsers} from "../helpers/authHelpers.js";
 import {seedPosts, likePosts} from "../helpers/postHelpers.js";
 import {seedComments} from "../helpers/commentHelpers.js";
 
-import {withinOneDay, withinOneWeek, withinOneMonth, withinOneYear} from "../helpers/timeHelpers.js";
+import {withinOneDay, withinOneWeek, withinOneMonth, withinOneYear, withinTimeConstraint} from "../helpers/timeHelpers.js";
 
 //mongoose connection function
 const connectMongoose = async (mongoURI) => {
@@ -24,10 +24,10 @@ const connectMongoose = async (mongoURI) => {
  * @param {number} options.numberOfUsers - Number of User(s) to create.
  * @param {number} options.numberOfPostsPerUser - Number of Post(s) tp create. 
  * @param {number} options.maxCommentsPerPost - Maximum number of Comment(s) per Post.
- * @param {Date} options.oneDayAgo- Last day Date object (optional).
- * @param {Date} options.oneWeekAgo - Last week Date object (optional).
- * @param {Date} options.oneMonthAgo - Last month Date object (optional).
- * @param {Date} options.oneYearAgo = Last year Date object (optional).
+ * @param {boolean} options.withinADay - If True will seed Post(s) created within 24hrs. 
+ * @param {boolean} options.withinAWeek - If True will seed Post(s) created within 7 days.
+ * @param {boolean} options.withinAMonth - If True will seed Post(s) created within 30 days.options.
+ * @param {boolean} options.withinAYear - If True will seed Post(s) created within 1 year.
  * @returns {object} An object with {.users} property.
  */
 const seedDB = async (options) => {
@@ -45,40 +45,40 @@ const seedDB = async (options) => {
     console.log("Creating Users");
     const usersCreated = await createUsers(options.numberOfUsers);
     console.log(`Created ${usersCreated.length} Users`);
-    // create some day old posts //
-    if(options.oneDayAgo) {
-      console.log("Creating one day old Posts, Comments, Likes");
-      const dayOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, options.oneDayAgo);
-      const postLikes = await likePosts(dayOldPosts, usersCreated, withinOneDay);
-      const postComments = await seedComments(usersCreated, dayOldPosts, options.maxCommentsPerPost, withinOneDay);
+    // create some recent posts //
+    if(options.withinADay) {
+      console.log("Creating some new Posts, Comments, Likes");
+      const newPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, withinOneDay);
+      const postLikes = await likePosts(newPosts, usersCreated, withinTimeConstraint);
+      const postComments = await seedComments(usersCreated, newPosts, options.maxCommentsPerPost, withinTimeConstraint);
       console.log("Finished");
     }
     // create some week old posts //
-    if (options.oneWeekAgo) {
+    if (options.withinAWeek) {
       console.log("Creating one week old Posts, Comments, Likes");
-      const weekOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, options.oneWeekAgo);
-      const postLikes = await likePosts(weekOldPosts, usersCreated, withinOneWeek);
-      const postComments = await seedComments(usersCreated, weekOldPosts, options.maxCommentsPerPost, withinOneWeek)
+      const weekOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, withinOneWeek);
+      const postLikes = await likePosts(weekOldPosts, usersCreated, withinTimeConstraint);
+      const postComments = await seedComments(usersCreated, weekOldPosts, options.maxCommentsPerPost, withinTimeConstraint)
       console.log("Finished");
     }
     // create some month old posts //
-    if (options.oneMonthAgo) {
+    if (options.withinAMonth) {
       console.log("Creating one month old Posts, Comments, Likes ");
-      const monthOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, options.oneMonthAgo);
+      const monthOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, withinOneMonth);
       const postLikes = await likePosts(monthOldPosts, usersCreated, withinOneMonth);
-      const postComments = await seedComments(usersCreated, monthOldPosts, options.maxCommentsPerPost, withinOneMonth);
+      const postComments = await seedComments(usersCreated, monthOldPosts, options.maxCommentsPerPost, withinTimeConstraint);
       console.log("Finished");
     }
     // creat some year old posts //
-    if (options.oneYearAgo) {
+    if (options.withinAYear) {
       console.log("Creating one year old Posts, Comments, Likes");
-      const yearOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, options.oneYearAgo);
-      const postLikes = await likePosts(yearOldPosts, usersCreated, withinOneYear);
-      const postComments = await seedComments(usersCreated, yearOldPosts, options.maxCommentsPerPost, withinOneYear);
+      const yearOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, withinOneYear);
+      const postLikes = await likePosts(yearOldPosts, usersCreated, withinTimeConstraint);
+      const postComments = await seedComments(usersCreated, yearOldPosts, options.maxCommentsPerPost,withinTimeConstraint);
       console.log("Finished");
     }
     // if no  specific date options //
-    if(!options.oneDayAgo && !options.oneWeekAgo && !options.oneMonthAgo && !options.oneYearAgo) {
+    if(!options.withinADay && !options.withinAWeek && !options.withinAMonth && !options.withinAYear) {
       console.log("Creating Posts, Comments, Likes")
       const posts = await seedPosts(options.numberOfPostsPerUser, usersCreated);
       const postLikes = await likePosts(posts, usersCreated);

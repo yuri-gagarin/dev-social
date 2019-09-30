@@ -11,10 +11,10 @@ seedDB({
   numberOfUsers: 25,
   numberOfPostsPerUser: 5,
   maxCommentsPerPost: 10,
-  oneDayAgo: goBackOneDay(),
-  oneWeekAgo:goBackOneWeek(),
-  oneMonthAgo: goBackOneMonth(),
-  oneYearAgo: goBackOneYear(),
+  withinADay: true,
+  withinAWeek: true,
+  withinAMonth: true,
+  withinAYear: true,
 })
   .then((result) => {
     //console.log("Seeded Dev DB");

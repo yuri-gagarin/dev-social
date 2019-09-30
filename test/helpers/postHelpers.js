@@ -79,11 +79,12 @@ export const seedPosts = async (count, users, createdDate=null) => {
  * Creates a random number of PostLike(s) per Post (the number will always be <= Users).
  * @param {Object[]} posts - An Array with Post objects. 
  * @param {Object[]} users - An Array with User objects.
- * @param {Date | function} createdDate - Date when PostLike was created  or a Function for random Date (optional).
+ * @param {function} createdDate - Date when PostLike was created  or a Function for random Date (optional).
  * @returns {Promise} A promise which resolves to either the number of PostLike(s) created or NULL.
  */
 export const likePosts = async (posts, users, createdDate=null) => {
   let postLikeCount = 0;
+  let now = new Date();
   for (let i = 0; i < posts.length; i++) {
     // set a random number of max likes;
     // will always be <= users.length;
@@ -91,14 +92,17 @@ export const likePosts = async (posts, users, createdDate=null) => {
     for (let j = 0; j < numOfLikes; j++) {
       try {
         let createdAt;
+        let post = await Post.findOne({_id: posts[i]._id});
+        //check for a function to create a specific date
         if (typeof createdDate === "function") {
-          createdAt = createdDate();
+          createdAt = createdDate(post.createdAt, now);
         }
         else {
           createdAt = createdDate;
         }
         await PostLike.create({postId: posts[i]._id, userId: users[j]._id, createdAt: createdAt});
-        await Post.findOneAndUpdate({_id: posts[i]._id}, {$inc:{likeCount: 1}});
+        post.likeCount +=1;
+        await post.save();
         postLikeCount+=1;
       }
       catch(error) {

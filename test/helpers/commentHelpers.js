@@ -11,14 +11,16 @@ import faker from "faker";
  */
 export const seedComments = async (users, posts, maxComments=5, createdDate=null) => {
   const comments = [];
+  const now = new Date();
   for (let i = 0; i < posts.length; i++) {
     const numOfComments  = Math.floor((Math.random() * maxComments) + 1);
     const userIndex = Math.floor(Math.random() * users.length);
     for(let j = 0; j < numOfComments; j++) {
       try {
         let createdAt;
+        let post = await Post.findOne({_id: posts[i]._id});
         if (typeof createdDate === "function") {
-          createdAt = createdDate()
+          createdAt = createdDate(post.createdAt, now);
         }
         else {
           createdAt = createdDate
@@ -30,7 +32,8 @@ export const seedComments = async (users, posts, maxComments=5, createdDate=null
           likeCount: 0,
           createdAt: createdAt,
         });
-        await Post.findOneAndUpdate({_id: posts[i]._id}, {$push:{comments: comment._id}});
+        post.comments.push(comment._id);
+        await post.save();
         comments.push(comment);
       }
       catch(error) {

@@ -50,3 +50,14 @@ export const withinOneYear = () => {
                          now.getHours(), now.getMinutes(), now.getSeconds());
   return aYear;
 };
+/**
+ * Creates a random date within two constraints.
+ * @param {Date} from - From date.
+ * @param {Date} to - To date.
+ * @returns {Date} A Date object fitting within to/from constraints.
+ */
+export const withinTimeConstraint = (from, to) => {
+  const lowerConstraint = from.getTime();
+  const upperConstaint = to.getTime();
+  return new Date(lowerConstraint + (Math.random() * (upperConstaint - lowerConstraint)));
+};
