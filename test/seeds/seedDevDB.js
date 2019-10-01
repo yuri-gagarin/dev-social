@@ -2,8 +2,8 @@ import seedDB from "./seedDB.js"
 import User from "../../models/User.js";
 import {TEST_PASSWORD} from "../seeds/constants.js";
 import mongoose from "mongoose";
+import Post from "../../models/Post.js";
 
-import {goBackOneDay, goBackOneWeek, goBackOneMonth, goBackOneYear} from "../helpers/timeHelpers.js";
 
 
 let firstUser, secondUser, moderator, administrator;
@@ -55,7 +55,6 @@ seedDB({
                   email: ${administrator.email}
                   password: ${administrator.password}`
                 );
-
     return mongoose.connection.close()
   })
   .then(() => {

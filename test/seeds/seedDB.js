@@ -94,10 +94,9 @@ const seedDB = async (options) => {
     const administrator = await User.findOneAndUpdate({_id: usersCreated[3]._id}, {$set: {role: "administrator"} });
     console.log("Finished");
     const numberOfUsers = await User.countDocuments({});
-    const numberOfPosts = await  Post.countDocuments({});
     const numberOfComments = await Comment.countDocuments({});
     const numberOfPostLikes = await PostLike.countDocuments({});
-
+    const numberOfPosts = await Post.countDocuments({});
     console.log(`Created: \n${numberOfUsers}: User(s) \n${numberOfPosts}: Post(s) \n${numberOfComments}: Comment(s) \n${numberOfPostLikes}: PostLike(s)` )
      
     return {

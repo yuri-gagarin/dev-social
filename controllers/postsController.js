@@ -5,8 +5,13 @@ import Comment from "../models/Comment.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
 import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
 
+//some indexting ideas for schema 
+//Post.createdAt
+//Port.likeCount?
+
 //query opts constants
 import {postSearchOptions} from "./controller_helpers/queryOptions.js";
+import PostLike from "../models/PostLike.js";
 
 const getTimeDifference = (option) => {
   const now = new Date();
@@ -71,7 +76,40 @@ const makePostQuery = (queryOptions) => {
       ]
     }
   }
+};
+
+const getHotPosts = (fromDate, toDate) => {
+  //hot posts should be recent, well discussed and liked.  
+  return Post.find({likeCount: {$gte: 10}, commentCount: {$gte: 5}}, {}, {sort: {createdAt: -1}, limit: 10});
 }
+const getDatedPosts = async (fromDate, toDate) => {
+  //so here we should be able to pull new posts or posts between a specific date
+  const now = Date.now();
+  return Post.find({createdAt: {$gte: fromDate, $lte: toDate || new Date(now)}})
+};
+const getDisccussedPosts = (fromDate, toDate) => {
+  return Post.find({createdAt: fromDate, commentCount: {$gte: 5}}, {}, {sort: {commentCount: -1}, limit: 10});
+};
+const getControversialPosts = (fromDate, toDate) => {
+  const UPPER_RATIO = 1.5;
+  const LOWER_RATIO = 0.5;
+  const controversialPosts = [];
+  //this should have a somewhat close ration between likes and dislikes.
+  Post.find({fromDate: {$gte: fromDate}, toDate: {$lte: toDate}, limit: 50})
+    .then((posts) => {
+      for (const post of posts) {
+        const likeRatio = post.likeCount / post.dislikeCount;
+        if (likeRatio <= UPPER_RATIO && likeRatio >= LOWER_RATIO) {
+          //mark post as controversial
+          let controversialPost = {...post.toObject(), likeRatio: likeRatio};
+          controversialPosts.push(controversialPost);
+        }
+      }
+      return controversialPosts;
+    })
+  //should sort and return posts with top elements being closest to 1.0 most controversial
+}
+
 export default {
   search: (req, res) => {
     console.log("calling")
