@@ -2,10 +2,8 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {postSearchOptions  as options} from "../../../redux/searchOptions.js";
 import { Menu, Dropdown, Icon } from "semantic-ui-react";
-
+import {rewind, convertTimeQuery} from "../../../helpers/time_helpers/timeHelpers.js";
 import styles from "../../../assets/stylesheets/posts/post.scss";
-
-
 
 class PostsNavbar extends Component {
   constructor(props) {
@@ -20,6 +18,7 @@ class PostsNavbar extends Component {
 
   handleSortClick = (e, {value}) => {
     if(value === options.filter.new) {
+      const fromDate = convertTimeQuery(this.state.time.value || ) 
       this.setState({filter: value, time: options.time.none, timeDisabled: true}, () => {
         const fetchOptions = {
           filter: this.state.filter,
@@ -41,9 +40,11 @@ class PostsNavbar extends Component {
 
   handleTimeClick = (e, {value}) => {
     this.setState({time: value} , () => {
+      //convert the time filter
+      const fromDate = convertTimeQuery(this.state.time.value).toString();
       const fetchOptions = {
         filter: this.state.filter,
-        time: this.state.time,
+        time: fromDate,
       };
       this.props.fetchPosts(fetchOptions);
     });

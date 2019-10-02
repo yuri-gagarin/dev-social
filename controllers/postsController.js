@@ -5,6 +5,8 @@ import Comment from "../models/Comment.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
 import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
 
+import {convertTimeQuery} from "../helpers/timeHelpers.js";
+import {postSearchOptions} from "../helpers/constants/queryOptions.js";
 //some indexting ideas for schema 
 //Post.createdAt
 //Port.likeCount?
@@ -13,29 +15,55 @@ import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
 import {postSearchOptions} from "./controller_helpers/queryOptions.js";
 import PostLike from "../models/PostLike.js";
 
-const getTimeDifference = (option) => {
+const getHotPosts = (fromDate, toDate) => {
+  //hot posts should be recent, well discussed and liked.  
+  return Post.find(
+    {likeCount: {$gte: 10}, commentCount: {$gte: 5}}, 
+    {}, 
+    {sort: {createdAt: -1}, limit: 10}
+  );
+}
+const getDatedPosts = (fromDate, toDate, limit) => {
+  //so here we should be able to pull new posts or posts between a specific date
   const now = new Date();
-  switch (option) {
-    case(postSearchOptions.time.day):
-      const lastDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 
-                               now.getHours(), now.getMinutes(), now.getSeconds());
-      return lastDay;
-    case(postSearchOptions.time.week):
-      const lastWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7,
-                                now.getHours(), now.getMinutes(), now.getSeconds());
-      return lastWeek;
-    case (postSearchOptions.time.month):
-      const lastMonth = new Date(now.getFullYear(). now.getMonth() - 1, now.getDate(),
-                                 now.getHours(), now.getMinutes(), now.getSeconds());
-      return lastMonth;
-    case (postSearchOptions.time.year):
-      const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate(),
-                                now.getHours(), now.getMinutes(), now.getSeconds());
-      return lastYear;
-    default:
-      return null;
-  } 
+  return Post.find(
+    {createdAt: {$gte: fromDate, $lte: toDate || now}}, 
+    {}, 
+    {sort: {createdAt: -1}},
+  );
 };
+const getDisccussedPosts = (fromDate, toDate, limit=10) => {
+  return Post.find(
+    {createdAt: fromDate, commentCount: {$gte: 5}}, 
+    {}, 
+    {sort: {commentCount: -1}, limit: limit}
+  );
+};
+const getHeatedPosts = (fromDate, toDate) => {
+  const UPPER_LIMIT = 65;
+  const LOWER_LIMIT = 35;
+  const heatedPosts = [];
+  //this should have a somewhat close ration between likes and dislikes.
+  Post.find({fromDate: {$gte: fromDate}, toDate: {$lte: toDate}, limit: 50})
+    .then((posts) => {
+      for (const post of posts) {
+        const likePercentage = (likeCount / (post.likeCount + post.dislikeCount)) * 100;
+        if (likePercentage <= UPPER_LIMIT && likePercentage >= LOWER_LIMIT) {
+          //mark post as heated
+          //controversy index, the closer to 0 the more even spread between likes and dislikes
+          let heatIndex = Math.abs(likePercentage - 50);
+          let heatedPost = {...post.toObject(), heatIndex: heatIndex};
+          heatedPosts.push(heatedPost);
+        }
+      }
+      //sort the heated Post(s) based on controversyIndex
+      heatedPosts.sort((a, b) => {
+        return a - b;
+      })
+      return heatedPosts;
+    })
+  //should sort and return posts with top elements being closest to 1.0 most heated
+}
 
 /**
  * Creates a post query from Post navbar options.
@@ -44,71 +72,28 @@ const getTimeDifference = (option) => {
  * @param {string} queryOptions.time - A time filter for the Post query (default - one day).
  * @returns {Array} An array with the mongo query (default returns sort by createdAt DESC).
 */
-const makePostQuery = (queryOptions) => {
-  const filter = queryOptions.filter ? queryOptions.filter : postSearchOptions.filter.new;
-  const time = queryOptions.time ? queryOptions.time : postSearchOptions.time.day;
+const executePostQuery = (queryOptions, postSearchOptions) => {
+  //some type checking
+  
   const timeFilter = getTimeDifference(time);
-  console.log(filter)
-  console.log(typeof timeFilter)
-  switch (filter) {
+  switch (queryOptions.filter) {
     case(postSearchOptions.filter.new):
-      console.log("here")
-      return [
-        {createdAt: {$gt: timeFilter}}, {}, {sort: {createdAt: -1}, limit: 10 }
-      ];
+      return getDatedPosts(queryOptions.fromDate, queryOptions.toDate, queryOptions.t)
     case(postSearchOptions.filter.trending): 
       //probably should be amount of likes in a time period
-      return [
-        {createdAt: {$gt: timeFilter}}, {}, {sort: {createdAt: 1}, limit: 5} 
-      ];
+      return getHotPosts()
     case(postSearchOptions.filter.heated): 
       //probably should be most liked or commented in a time period
-      return [
-        {createdAt: {$gt: timeFilter}}, {}, {}
-      ];
+      return getHeatedPosts()
     case(postSearchOptions.filter.discussed): 
-    return [
-
-    ]
+      return getDisccussedPosts()
     default: {
-      return [
-        {}, {}, {sort: {createdAt: -1}, limit: 10}
-      ]
+      return 
     }
   }
 };
 
-const getHotPosts = (fromDate, toDate) => {
-  //hot posts should be recent, well discussed and liked.  
-  return Post.find({likeCount: {$gte: 10}, commentCount: {$gte: 5}}, {}, {sort: {createdAt: -1}, limit: 10});
-}
-const getDatedPosts = async (fromDate, toDate) => {
-  //so here we should be able to pull new posts or posts between a specific date
-  const now = Date.now();
-  return Post.find({createdAt: {$gte: fromDate, $lte: toDate || new Date(now)}})
-};
-const getDisccussedPosts = (fromDate, toDate) => {
-  return Post.find({createdAt: fromDate, commentCount: {$gte: 5}}, {}, {sort: {commentCount: -1}, limit: 10});
-};
-const getControversialPosts = (fromDate, toDate) => {
-  const UPPER_RATIO = 1.5;
-  const LOWER_RATIO = 0.5;
-  const controversialPosts = [];
-  //this should have a somewhat close ration between likes and dislikes.
-  Post.find({fromDate: {$gte: fromDate}, toDate: {$lte: toDate}, limit: 50})
-    .then((posts) => {
-      for (const post of posts) {
-        const likeRatio = post.likeCount / post.dislikeCount;
-        if (likeRatio <= UPPER_RATIO && likeRatio >= LOWER_RATIO) {
-          //mark post as controversial
-          let controversialPost = {...post.toObject(), likeRatio: likeRatio};
-          controversialPosts.push(controversialPost);
-        }
-      }
-      return controversialPosts;
-    })
-  //should sort and return posts with top elements being closest to 1.0 most controversial
-}
+
 
 export default {
   search: (req, res) => {
@@ -146,22 +131,33 @@ export default {
       });
   },
   index: (req, res) => {
-    console.log("Searching posts")
-    const filter = req.query.filter;
-    const time  = req.query.time;
-    const limit = req.query.limit;
-    Post.find(...makePostQuery({filter: filter, time: time}) )
+    const filter = req.query.filter || postSearchOptions.filter.new;
+    const time  = req.query.time || postSearchOptions.time.day;
+    const limit = req.query.limit || 10;
+    const toDate = req.query.toDate || new Date();
+    //normalize parameters for a query. Maybe I will do most of this on the front end dont know yet...
+    //first convert the time parameter passed in into a valid Date object
+    const fromDate = convertTimeQuery(time, postSearchOptions)
+    const params = {
+      filter: filter,
+      toDate: toDate,
+      fromDate: fromDate,
+      limit: limit, 
+    };
+    //execute the post query based on either default params or params passed down from Post toolbar
+    executePostQuery(params, postSearchOptions)
       .then((posts) => {
-        console.log(116)
-        console.log(posts)
-        return res.json({
-          message: "Success",
+        return res.status(200).json({
+          message: "Loaded posts",
           posts: posts,
-        })
+        });
       })
-      .catch((err) => {
-        console.log(err);
-      })
+      .catch((error) => {
+        console.error(error);
+        return res.status(500).json({
+          message: "An error occured",
+        });
+      });
     
   },  
 

@@ -10,7 +10,7 @@ import {createUsers} from "../helpers/authHelpers.js";
 import {seedPosts, likePosts} from "../helpers/postHelpers.js";
 import {seedComments} from "../helpers/commentHelpers.js";
 
-import {withinOneDay, withinOneWeek, withinOneMonth, withinOneYear, withinTimeConstraint} from "../helpers/timeHelpers.js";
+import {withinOneDay, withinOneWeek, withinOneMonth, withinOneYear, withinTimeConstraint} from "../../helpers/timeHelpers.js";
 
 //mongoose connection function
 const connectMongoose = async (mongoURI) => {
