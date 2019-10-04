@@ -1,4 +1,3 @@
-import {postSearchOptions} from "../helpers/constants/queryOptions.js";
 export const rewind = {
   goBackOneDay: () => {
     const now = new Date();

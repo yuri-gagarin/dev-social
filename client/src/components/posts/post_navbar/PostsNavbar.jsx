@@ -10,28 +10,31 @@ class PostsNavbar extends Component {
     super(props);
     this.state = {
       filter: options.filter.new,
-      time: options.time.day,
-      filterDisabled: false,
-      timeDisabled: true,
+      fromDate: options.time.day,
+      filterBarDisabled: false,
+      timeBarDisabled: true,
     }
   }
 
   handleSortClick = (e, {value}) => {
     if(value === options.filter.new) {
-      const fromDate = convertTimeQuery(this.state.time.value || ) 
-      this.setState({filter: value, time: options.time.none, timeDisabled: true}, () => {
+      this.setState({filter: value, fromDate: options.time.none, timeBarDisabled: true}, () => {
+        const fromDate = convertTimeQuery(this.state.fromDate.value, options);
         const fetchOptions = {
           filter: this.state.filter,
-          time: this.state.time,
+          fromDate: fromDate,
+          limit: this.state.limit || 10,
         };
         this.props.fetchPosts(fetchOptions)
       });
     }
     else {
       this.setState({filter: value, timeDisabled: false}, () => {
+        const fromDate = convertTimeQuery(this.state.fromDate.value, options).toString();
         const fetchOptions = {
           filter: this.state.filter,
-          time: this.state.time,
+          fromDate: fromDate,
+          limit: this.state.limit || 10,
         };
         this.props.fetchPosts(fetchOptions);
       });
@@ -39,12 +42,13 @@ class PostsNavbar extends Component {
   }
 
   handleTimeClick = (e, {value}) => {
-    this.setState({time: value} , () => {
+    this.setState({fromDate: value} , () => {
       //convert the time filter
-      const fromDate = convertTimeQuery(this.state.time.value).toString();
+      const fromDate = convertTimeQuery(this.state.fromDate.value, options).toString();
       const fetchOptions = {
         filter: this.state.filter,
-        time: fromDate,
+        fromDate: fromDate,
+        limit: this.state.limit || 10,
       };
       this.props.fetchPosts(fetchOptions);
     });

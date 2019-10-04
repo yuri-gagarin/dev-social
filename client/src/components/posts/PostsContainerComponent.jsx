@@ -15,6 +15,9 @@ class PostsContainerComponent extends Component {
     super(props);
   }
   componentDidMount() {
+    const options = {
+      limit: 10
+    }
     this.props.fetchPosts();
   }
   shouldComponentUpdate(nextProps, nextState) {

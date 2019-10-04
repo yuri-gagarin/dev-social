@@ -6,7 +6,6 @@ import getDateWithTime from "../helpers/getDateWithTime.js";
 import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
 
 import {convertTimeQuery} from "../helpers/timeHelpers.js";
-import {postSearchOptions} from "../helpers/constants/queryOptions.js";
 //some indexting ideas for schema 
 //Post.createdAt
 //Port.likeCount?
@@ -131,13 +130,14 @@ export default {
       });
   },
   index: (req, res) => {
-    const filter = req.query.filter || postSearchOptions.filter.new;
-    const time  = req.query.time || postSearchOptions.time.day;
+    console.log(req.query)
+
+    const filter = req.query.filter 
+    const fromDate  = req.query.fromDate 
     const limit = req.query.limit || 10;
     const toDate = req.query.toDate || new Date();
     //normalize parameters for a query. Maybe I will do most of this on the front end dont know yet...
     //first convert the time parameter passed in into a valid Date object
-    const fromDate = convertTimeQuery(time, postSearchOptions)
     const params = {
       filter: filter,
       toDate: toDate,
@@ -145,6 +145,7 @@ export default {
       limit: limit, 
     };
     //execute the post query based on either default params or params passed down from Post toolbar
+    /*
     executePostQuery(params, postSearchOptions)
       .then((posts) => {
         return res.status(200).json({
@@ -158,6 +159,8 @@ export default {
           message: "An error occured",
         });
       });
+      */
+     return res.json(params);
     
   },  
 
