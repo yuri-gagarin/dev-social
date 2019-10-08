@@ -19,7 +19,7 @@ class PostsNavbar extends Component {
   handleSortClick = (e, {value}) => {
     if(value === options.filter.new) {
       this.setState({filter: value, fromDate: options.time.none, timeBarDisabled: true}, () => {
-        const fromDate = convertTimeQuery(this.state.fromDate.value, options);
+        const fromDate = convertTimeQuery(this.state.fromDate, options);
         const fetchOptions = {
           filter: this.state.filter,
           fromDate: fromDate,
@@ -30,7 +30,7 @@ class PostsNavbar extends Component {
     }
     else {
       this.setState({filter: value, timeDisabled: false}, () => {
-        const fromDate = convertTimeQuery(this.state.fromDate.value, options).toString();
+        const fromDate = convertTimeQuery(this.state.fromDate, options).toString();
         const fetchOptions = {
           filter: this.state.filter,
           fromDate: fromDate,
@@ -42,9 +42,10 @@ class PostsNavbar extends Component {
   }
 
   handleTimeClick = (e, {value}) => {
+    console.log(value)
     this.setState({fromDate: value} , () => {
       //convert the time filter
-      const fromDate = convertTimeQuery(this.state.fromDate.value, options).toString();
+      const fromDate = convertTimeQuery(this.state.fromDate, options).toString();
       const fetchOptions = {
         filter: this.state.filter,
         fromDate: fromDate,

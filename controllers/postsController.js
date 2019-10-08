@@ -5,14 +5,15 @@ import Comment from "../models/Comment.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
 import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
 
-import {convertTimeQuery} from "../helpers/timeHelpers.js";
+import {rewind} from "../helpers/timeHelpers.js";
+
+
 //some indexting ideas for schema 
 //Post.createdAt
 //Port.likeCount?
 
 //query opts constants
 import {postSearchOptions} from "./controller_helpers/queryOptions.js";
-import PostLike from "../models/PostLike.js";
 
 const getTrendingPosts = (fromDate, toDate) => {
   //hot posts should be recent, well discussed and liked.  
@@ -190,15 +191,28 @@ export default {
   },
   index: (req, res) => {
     console.log(req.query)
-    const {fromDate, toDate, filter, limit} = req.query
+    let {fromDate, toDate, filter, limit} = req.query
+    //check for null required values
+    if (!fromDate) {
+      fromDate = rewind.goBackOneMonth();
+    }
+    else {
+      fromDate = new Date(fromDate);
+    }
+    if (!filter) filter = postSearchOptions.filter.new;
+    if (limit) {
+      limit = parseInt(limit, 10);
+    }
+    else {
+      limit = 5;
+    }
     //normalize parameters for a query. Maybe I will do most of this on the front end dont know yet...
     //first convert the time parameter passed in into a valid Date object
-    e
     const params = {
       filter: filter,
       toDate: toDate,
       fromDate: fromDate,
-      limit: limit, 
+      limit: limit,
     };
     //execute the post query based on either default params or params passed down from Post toolbar
     executePostQuery(params, postSearchOptions)
@@ -213,9 +227,7 @@ export default {
         return res.status(500).json({
           message: "An error occured",
         });
-      });
-     return res.json(params);
-    
+      });    
   },  
 
   viewBySlug: (req, res) => {

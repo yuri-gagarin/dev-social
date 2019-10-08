@@ -13,9 +13,9 @@ export const rewind = {
   },
   goBackOneMonth: () => {
     const now = new Date();
-    const oneMonthAgp = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate(),
+    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate(),
                                  now.getHours(), now.getMinutes(), now.getSeconds());
-    return oneMonthAgp;
+    return oneMonthAgo;
   },
   goBackOneYear: () => {
   const now = new Date();
@@ -71,6 +71,7 @@ export const withinTimeConstraint = (from, to) => {
  * @returns {Date} A Date object for the query.
  */
 export const convertTimeQuery = (timeQuery, queryOptions) => {
+  console.log(timeQuery)
   switch (timeQuery) {
     case(queryOptions.time.day):
       return rewind.goBackOneDay();
