@@ -62,7 +62,7 @@ export const seedPosts = async (count, users, createdDate=null) => {
           likeCount: 0,
           createdAt: createdAt,
         };
-        posts.push(post);
+        const newPost = await Post.create(post);
       }
     }
   }

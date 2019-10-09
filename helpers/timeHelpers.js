@@ -26,29 +26,41 @@ export const rewind = {
   withinOneDay: () => {
   const now = new Date();
   const hours = Math.floor(Math.random() * 24);
+  const minutes = Math.floor(Math.random() * 60);
+  const seconds = Math.floor(Math.random() * 60);
   const aDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                        now.getHours() - hours, now.getMinutes(), now.getSeconds());
+                        now.getHours() - hours, now.getMinutes() - minutes, now.getSeconds() - seconds);
   return aDay;
   },
   withinOneWeek: () => {
   const now  = new Date();
   const days = Math.floor(Math.random() * 7);
+  const hours = Math.floor(Math.random() * 24);
+  const minutes = Math.floor(Math.random() * 60);
+  const seconds = Math.floor(Math.random() * 60);
   const aWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - days,
-                         now.getHours(), now.getMinutes(), now.getSeconds());
+                         now.getHours() - hours, now.getMinutes() - minutes, now.getSeconds() - seconds);
   return aWeek;
   },
   withinOneMonth: () => {
   const now = new Date();
   const days = Math.floor(Math.random() * 30);
+  const hours = Math.floor(Math.random() * 24);
+  const minutes = Math.floor(Math.random() * 60);
+  const seconds = Math.floor(Math.random() * 60);
   const aMonth = new Date(now.getFullYear(), now.getMonth(), now.getDate() - days,
-                          now.getHours(), now.getMinutes(), now.getSeconds());
+                          now.getHours() - hours, now.getMinutes() - minutes, now.getSeconds() - seconds);
   return aMonth;
   },
   withinOneYear: () => {
   const now = new Date();
   const months = Math.floor(Math.random() * 12);
-  const aYear = new Date(now.getFullYear(), now.getMonth() - months, now.getDate(),
-                         now.getHours(), now.getMinutes(), now.getSeconds());
+  const days = Math.floor(Math.random() * 30);
+  const hours = Math.floor(Math.random() * 24);
+  const minutes = Math.floor(Math.random() * 60);
+  const seconds = Math.floor(Math.random() * 60);
+  const aYear = new Date(now.getFullYear(), now.getMonth() - months, now.getDate() - days,
+                         now.getHours() - hours, now.getMinutes() - minutes, now.getSeconds() - seconds);
   return aYear;
   }
 };

@@ -10,7 +10,7 @@ import {createUsers} from "../helpers/authHelpers.js";
 import {seedPosts, likePosts} from "../helpers/postHelpers.js";
 import {seedComments} from "../helpers/commentHelpers.js";
 
-import {withinOneDay, withinOneWeek, withinOneMonth, withinOneYear, withinTimeConstraint} from "../../helpers/timeHelpers.js";
+import {rewind, withinTimeConstraint} from "../../helpers/timeHelpers.js";
 
 //mongoose connection function
 const connectMongoose = async (mongoURI) => {
@@ -48,7 +48,7 @@ const seedDB = async (options) => {
     // create some recent posts //
     if(options.withinADay) {
       console.log("Creating some new Posts, Comments, Likes");
-      const newPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, withinOneDay);
+      const newPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, rewind.withinOneDay);
       const postLikes = await likePosts(newPosts, usersCreated, withinTimeConstraint);
       const postComments = await seedComments(usersCreated, newPosts, options.maxCommentsPerPost, withinTimeConstraint);
       console.log("Finished");
@@ -56,7 +56,7 @@ const seedDB = async (options) => {
     // create some week old posts //
     if (options.withinAWeek) {
       console.log("Creating one week old Posts, Comments, Likes");
-      const weekOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, withinOneWeek);
+      const weekOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, rewind.withinOneWeek);
       const postLikes = await likePosts(weekOldPosts, usersCreated, withinTimeConstraint);
       const postComments = await seedComments(usersCreated, weekOldPosts, options.maxCommentsPerPost, withinTimeConstraint)
       console.log("Finished");
@@ -64,15 +64,15 @@ const seedDB = async (options) => {
     // create some month old posts //
     if (options.withinAMonth) {
       console.log("Creating one month old Posts, Comments, Likes ");
-      const monthOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, withinOneMonth);
-      const postLikes = await likePosts(monthOldPosts, usersCreated, withinOneMonth);
+      const monthOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, rewind.withinOneMonth);
+      const postLikes = await likePosts(monthOldPosts, usersCreated, withinTimeConstraint);
       const postComments = await seedComments(usersCreated, monthOldPosts, options.maxCommentsPerPost, withinTimeConstraint);
       console.log("Finished");
     }
     // creat some year old posts //
     if (options.withinAYear) {
       console.log("Creating one year old Posts, Comments, Likes");
-      const yearOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, withinOneYear);
+      const yearOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, rewind.withinOneYear);
       const postLikes = await likePosts(yearOldPosts, usersCreated, withinTimeConstraint);
       const postComments = await seedComments(usersCreated, yearOldPosts, options.maxCommentsPerPost,withinTimeConstraint);
       console.log("Finished");

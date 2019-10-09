@@ -1,9 +1,9 @@
 export const postSearchOptions = {
   filter: {
-    new: "New",
-    trending: "Trending",
-    heated: "Heated",
-    discussed: "Discussed",
+    new: "new",
+    trending: "trending",
+    heated: "heated",
+    discussed: "discussed",
   },
   time: {
     day: "24 Hours",
