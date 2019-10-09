@@ -122,7 +122,6 @@ export const executePostQuery = (params, postSearchOptions) => {
   const {filter, fromDate, toDate, limit} = params;
   switch (filter) {
     case(postSearchOptions.filter.new):
-      console.log("calling dated")
       return getDatedPosts({fromDate: fromDate, limit: limit});
     case(postSearchOptions.filter.trending): 
       //probably should be most liked or commented in a time period
