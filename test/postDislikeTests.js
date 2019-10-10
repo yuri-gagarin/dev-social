@@ -4,13 +4,12 @@ import app from "../server.js";
 import Post from "../models/Post.js";
 
 import {createPost} from "./helpers/postHelpers.js";
-import mongoose from "mongoose";
 import seedDB from "./seeds/seedDB.js";
-import PostLike from "../models/PostLike.js";
+import PostDislike from "../models/PostDislike.js";
 
 chai.use(chaiHttp);
 
-describe("PostLike Tests", function() {
+describe("PostDislikeLike Tests", function() {
   let user, userToken;
   before("Populate DB", function(done) {
     this.timeout(10000);
@@ -37,15 +36,15 @@ describe("PostLike Tests", function() {
       })
   });
   describe("A guest User", function() {
-    let post, likeCount, PostLikes;
+    let post, dislikeCount, PostDislikes;
     before("Create a Post", function(done) {
       createPost(user)
         .then((postResponse) => {
           post = postResponse;
-          likeCount = postResponse.likeCount;
-          PostLike.countDocuments({}, (err, count) => {
+          dislikeCount = post.dislikeCount;
+          PostDislike.countDocuments({}, (err, count) => {
             if (err) return Promise.reject(err);
-            PostLikes = count;
+            PostDislikes = count;
             done();
           });
         })
@@ -55,34 +54,34 @@ describe("PostLike Tests", function() {
         });
     });
     
-    describe("POST /api/posts/like_post", function() {
-      it("Should NOT be able to like a Post", function(done) {
+    describe("POST /api/posts/dislike_post", function() {
+      it("Should NOT be able to dislike a Post", function(done) {
         chai.request(app)
-          .post("/api/posts/like_post/" + post._id)
+          .post("/api/posts/dislike_post/" + post._id)
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(401);
             done();
           });
       });
-      it("Should NOT increment Post.likeCount", function(done) {
+      it("Should NOT increment Post.dislikeCount", function(done) {
         Post.findOne({_id: post._id})
           .then((post) => {
-            expect(post.likeCount).to.equal(likeCount);
+            expect(post.dislikeCount).to.equal(dislikeCount);
             done();
           })
       });
       it("Should NOT add a PostLike", function(done) {
-        PostLike.countDocuments({}, (err, count) => {
-          expect(count).to.equal(PostLikes);
+        PostDislike.countDocuments({}, (err, count) => {
+          expect(count).to.equal(PostDislikes);
           done();
         });
       });
     });
-    describe("DELETE, /api/posts/unlike_post", function() {
+    describe("DELETE, /api/posts/undislike_post", function() {
       it("Should NOT be able to unlike a Post", function(done) {
         chai.request(app)
-          .delete(("/api/posts/unlike_post" + post._id))
+          .delete(("/api/posts/undislike_post" + post._id))
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(401);
@@ -131,11 +130,11 @@ describe("PostLike Tests", function() {
         done();
       });
     });
-    describe("POST /api/posts/like_post/:postId", function() {
+    describe("POST /api/posts/dislike_post/:postId", function() {
       describe("User liking an unliked Post ", function() {
         it("Should be able to Like a Post", function(done) {
           chai.request(app)
-            .post("/api/posts/like_post/" + post._id)
+            .post("/api/posts/dislike_post/" + post._id)
             .set({"Authorization": userToken})
             .end((error, response) => {
               expect(error).to.be.null;
@@ -168,7 +167,7 @@ describe("PostLike Tests", function() {
       describe("User liking a Post they already liked", function() {
         it("Should NOT be able to like the same Post", function(done) {
           chai.request(app)
-            .post("/api/posts/like_post/" + post._id)
+            .post("/api/posts/dislike_post/" + post._id)
             .set({"Authorization": userToken})
             .end((error, response) => {
               expect(error).to.be.null;
@@ -195,11 +194,11 @@ describe("PostLike Tests", function() {
         });
       });
     });
-    describe("DELETE /api/posts/unlike_post/:postId", function() {
+    describe("DELETE /api/posts/undislike_post/:postId", function() {
       describe("User unliking a post they liked", function() {
         it("Should be able to unlike a post", function(done) {
           chai.request(app)
-            .delete("/api/posts/unlike_post/" + post._id)
+            .delete("/api/posts/undislike_post/" + post._id)
               .set({"Authorization": userToken})
               .end((error, response) => {
                 expect(error).to.be.null;
@@ -231,7 +230,7 @@ describe("PostLike Tests", function() {
       describe("User unliking a post they did NOT like", function() {
         it("Should NOT be able to unlike a Post which user didn't like", function(done) {
           chai.request(app)
-            .delete("/api/posts/unlike_post/" + post._id)
+            .delete("/api/posts/undislike_post/" + post._id)
             .set({"Authorization": userToken})
             .end((error, response) => {
               expect(response).to.have.status(400)

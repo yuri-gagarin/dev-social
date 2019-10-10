@@ -228,12 +228,74 @@ describe("Post Query Tests", function() {
         done();
       });
     });
+    // end within a week //
+    describe("{discussed} Post(s) within a month", function() {
+      let posts = [], newPosts = [];
+      const limit = 5;
+      before("create new not discussed posts", async function() {
+        try {
+          const users = await User.find({}).lean();
+          //these are posts not dicussed
+          newPosts = await seedPosts(2, users, rewind.withinOneMonth());
+        }
+        catch (error) {
+          console.error(error);
+        }
+      });
+      it("Should return a Post(s) Array", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneMonth()})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            posts = [...response.body.posts];
+            done();
+          });
+      });
+      it("Should return Post(s) within the last 30 days", function(done) {
+        const aMonthAgo = rewind.goBackOneMonth();
+        for (const post of posts) {
+          const postDate = new Date(post.createdAt);
+          expect(postDate).to.be.gte(aMonthAgo);
+        }
+        done();
+      });
+      it("Should return sorted Post(s) by number of Comment(s) in descending order", function(done) {
+        for(let i = 0; i < posts.length; i++) {
+          if(posts[i]-1) {
+            expect(posts[i-1].commentsCount).to.be.gte(posts[i].commentsCount);
+          }
+        }
+        done();
+      });
+      it("Should have a default limit of 10", function(done) {
+        expect(posts.length).to.be.lte(10);
+        done();
+      });
+      it("Should return a specified query limit", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.discussed, createdAt: rewind.goBackOneWeek(), limit: limit})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            expect(response.body.posts.length).to.equal(limit);
+            done();
+          });
+      });
+
+    })
   });
   // end discussed Post(s) //
-
-  /*
+  // controversial Posts(s) //
+  // Post(s) which have a close Like/Dislike Ratio //
   describe("GET {controversial} Post(s)", function() {
     //for later //
+    describe("General GET request for {controversial} Post(s)", function() {
+
+    })
   })
-  */
 });
