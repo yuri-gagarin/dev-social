@@ -1,4 +1,8 @@
 export const rewind = {
+  /**
+   * Goes back one day.
+   * @returns {Date} Date one dat ago.
+   */
   goBackOneDay: () => {
     const now = new Date();
     const oneDayAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1,

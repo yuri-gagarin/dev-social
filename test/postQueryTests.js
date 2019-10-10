@@ -78,7 +78,7 @@ describe("Post Query Tests", function() {
   // end new Post(s) //
   // discussed Post(s) //
   describe("GET {discussed} Post(s)", function() {
-    describe("General GET request for {discussed} Post(s)", function() {
+    describe("General GET request for {discussed} Post(s) without a date", function() {
       let posts = [];
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
@@ -97,38 +97,8 @@ describe("Post Query Tests", function() {
         done();
       });
     });
+    // within a day //
     describe("{discussed} Post(s) within a day", function() {
-      let posts = [];
-      it("Should return a Post(s) Array", function(done) {
-        chai.request(app)
-          .get("/api/posts")
-          .query({filter: postSearchOptions.trending, createdAt: postSearchOptions.time.day})
-          .end((error, response) => {
-            expect(error).to.be.null;
-            expect(response).to.have.status(200);
-            expect(response.body.posts).to.be.an('array');
-            posts = [...response.body.posts];
-            done();
-          });
-      });
-      it("Should return sorted Post(s) by number of Comment(s) in descending order", function(done) {
-        expect(posts[0].comments.length).to.be.gte(posts[1].comments.length);
-        done();
-      });
-      it("Should return Post(s) within 24Hrs", function(done) {
-        const oneDayAgo = rewind.goBackOneDay();
-        posts.forEach((post) => {
-          const postDate = new Date(post.createdAt);
-          expect(postDate).to.be.gte(oneDayAgo);
-        });
-        done();
-      });
-      it("Should have a default limit of 10", function(done) {
-        expect(posts.length).to.equal(10);
-        done();
-      });
-    });
-    describe("{discussed} Post(s) within a day with a query limit", function() {
       let posts = [], newPosts = [];
       const limit = 5;
       before("create new not discussed posts", async function() {
@@ -144,7 +114,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.trending, createdAt: postSearchOptions.time.day, limit: limit})
+          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneDay()})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -152,10 +122,6 @@ describe("Post Query Tests", function() {
             posts = [...response.body.posts];
             done();
           });
-      });
-      it("Should return sorted Post(s) by number of Comments in descending order", function(done) {
-        expect(posts[0].comments.length).to.be.gte(posts[1].comments.length);
-        done();
       });
       it("Should return Post(s) within 24Hrs", function(done) {
         const oneDayAgo = rewind.goBackOneDay();
@@ -165,11 +131,95 @@ describe("Post Query Tests", function() {
         });
         done();
       });
-      it("Should return a specified query limit", function(done) {
-        expect(posts.length).to.equal(limit);
+      it("Should return sorted Post(s) by number of Comment(s) in descending order", function(done) {
+        expect(posts[0].comments.length).to.be.gte(posts[1].comments.length);
         done();
       });
-      it("Should not include any new less discussed posts", function(done) {
+      it("Should have a default limit of 10", function(done) {
+        expect(posts.length).to.be.lte(10);
+        done();
+      });
+      it("Should return a specified query limit", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneDay(), limit: limit})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            expect(response.body.posts.length).to.equal(limit);
+            done();
+          })
+      });
+      it("Should not include any new not commented posts", function(done) {
+        for (const post of posts) {
+          for (const newPost of newPosts) {
+            expect(newPost._id.toString()).to.not.equal(post._id.toString());
+          }
+        }
+        done();
+      });
+    });
+    // end within a day //
+    // within a week //
+    describe("{discussed} Post(s) within a week", function() {
+      let posts = [], newPosts = [];
+      const limit = 5;
+      before("create new not discussed posts", async function() {
+        try {
+          const users = await User.find({}).lean();
+          //these are posts not dicussed
+          newPosts = await seedPosts(2, users, rewind.withinOneWeek());
+        }
+        catch (error) {
+          console.error(error);
+        }
+      });
+      it("Should return a Post(s) Array", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneWeek()})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            posts = [...response.body.posts];
+            done();
+          });
+      });
+      it("Should return Post(s) within last 7 days", function(done) {
+        const aWeekAgo = rewind.goBackOneWeek();
+        for (const post of posts) {
+          const postDate = new Date(post.createdAt);
+          expect(postDate).to.be.gte(aWeekAgo);
+        }
+        done();
+      });
+      it("Should return sorted Post(s) by number of Comment(s) in descending order", function(done) {
+        for(let i = 0; i < posts.length; i++) {
+          if(posts[i]-1) {
+            expect(posts[i-1].commentsCount).to.be.gte(posts[i].commentsCount);
+          }
+        }
+        done();
+      });
+      it("Should have a default limit of 10", function(done) {
+        expect(posts.length).to.be.lte(10);
+        done();
+      });
+      it("Should return a specified query limit", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.discussed, createdAt: rewind.goBackOneWeek(), limit: limit})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            expect(response.body.posts.length).to.equal(limit);
+            done();
+          });
+      });
+      it("Should NOT return any not commented Post(s)", function(done) {
         for (const post of posts) {
           for (const newPost of newPosts) {
             expect(newPost._id.toString()).to.not.equal(post._id.toString());

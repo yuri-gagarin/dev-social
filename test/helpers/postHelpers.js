@@ -62,18 +62,17 @@ export const seedPosts = async (count, users, createdDate=null) => {
           likeCount: 0,
           createdAt: createdAt,
         };
-        const newPost = await Post.create(post);
+        try {
+          const newPost = await Post.create(post);
+          posts.push(newPost);
+        }
+        catch (error) {
+          console.error(error);
+        }
       }
     }
   }
-  try {
-    const createdPosts = await Post.insertMany(posts);
-    return createdPosts;
-  }
-  catch (error) {
-    console.log(error);
-    return null;
-  }
+  return posts;
 };
 /**
  * Creates a random number of PostLike(s) per Post (the number will always be <= Users).

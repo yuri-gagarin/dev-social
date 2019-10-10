@@ -2,7 +2,6 @@ import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
 import commentValidator from "../helpers/validators/commentValidator.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
-import rejectionPromise from "../helpers/APIhelpers/rejectionPromise.js";
 
 export default {
 
@@ -11,7 +10,6 @@ export default {
     const postId = req.body.postId;
     let commentedPost;
 
-    console.log(req.body);
 
     //build a comment
     let newComment = {
@@ -38,12 +36,13 @@ export default {
           return Comment.create(newComment);
         }
         else {
-          return rejectionPromise("Cant match post to comment");
+          return Promise.reject("Can't match Post to Comment");
         }
       })
       //push a comment to post, resolve promise
       .then((comment) => {
         commentedPost.comments.push(comment);
+        commentedPost.commentCount += 1;
         return commentedPost.save();
       })
       .then((post) => {
@@ -82,7 +81,7 @@ export default {
           return comment.save();
         }
         else {
-          return rejectionPromise("Seems no comment here");
+          return Promise.reject("Seems no comment here");
         }
       })
       .then((comment) => {
@@ -114,7 +113,7 @@ export default {
           return Comment.deleteOne({_id: commentId});
         }
         else {
-          return rejectionPromise("Seems to be a problem finding the comment");
+          return Promise.reject("Seems to be a problem finding the comment");
         }
       })
       .then((result) => {
@@ -122,7 +121,7 @@ export default {
           return Post.findOne({_id: postId})
         }
         else {
-          return rejectionPromise("Seems to be a problem deleting the comment...");
+          return Promise.reject("Seems to be a problem deleting the comment...");
         }
       })
       .then((post) => {
@@ -141,14 +140,15 @@ export default {
           //verify the delete index 
           if (deleteIndex > -1) {
             post.comments.splice(deleteIndex, 1);
+            post.commentCount -= 1;
             return post.save();
           }
           else {
-            return rejectionPromise("Seems no Post-Comment");
+            return Promise.reject("Seems no Post-Comment");
           }
         }
         else {
-          return rejectionPromise("Seems no post here");
+          return Promise.reject("Seems no post here");
         }
       })
       .then((post) => {

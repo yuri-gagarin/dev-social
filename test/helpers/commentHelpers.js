@@ -33,6 +33,7 @@ export const seedComments = async (users, posts, maxComments=5, createdDate=null
           createdAt: createdAt,
         });
         post.comments.push(comment._id);
+        post.commentCount += 1;
         await post.save();
         comments.push(comment);
       }
