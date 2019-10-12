@@ -81,6 +81,48 @@ export default {
       });
   },
   removePostDislike: (req, res) => {
-
+    const postId = req.params.postId;
+    const userId = req.user.id;
+    let editedPost, responseCode;
+    Post.findOne({_id: postId})
+      .then((post) => {
+        if(post) {
+          return PostDislike.deleteOne({_postId: postId, userId: userId})
+        }
+        else {
+          //no post or wrong user input?
+          responseCode = 404;
+          return Promise.reject(new Error("Seems we can't find that Post"));
+        }
+      })
+      .then((response) => {
+        if(response.ok && response.deletedCount === 1) {
+          editedPost.dislikeCount -= 1;
+          return editedPost.save();
+        }
+        else if(response.ok && response.deletedCount === 0) {
+          //no PostDislike to delete
+          responseCode = 400;
+          return Promise.reject(new Error("No dislike to revome"));
+        }
+        else {
+          //something wrong on the server
+          responseCode = 500;
+          Promise.reject(new Error("Seems like somthing went wrong on our end"));
+        }
+      })
+      .then((post) => {
+        responseCode = 200;
+        return res.status(200).json({
+          message: "Removed the dislike",
+          post: post,
+        });
+      })
+      .catch((error) => {
+        return res.status(responseCode || 500).json({
+          message: "An error occured",
+          error: error,
+        });
+      });
   },
 };
