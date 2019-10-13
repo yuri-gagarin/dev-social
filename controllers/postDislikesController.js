@@ -87,7 +87,8 @@ export default {
     Post.findOne({_id: postId})
       .then((post) => {
         if(post) {
-          return PostDislike.deleteOne({_postId: postId, userId: userId})
+          editedPost = post;
+          return PostDislike.deleteOne({postId: postId, userId: userId})
         }
         else {
           //no post or wrong user input?
@@ -103,7 +104,7 @@ export default {
         else if(response.ok && response.deletedCount === 0) {
           //no PostDislike to delete
           responseCode = 400;
-          return Promise.reject(new Error("No dislike to revome"));
+          return Promise.reject(new Error("No dislike to remove"));
         }
         else {
           //something wrong on the server
@@ -122,6 +123,7 @@ export default {
         return res.status(responseCode || 500).json({
           message: "An error occured",
           error: error,
+          errorMsg: error.message,
         });
       });
   },

@@ -220,7 +220,7 @@ describe("PostDislike Tests", function() {
               .set({"Authorization": userToken})
               .end((error, response) => {
                 expect(error).to.be.null;
-                expect(response.error).to.be.null;
+                //expect(response.error).to.be.null;
                 expect(response.body.post).to.not.be.null;
                 expect(response).to.have.status(200);
                 done();
