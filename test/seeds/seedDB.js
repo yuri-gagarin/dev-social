@@ -85,14 +85,15 @@ const seedDB = async (options) => {
       const postComments = await seedComments(usersCreated, posts, options.maxCommentsPerPost);
       console.log("Finished");
     }
-   
-    // create a moderator //
-    console.log("Setting User roles");
-    console.log("Setting a Moderator");
-    const moderator = await User.findOneAndUpdate({_id: usersCreated[2]._id}, {$set: {role: "moderator"} });
-    // create an administrator //
-    const administrator = await User.findOneAndUpdate({_id: usersCreated[3]._id}, {$set: {role: "administrator"} });
-    console.log("Finished");
+    if(usersCreated.length > 1) {
+      // create a moderator //
+      console.log("Setting User roles");
+      console.log("Setting a Moderator");
+      const moderator = await User.findOneAndUpdate({_id: usersCreated[2]._id}, {$set: {role: "moderator"} });
+      // create an administrator //
+      const administrator = await User.findOneAndUpdate({_id: usersCreated[3]._id}, {$set: {role: "administrator"} });
+      console.log("Finished");
+    }
     const numberOfUsers = await User.countDocuments({});
     const numberOfComments = await Comment.countDocuments({});
     const numberOfPostLikes = await PostLike.countDocuments({});
