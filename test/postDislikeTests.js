@@ -11,13 +11,12 @@ import PostDislike from "../models/PostDislike.js";
 chai.use(chaiHttp);
 
 describe("PostDislike Tests", function() {
-  this.timeout(5000);
+  this.timeout(10000);
   let user, userToken;
   before("Populate DB", function(done) {
-    this.timeout(10000);
     seedDB({
-      numberOfUsers: 5, 
-      numberOfPostsPerUser: 3, 
+      numberOfUsers: 1, 
+      numberOfPostsPerUser: 0, 
       maxCommentsPerPost: 0,
       withinADay: true,
       })
@@ -26,7 +25,7 @@ describe("PostDislike Tests", function() {
         done();
       })
       .catch((error) => {
-        console.error(error);
+        done(error);
       })
   });;
   before("Login User", function(done) {
@@ -35,7 +34,6 @@ describe("PostDislike Tests", function() {
       .send({email: user.email, password: user.password})
       .end((error, response) => {
         if (error) {
-          console.error(error);
           done(error);
         }
         userToken = response.body.token;
@@ -49,14 +47,13 @@ describe("PostDislike Tests", function() {
         .then((postResponse) => {
           post = postResponse;
           dislikeCount = post.dislikeCount;
-          PostDislike.countDocuments({}, (err, count) => {
-            if (err) return Promise.reject(err);
-            PostDislikes = count;
-            done();
-          });
+          return  PostDislike.countDocuments({});
+        })
+        .then((value) => {
+          PostDislikes = value;
+          done();
         })
         .catch((error) => {
-          console.error(error);
           done(error);
         });
     });
@@ -77,12 +74,19 @@ describe("PostDislike Tests", function() {
             expect(post.dislikeCount).to.equal(dislikeCount);
             done();
           })
+          .catch((error) => {
+            done(error);
+          })
       });
       it("Should NOT add a PostDislike", function(done) {
-        PostDislike.countDocuments({}, (err, count) => {
-          expect(count).to.equal(PostDislikes);
-          done();
-        });
+        PostDislike.countDocuments({})
+          .then((value) => {
+            expect(value).to.equal(PostDislikes);
+            done();
+          })
+          .catch((error) => {
+            done(error);
+          })
       });
     });
     describe("DELETE, /api/posts/remove_dislike/:postId", function() {
@@ -102,90 +106,168 @@ describe("PostDislike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error)
-              done();
-            })
+              done(error);
+            });
           });
       });
       it("Should NOT remove a PostDislike", function(done) {
-          PostDislike.countDocuments({}, (err, count) => {
-            if(err) {console.error(err)};
-            expect(count).to.equal(PostDislikes);
-            done();
-          });
+          PostDislike.countDocuments({})
+            .then((value) => {
+              expect(value).to.equal(PostDislikes);
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
       });
   });
   // end guest user //
   // Logged in User tests //
   describe("A logged in User", function() {
-    let post, likedPost, likeCount, dislikeCount, PostDislikes, PostLikes;
+    let post1, post2, post1DislikeCount, post2DislikeCount, post2LikeCount, PostDislikes, PostLikes;
     before("Create a Post", function(done) {
       createPost(user)
-        .then((createdPost) => {
-          post = createdPost;
-          dislikeCount = createdPost.dislikeCount;
+        .then((post) => {
+          post1 = post;
+          post1DislikeCount = post.dislikeCount;
           done();
         })
-        .catch((error) => console.error(error));
-  
+        .catch((error) =>{
+          done(error);
+        });
     });
-    before("Create a Post and add a PostLike", function(done) {
-      createPost(user)
-        .then((createdPost) => {
-          likedPost = createdPost;
-          return PostLike.create({postId: createdPost._id, userId: user._id})
-        })
-        .then((response) => {
-          likedPost.likeCount +=1;
-          return likedPost.save();
-        })
-        .then((post) => {done() })
-        .catch((error) => console.error(error));
-    })
     before("Count PostsDislike model", function(done) {
-      PostDislike.countDocuments({}, (err, count) => {
-        PostDislikes = count;
-        done();
-      });
+      PostDislike.countDocuments({})
+        .then((value) => {
+          PostDislikes = value;
+          done();
+        })
+        .catch((error) => {
+          done(error);
+        })
     });
     describe("POST /api/posts/dislike_post/:postId", function() {
       describe("User disliking a new Post ", function() {
         it("Should be able to Dislike a Post", function(done) {
           chai.request(app)
-            .post("/api/posts/dislike_post/" + post._id)
+            .post("/api/posts/dislike_post/" + post1._id)
+            .set({"Authorization": userToken})
+            .end((error, response) => {
+              expect(error).to.be.null;
+              expect(response).to.have.status(200);
+              expect(response.body.error).to.not.be.an("object");
+              expect(response.body.post).to.not.be.null;
+              done();
+            });
+        });
+        it("Should increment number of Post.dislikeCount by 1", function(done) {
+          Post.findOne({_id: post1._id})
+            .then((post) => {
+              expect(post.dislikeCount).to.equal(post1DislikeCount + 1);
+              post1DislikeCount = post.dislikeCount;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            })
+        });
+        it("Should add a PostDislike", function(done) {
+          PostDislike.countDocuments({})
+            .then((value) => {
+              expect(value).to.equal(PostDislikes + 1);
+              PostDislikes = value;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            })
+        });
+      });
+      describe("User DISLIKING a Post they LIKED", function() {
+        before("Create a Post and add a PostLike", function(done) {
+          createPost(user)
+            .then((post) => {
+              post2 = post;
+              return PostLike.create({postId: post2._id, userId: user._id})
+            })
+            .then((response) => {
+              post2.likeCount +=1;
+              return post2.save();
+            })
+            .then((post) => {
+              post2DislikeCount = post.dislikeCount;
+              post2LikeCount = post.likeCount;
+              return PostLike.countDocuments({});
+            })
+            .then((value) => {
+              PostLikes = value;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
+        });        
+        it("Should be able to dislike a Post", function(done) {
+          chai.request(app)
+            .post("/api/posts/dislike_post/" + post2._id)
             .set({"Authorization": userToken})
             .end((error, response) => {
               expect(error).to.be.null;
               expect(response).to.have.status(200);
               expect(response.body.post).to.not.be.null;
               done();
-            });
+            })
         });
-        it("Should increment number of Post.dislikeCount by 1", function(done) {
-          Post.findOne({_id: post._id})
-            .then((post) => {
-              expect(post.dislikeCount).to.equal(dislikeCount + 1);
-              //set for delete test;
-              dislikeCount = post.dislikeCount;
+        it("Should remove one PostLike", function(done) {
+          PostLike.countDocuments({})
+            .then((value) => {
+              expect(value).to.equal(PostLikes - 1);
+              PostLikes = value;
               done();
             })
             .catch((error) => {
-              console.error(error);
-              done();
+              done(error);
             })
         });
-        it("Should add a PostDislike", function(done) {
-          PostDislike.countDocuments({}, (err, newCount) => {
-            expect(newCount).to.equal(PostDislikes + 1);
-            PostDislikes = newCount;
-            done();
-          })
+        it("Should decrement Post.likeCount by 1", function(done) {
+          Post.findOne({_id: post2._id})
+            .then((post) => {
+              expect(post.likeCount).to.equal(post2LikeCount - 1);
+              post2LikeCount = post.likeCount;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            })
+        }); 
+        it("Should add one PostDislike", function(done) {
+          PostDislike.countDocuments({})
+            .then((value) => {
+              expect(value).to.equal(PostDislikes + 1);
+              PostDislikes = value;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            })
         });
-      });
+        it("Should increment Post.dislikeCount by 1", function(done) {
+          Post.findOne({_id: post2._id})
+            .then((post) => {
+              expect(post.dislikeCount).to.equal(post2DislikeCount + 1);
+              post2DislikeCount = post.dislikeCount;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
+        });
+
+      })
       describe("User DISLIKING a Post they already DISLIKED", function() {
         it("Should NOT be able to dislike the same Post", function(done) {
           chai.request(app)
-            .post("/api/posts/dislike_post/" + post._id)
+            .post("/api/posts/dislike_post/" + post1._id)
             .set({"Authorization": userToken})
             .end((error, response) => {
               expect(error).to.be.null;
@@ -194,62 +276,68 @@ describe("PostDislike Tests", function() {
             });
         });
         it("Should NOT increment number of Post.dislikeCount", function(done) {
-          Post.findOne({_id: post._id})
+          Post.findOne({_id: post1._id})
             .then((post) => {
-              expect(post.dislikeCount).to.equal(dislikeCount);
+              expect(post.dislikeCount).to.equal(post1DislikeCount);
               done();
             })
             .catch((error) => {
-              console.error(error);
-              done();
+              done(error);
             });
         });
         it("Should NOT add a PostDislike", function(done) {
-          PostDislike.countDocuments({}, (error, count) => {
-            expect(count).to.equal(PostDislikes);
-            done();
-          });
+          PostDislike.countDocuments({})
+            .then((value) => {
+              expect(value).to.equal(PostDislikes);
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
         });
       });
     });
     describe("DELETE /api/posts/dislike_post/:postId", function() {
-      describe("User removiving a dislike from a Post they disliked", function() {
+      describe("User removing a dislike from a Post they disliked", function() {
         it("Should be able to remove a Dislike", function(done) {
           chai.request(app)
-            .delete("/api/posts/remove_dislike/" + post._id)
+            .delete("/api/posts/remove_dislike/" + post1._id)
               .set({"Authorization": userToken})
               .end((error, response) => {
                 expect(error).to.be.null;
-                //expect(response.error).to.be.null;
+                expect(response.body.error).to.not.be.an("object");
                 expect(response.body.post).to.not.be.null;
                 expect(response).to.have.status(200);
                 done();
               })
         });
         it("Should decrement Post.dislikeCount by 1", function(done) {
-          Post.findOne({_id: post._id})
+          Post.findOne({_id: post1._id})
             .then((post) => {
-              expect(post.dislikeCount).to.equal(dislikeCount - 1);
-              dislikeCount = post.dislikeCount;
+              expect(post1.dislikeCount).to.equal(post1DislikeCount - 1);
+              post1DislikeCount = post.dislikeCount;
               done();
             })
             .catch((error) => {
-              console.error(error);
-              done();
+              done(error);
             });
         });
         it("Should remove one PostDislike", function(done) {
-          PostDislike.countDocuments({}, (error, count) => {
-            expect(count).to.equal(PostDislikes - 1);
-            PostDislikes = count;
-            done();
-          });
+          PostDislike.countDocuments({})
+            .then((value) => {
+              expect(value).to.equal(PostDislikes - 1);
+              PostDislikes = value;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            })
         });
       });
       describe("User removing a Dislike from a Post they did NOT dislike", function() {
         it("Should NOT be able to remove Dislike a Post which user didn't dislike", function(done) {
           chai.request(app)
-            .delete("/api/posts/remove_dislike/" + post._id)
+            .delete("/api/posts/remove_dislike/" + post1._id)
             .set({"Authorization": userToken})
             .end((error, response) => {
               expect(response).to.have.status(400)
@@ -257,21 +345,24 @@ describe("PostDislike Tests", function() {
             });
         });
         it("Should NOT decrement Post.dislikeCount by 1", function(done) {
-          Post.findOne({_id: post._id})
+          Post.findOne({_id: post1._id})
             .then((post) => {
-              expect(post.dislikeCount).to.equal(dislikeCount);
+              expect(post.dislikeCount).to.equal(post1DislikeCount);
               done();
             })
             .catch((error) => {
-              console.error(error);
-              done();
+              done(error);
             });
         });
         it("Should NOT remove a PostDislike", function(done) {
-          PostDislike.countDocuments({}, (error, count) => {
-            expect(count).to.equal(PostDislikes);
-            done();
-          });
+          PostDislike.countDocuments({})
+            .then((value) => {
+              expect(value).to.equal(PostDislikes);
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
         });
       });
     });

@@ -18,17 +18,20 @@ export default {
         }
         else {
           responseCode = 404;
-          Promise.reject(new Error("Seem to can't find the Post"));
+          Promise.reject(new Error("Can't seem to find the Post"));
         }
       })
       .then((response) => { 
+        //found and deleted
         if(response.ok && response.deletedCount === 1) {
           editedPost.dislikeCount -= 1;
           return Promise.resolve(editedPost);
         }
+        //not found but no delete error
         else if(response.ok && response.deletedCount === 0) {
           return Promise.resolve(editedPost);
-        }   
+        }  
+        //some sort of error 
         else {
           responseCode = 500;
           return Promise.reject(new Error("Something went wrong on our end"));

@@ -1,7 +1,6 @@
 import PostDislike from "../models/PostDislike.js";
 import Post from "../models/Post.js";
 import PostLike from "../models/PostLike.js";
-import postLikes from "../routes/postLikes.js";
 
 
 export default {
@@ -16,37 +15,32 @@ export default {
           //check if user liked a Post
           //if liked remove Like and add a Dislike
           editedPost = post;
-          return PostLike.findOne({postId: postId, userId: userId});
+          return PostLike.deleteOne({postId: postId, userId: userId});
         }
         else {
-          responseCode = 400;
-          return Promise.reject(new Error("No Post found"));
-        }
-      })
-      .then((postLike) => {
-        if(postLike) {
-          //Post was liked, remove it first
-          PostLike.deleteOne({postId: postId, userId: userId})
-            .then((response) => {
-              if(response.ok && response.deletedCount === 1) {
-                editedPost.likeCount -= 1;
-                return Promise.resolve(true);
-              }
-              else {
-                responseCode = 500;
-                return Promise.reject("Something went wrong");
-              }
-            })
-            .catch((error) => console.error(error));
-        }
-        else {
-          //Post was not liked, continue
-          return Promise.resolve(true);
+          responseCode = 404;
+          return Promise.reject(new Error("Can't seem to find the Post"));
         }
       })
       .then((response) => {
-        //check if a Post is already disliked
-        return PostDislike.findOne({postId: postId, userId: userId})
+        //found and deleted
+        if(response.ok && response.deletedCount === 1) {
+          editedPost.likeCount -= 1;
+          return Promise.resolve(editedPost);
+        }
+        //not found but no delete error
+        else if(response.ok && response.deletedCount === 0) {
+          return Promise.resolve(editedPost);
+        }
+        //some sort of error
+        else {
+          responseCode = 500;
+          return Promise.reject("Uh Oh. Something is wrong on our end");
+        }
+      })
+      .then((post) => {
+        //check for an already present PostDislike
+        return PostDislike.findOne({postId: post._id, userId: userId});
       })
       .then((postDislike) => {
         //user already disliked the post 
