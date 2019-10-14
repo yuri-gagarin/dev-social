@@ -20,7 +20,7 @@ describe("PostLike Tests", function() {
         done();
       })
       .catch((error) => {
-        console.error(error);
+        done(error);
       })
   });
   before("Login User", function(done) {
@@ -29,7 +29,7 @@ describe("PostLike Tests", function() {
       .send({email: user.email, password: user.password})
       .end((error, response) => {
         if (error) {
-          console.error(error);
+          done(error);
         }
         userToken = response.body.token;
         done();
@@ -51,7 +51,7 @@ describe("PostLike Tests", function() {
           done();
         })
         .catch((error) => {
-          console.error(error);
+          done(error);
         });
     });
     
@@ -72,7 +72,7 @@ describe("PostLike Tests", function() {
             done();
           })
           .catch((error) => {
-            console.error(error)
+            done(error);
           });
       });
       it("Should NOT add a PostLike", function(done) {
@@ -82,7 +82,7 @@ describe("PostLike Tests", function() {
             done();
           })
           .catch((error) => {
-            console.error(error)
+            done(error);
           });
       });
     });
@@ -104,7 +104,7 @@ describe("PostLike Tests", function() {
             done();
           })
           .catch((error) => {
-            console.error(error)
+            done(error);
           });
       });
       it("Should NOT remove a PostLike", function(done) {
@@ -114,7 +114,7 @@ describe("PostLike Tests", function() {
             done();
           })
           .catch((error) => {
-            console.error(error)
+            done(error);
           });
       });
     });
@@ -135,7 +135,7 @@ describe("PostLike Tests", function() {
           done();
         })
         .catch((error) => {
-          console.error(error)
+          done(error);
         });
     });
     describe("POST /api/posts/like_post/:postId", function() {
@@ -160,7 +160,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             })
         });
         it("Should add a PostLike", function(done) {
@@ -171,7 +171,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             });
         });
       });
@@ -197,7 +197,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             })
         });
         it("Should be able to like the Post", function(done) {
@@ -207,7 +207,7 @@ describe("PostLike Tests", function() {
             .end((error, response) => {
               expect(error).to.be.null;
               expect(response).to.have.status(200);
-              expect(response.body.error).to.be.null;
+              expect(response.body.error).to.not.be.an("object");
               expect(response.body.post).to.not.be.null;
               done();
             });
@@ -219,7 +219,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             });
         });
         it("Should decrement number of Post.dislikeCount by 1", function(done) {
@@ -230,7 +230,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             })
         });
         it("Should add a PostLike", function(done) {
@@ -241,7 +241,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             });
         });
         it("Should increment number of Post.likeCount by 1", function(done) {
@@ -251,8 +251,8 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
-            })
+              done(error);
+            });
         });
       });
       // end disliked Post
@@ -275,7 +275,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             });
         });
         it("Should NOT add a PostLike", function(done) {
@@ -285,7 +285,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             });
         });
       });
@@ -311,7 +311,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             });
         });
         it("Should remove one PostLike", function(done) {
@@ -322,7 +322,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             });
         });
       });
@@ -344,7 +344,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             });
         });
         it("Should NOT remove a PostLike", function(done) {
@@ -354,7 +354,7 @@ describe("PostLike Tests", function() {
               done();
             })
             .catch((error) => {
-              console.error(error);
+              done(error);
             });
         });
       });

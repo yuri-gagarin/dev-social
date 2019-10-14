@@ -77,6 +77,7 @@ export default {
         return res.status(responseCode||500).json({
           message: "Seems something went wrong",
           error: error,
+          errorMessage: error.message,
         })
       });
   },
@@ -123,7 +124,7 @@ export default {
         return res.status(responseCode || 500).json({
           message: "An error occured",
           error: error,
-          errorMsg: error.message,
+          errorMessage: error.message,
         });
       });
   },
