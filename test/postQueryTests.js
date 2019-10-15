@@ -24,10 +24,12 @@ describe("Post Query Tests", function() {
     .then((data) => {
       done();
     })
-    .catch((error) => {console.error(error)});
+    .catch((error) => {
+      done(error);
+    });
   });
   // new Post(s) //
-  describe("GET {new} Post(s)", function() {
+  describe("GET {new} Post(s) /api/posts?filter=new", function() {
     describe("A request without any params", function() {
       let posts = [];
       it("Should return a Post(s) Array", function(done) {
@@ -229,6 +231,7 @@ describe("Post Query Tests", function() {
       });
     });
     // end within a week //
+    // within a month //
     describe("{discussed} Post(s) within a month", function() {
       let posts = [], newPosts = [];
       const limit = 5;
@@ -286,16 +289,83 @@ describe("Post Query Tests", function() {
             done();
           });
       });
-
-    })
+      it("Should not return any not commented Post(s)", function(done) {
+        for (const post of posts) {
+          for (const newPost of newPosts)  {
+            expect(newPost._id.toString).to.not.equal(post._id.toString());
+          }
+        }
+        done();
+      })
+    });
+    // end within a month //
+    // within a year //
+    describe("{discussed} Post(s) within a year", function() {
+      let posts = [], newPosts = [];
+      const limit = 5;
+      before("create new not discussed posts", async function() {
+        try {
+          const users = await User.find({}).lean();
+          //these are posts not dicussed
+          newPosts = await seedPosts(2, users, rewind.withinOneYear());
+        }
+        catch (error) {
+          console.error(error);
+        }
+      });
+      it("Should return a Post(s) Array", function(done) {
+        chai.request(app) 
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneYear()})
+          .end((error, response) => {
+            if (error) {done(error)};
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            posts = [...response.body.posts];
+            done();
+          });
+      });
+      it("Should return Post(s) within the last year", function(done) {
+        const oneYearAgo = rewind.goBackOneYear();
+        for (const post of posts) {
+          const postDate = new Date(post.createdAt)
+          expect(postDate).to.be.gte(oneYearAgo);
+        }
+        done();
+      });
+      it("Should return sorted Post(s) by number of Comment(s) in descending order", function(done) {
+        for (let i = 1; i < posts.length; i++) {
+         expect(posts[i-1].comments.length).to.be.gte(posts[i].comments.length);
+        }
+        done();
+      });
+      it("Should have a default limit of 10", function(done) {
+        expect(posts.length).to.be.lte(10);
+        done();
+      });
+      it("Should return a specified query limit", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.discussed, createdAt: rewind.goBackOneYear(), limit: limit})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            expect(response.body.posts.length).to.equal(limit);
+            done();
+          });
+      });
+      it("Should not return any not commented Post(s)", function(done) {
+        for (const post of posts) {
+          for (const newPost of newPosts)  {
+            expect(newPost._id.toString).to.not.equal(post._id.toString());
+          }
+        }
+        done();
+      });
+    });
+    // end within a year //
   });
-  // end discussed Post(s) //
-  // controversial Posts(s) //
-  // Post(s) which have a close Like/Dislike Ratio //
-  describe("GET {controversial} Post(s)", function() {
-    //for later //
-    describe("General GET request for {controversial} Post(s)", function() {
-
-    })
-  })
+  // end {discussed} Post(s) //
 });
