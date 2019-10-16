@@ -74,39 +74,41 @@ const getDisccussedPosts = (options) => {
   }
 };
 /**
- * Returns a query for 'heated Post(s)'. Post(s) with a close ratio to Like/Dislike.
+ * Returns a query for 'Controversial Post(s)'. Post(s) with a close ratio to Like/Dislike.
  * @param {object} options - An options object.
  * @param {string} options.fromDate - Lower limit date for the query. 
  * @param {string} options.toDate - Upper limit date for the query.
  * @param {number} options.limit - A limit for the query.
  * @returns {Promise} Mongoose query promise for Post model.
  */
-const getHeatedPosts = (options) => {
+const getControversialPosts = (options) => {
   const {fromDate, toDate, limit=50} = options;
   const UPPER_LIMIT = 65;
   const LOWER_LIMIT = 35;
-  const heatedPosts = [];
+  const ControversialPosts = [];
   //this should have a somewhat close ration between likes and dislikes.
   Post.find({fromDate: {$gte: fromDate}, toDate: {$lte: toDate}, limit: limit})
     .then((posts) => {
       for (const post of posts) {
         const likePercentage = (likeCount / (post.likeCount + post.dislikeCount)) * 100;
         if (likePercentage <= UPPER_LIMIT && likePercentage >= LOWER_LIMIT) {
-          //mark post as heated
+          //mark post as Controversial
           //controversy index, the closer to 0 the more even spread between likes and dislikes
-          let heatIndex = Math.abs(likePercentage - 50);
-          let heatedPost = {...post.toObject(), heatIndex: heatIndex};
-          heatedPosts.push(heatedPost);
+          let controversyIndex = Math.abs(likePercentage - 50);
+          let ControversialPost = {...post.toObject(), controversyIndex: controversyIndex};
+          ControversialPosts.push(ControversialPost);
         }
       }
-      //sort the heated Post(s) based on controversyIndex
-      heatedPosts.sort((a, b) => {
+      //sort the Controversial Post(s) based on controversyIndex
+      ControversialPosts.sort((a, b) => {
         return a - b;
       })
-      return Promise.resolve(heatedPosts);
+      return Promise.resolve(ControversialPosts);
     })
-    .catch((error) => {con})
-  //should sort and return posts with top elements being closest to 1.0 most heated
+    .catch((error) => {
+      console.error(error);
+    })
+  //should sort and return posts with top elements being closest to 1.0 most Controversial
 }
 
 /**

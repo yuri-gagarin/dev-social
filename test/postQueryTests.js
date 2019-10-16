@@ -6,7 +6,7 @@ chai.use(chaiHttp);
 
 import {rewind} from "../helpers/timeHelpers.js";
 import {postSearchOptions} from "../controllers/controller_helpers/queryOptions.js";
-import {seedPosts} from "./helpers/postHelpers.js";
+import {seedPosts, likePosts} from "./helpers/postHelpers.js";
 import User from "../models/User.js";
 
 describe("Post Query Tests", function() {
@@ -15,7 +15,7 @@ describe("Post Query Tests", function() {
     seedDB({
       numberOfUsers: 5,
       numberOfPostsPerUser: 5,
-      maxCommentsPerPost: 5,
+      maxCommentsPerPost: 10,
       withinADay: true,
       withinAWeek: true,
       withinAMonth: true,
@@ -368,4 +368,95 @@ describe("Post Query Tests", function() {
     // end within a year //
   });
   // end {discussed} Post(s) //
+  // controversial Post(s) //
+  describe("GET {controversial} Post(s)", function() {
+    describe("General GET request for {controversial} Post(s) without a date", function() {
+      let posts = [];
+      it("Should return a Post(s) Array", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.controversial})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an('array');
+            posts = [...response.body.posts];
+            done();
+          });
+      });
+      it("Should return sorted Post(s) by controversy", function(done) {
+        for (let i = 1; i < posts.length; i++) {
+          expect(post[i - 1].controversyIndex).to.be.lte(posts[i].controversyIndex);
+          done();
+        }
+      });
+    });
+    // within a day //
+    describe("{controversial} Post(s) within a day", function() {
+      let posts = [], newPosts = [];
+      const limit = 5;
+      before("create new not controversial posts", async function() {
+        try {
+          const users = await User.find({}).lean();
+          //these are posts not dicussed
+          newPosts = await seedPosts(2, users, new Date());
+          likedPosts = await likePosts(newPosts)
+        }
+        catch (error) {
+          console.error(error);
+        }
+      });
+      it("Should return a Post(s) Array", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneDay()})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an('array');
+            posts = [...response.body.posts];
+            done();
+          });
+      });
+      it("Should return Post(s) within 24Hrs", function(done) {
+        const oneDayAgo = rewind.goBackOneDay();
+        posts.forEach((post) => {
+          const postDate = new Date(post.createdAt);
+          expect(postDate).to.be.gte(oneDayAgo);
+        });
+        done();
+      });
+      it("Should return sorted Post(s) by Post.controversyIndex in descending order", function(done) {
+        for (let i = 1; i < posts.length; i++) {
+          expect(post[i-1].controversyIndex).to.be.gte(posts[i].controversyIndex);
+        }
+        done();
+      });
+      it("Should have a default limit of 10", function(done) {
+        expect(posts.length).to.be.lte(10);
+        done();
+      });
+      it("Should return a specified query limit", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneDay(), limit: limit})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            expect(response.body.posts.length).to.equal(limit);
+            done();
+          })
+      });
+      it("Should not include any new not controversial Post(s)", function(done) {
+        for (const post of posts) {
+          for (const newPost of newPosts) {
+            expect(newPost._id.toString()).to.not.equal(post._id.toString());
+          }
+        }
+        done();
+      });
+    });
+    // end within a day //
+  })
 });

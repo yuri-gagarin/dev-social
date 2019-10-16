@@ -1,6 +1,7 @@
 import faker from "faker";
 import Post from "../../models/Post.js";
 import PostLike from "../../models/PostLike.js";
+import PostDislike from "../../models/PostDislike.js";
 /**
  * Generates Post data.
  * 
@@ -112,3 +113,58 @@ export const likePosts = async (posts, users, createdDate=null) => {
   };
   return postLikeCount;
 };
+
+export const likePostNumOfTimes = async(post, users, createdDate=null) => {
+  let now  = new Date();
+  let post = await Post.findOne({_id: post._id});
+  for (let i = 0; i < users.length; i++) {
+    try {
+      let createdAt;
+      if(typeof createdDate === "function") {
+        createdAt = createdDate(post.createdAt, now);
+      }
+      else {
+        createdAt = createdDate;
+      }
+      await PostLike.create({postId: post._id, userId: users[i]._id, createdAt: createdAt});
+      post.dislikeCount += 1;
+    }
+    catch (error) {
+      console.error(error);
+      return Promise.reject(error);
+    }
+  }
+  return post.save();
+};
+
+
+export const dislikePosts = async(posts, users, createdDate=null) => {
+  let postDislikeCount = 0;
+  let now  = new Date();
+  for (let i = 0; i < posts.length; i++) {
+    const numOfDislikes = Math.floor(Math.random() * (users.length + 1));
+    for (let j = 0; j < numOfDislikes; j++) {
+      try {
+        let createdAt;
+        let post = await Post.findOne({_id: posts[i]._id});
+        if (typeof createdDate === "function") {
+          // this creates a dislike between the Post.createdAt and now
+          createdAt = createdDate(post.createdAt, now);
+        }
+        else {
+          createdAt = createdAt;
+        }
+        await PostDislike.create({postId: posts[i]._id, usrId: users[j]._id, createdAt: createdAt});
+        post.dislikeCount += 1;
+        await post.save();
+        postDislikeCount +=1;
+      }
+      catch(error) {
+        console.error(error)
+        return null;
+      }
+    }
+  }
+  return postDislikeCount;
+};
+
