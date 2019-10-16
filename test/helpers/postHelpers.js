@@ -127,10 +127,9 @@ export const likePostNumOfTimes = async(post, users, createdDate=null) => {
         createdAt = createdDate;
       }
       await PostLike.create({postId: post._id, userId: users[i]._id, createdAt: createdAt});
-      post.dislikeCount += 1;
+      post.likeCount += 1;
     }
     catch (error) {
-      console.error(error);
       return Promise.reject(error);
     }
   }
@@ -167,4 +166,75 @@ export const dislikePosts = async(posts, users, createdDate=null) => {
   }
   return postDislikeCount;
 };
+
+export const dislikePostNumOfTimes = async(post, numOfDislikes, createdDate=null) => {
+  let now = new Date();
+  try {
+    let allUsers = await User.find({});
+    let postLikes = await PostLike.find({postId: post._id});
+    let userIds = allUsers.map((user) => {return user._id.toString()});
+    for (const userId of userIds) {
+      for(const postLike of postLikes) {
+        if(userId === postLike._id.toString()) {
+          const index = postsLikes.indexOf(userId);
+          postLikes.splice(index, 1);
+        }
+      }
+    }
+    //check for enough users for dislikes
+    if(userIds.length < numOfDislikes) {
+      //create more users
+      const usersToCreate = numOfDislikes - userIds.length;
+      let additionalUsers = await createUsers(usersToCreate);
+      for(const user of additionalUsers) {
+        userIds.push(user._id.toString());
+      }
+    }
+    for (const userId of userIds) {
+      let createdAt;
+      if (typeof createdDate === "function") {
+        createdAt = createdDate(post.createdAt, now);
+      }
+      else {
+        createdAt = createdDate;
+      }
+      await PostDislike.create({userId: userId, postId: post._id, createdAt: createdAt});
+    }
+    return PostDislike.countDocuments({});
+  }
+  catch(error) {
+    return error;
+  }
+};
+
+export const createControversialPosts = async(users, number, createdDate=null) => {
+  let now = new Date();
+  try {
+    let createdPosts = await seedPosts(number, users, createdDate);
+    for (const post of createdPosts) {
+      for (let i = 0; i < users.length; i++) {
+        let createdAt;
+        if(typeof createdDate === "function") {
+          createdAt = createdDate(post.createdAt, now);
+        }
+        else {
+          createdAt = createdDate;
+        }
+        if(i % 2 === 0) {
+          await PostLike.create({userId: users[i]._id, postId: post._id, createdAt: createdAt});
+        }
+        else {
+          await PostDislike.create({userId: users[i]._id, postId: post._id, createdAt: createdAt});
+        }
+      }
+    }
+    return true;
+  }
+  catch (error) {
+    return error;
+  }
+};
+
+
+
 
