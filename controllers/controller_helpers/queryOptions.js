@@ -2,7 +2,7 @@ export const postSearchOptions = {
   filter: {
     new: "new",
     trending: "trending",
-    heated: "heated",
+    controversial: "controversial",
     discussed: "discussed",
   },
   time: {

@@ -6,15 +6,15 @@ chai.use(chaiHttp);
 
 import {rewind} from "../helpers/timeHelpers.js";
 import {postSearchOptions} from "../controllers/controller_helpers/queryOptions.js";
-import {seedPosts, likePosts} from "./helpers/postHelpers.js";
+import {seedPosts, likePosts, createControversialPosts} from "./helpers/postHelpers.js";
 import User from "../models/User.js";
 
 describe("Post Query Tests", function() {
-  this.timeout(10000);
+  this.timeout(40000);
   before("Set up database", function(done) {
     seedDB({
-      numberOfUsers: 5,
-      numberOfPostsPerUser: 5,
+      numberOfUsers: 25,
+      numberOfPostsPerUser: 1,
       maxCommentsPerPost: 10,
       withinADay: true,
       withinAWeek: true,
@@ -372,6 +372,27 @@ describe("Post Query Tests", function() {
   describe("GET {controversial} Post(s)", function() {
     describe("General GET request for {controversial} Post(s) without a date", function() {
       let posts = [];
+      before("Create some controversial Post(s)", function(done) {
+       User.find({})
+        .then((users) => {
+          return Promise.all(
+            createControversialPosts(users, 3, rewind.withinOneDay()),
+            createControversialPosts(users, 3, rewind.withinOneWeek()),
+            createControversialPosts(users, 3, rewind.withinOneMonth()),
+            createControversialPosts(users, 3, rewind.withinOneYear())
+          );
+        })
+        .then((createdPosts) => {
+          posts = [...createdPosts];
+          done()
+        })
+        .catch((error) => {
+          done(error);
+        });
+      });
+      it("Should log the new Post(s)", function(done) {
+        done();
+      })
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
@@ -400,7 +421,7 @@ describe("Post Query Tests", function() {
           const users = await User.find({}).lean();
           //these are posts not dicussed
           newPosts = await seedPosts(2, users, new Date());
-          likedPosts = await likePosts(newPosts)
+          likedPosts = await likePosts(users, newPosts)
         }
         catch (error) {
           console.error(error);
@@ -457,6 +478,5 @@ describe("Post Query Tests", function() {
         done();
       });
     });
-    // end within a day //
-  })
+  });
 });

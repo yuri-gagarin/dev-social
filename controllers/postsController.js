@@ -20,7 +20,6 @@ import {executePostQuery} from "./controller_helpers/postQueryHelpers.js";
 
 export default {
   search: (req, res) => {
-    console.log("calling")
     const pattern = req.query.pattern;
     const regex = new RegExp(pattern, "i");
     Post.find({title: {$regex: regex} }).limit(5)

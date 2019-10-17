@@ -113,7 +113,7 @@ export const likePosts = async (posts, users, createdDate=null) => {
   };
   return postLikeCount;
 };
-
+/*
 export const likePostNumOfTimes = async(post, users, createdDate=null) => {
   let now  = new Date();
   let post = await Post.findOne({_id: post._id});
@@ -135,7 +135,7 @@ export const likePostNumOfTimes = async(post, users, createdDate=null) => {
   }
   return post.save();
 };
-
+*/
 
 export const dislikePosts = async(posts, users, createdDate=null) => {
   let postDislikeCount = 0;
@@ -206,13 +206,31 @@ export const dislikePostNumOfTimes = async(post, numOfDislikes, createdDate=null
     return error;
   }
 };
+/**
+ * Creates controversial Post(s) for testing and development database.
+ * @param {Array} users - An array of Users.
+ * @param {number} postsPerUser - How many Post(s) per User to create.
+ * @param {function|Date} createdDate - Either a function for date params or Date (optional).
+ * @returns {Promise} A Promise which resolves to True on success.
+ */
+export const createControversialPosts = async(users, postsPerUser=10, createdDate=null) => {
 
-export const createControversialPosts = async(users, number, createdDate=null) => {
+  // a fail safe if not enough users were passed in
+  if(users.length < 4) {
+    let restUsers = 4 - users.length;
+    let newUsers = await createUsers(restUsers);
+    users.concat(newUsers);
+  }
   let now = new Date();
+  let updatedPosts = [];
   try {
-    let createdPosts = await seedPosts(number, users, createdDate);
+    let createdPosts = await seedPosts(postsPerUser, users, createdDate);
     for (const post of createdPosts) {
-      for (let i = 0; i < users.length; i++) {
+      let randomNum = 0;
+      while(randomNum < 4) {
+        randomNum = Math.floor(Math.random() * users.length) + 1;
+      }
+      for (let i = 0; i < randomNum; i++) {
         let createdAt;
         if(typeof createdDate === "function") {
           createdAt = createdDate(post.createdAt, now);
@@ -222,13 +240,19 @@ export const createControversialPosts = async(users, number, createdDate=null) =
         }
         if(i % 2 === 0) {
           await PostLike.create({userId: users[i]._id, postId: post._id, createdAt: createdAt});
+          post.likeCount += 1;
         }
         else {
           await PostDislike.create({userId: users[i]._id, postId: post._id, createdAt: createdAt});
+          post.dislikeCount += 1;
         }
       }
     }
-    return true;
+    for (const post of createdPosts) {
+      let updatedPost = await post.save();
+      updatedPosts.push(updatedPost);
+    }
+    return updatedPosts
   }
   catch (error) {
     return error;
