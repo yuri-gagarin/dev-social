@@ -82,31 +82,44 @@ const getDisccussedPosts = (options) => {
  * @returns {Promise} Mongoose query promise for Post model.
  */
 const getControversialPosts = (options) => {
-  const {fromDate, toDate, limit=50} = options;
+  console.info("Calling controversial")
+  const {fromDate, toDate, limit=10} = options;
   const UPPER_LIMIT = 65;
   const LOWER_LIMIT = 35;
-  const ControversialPosts = [];
+  const controversialPosts = [];
   //this should have a somewhat close ration between likes and dislikes.
-  Post.find({fromDate: {$gte: fromDate}, toDate: {$lte: toDate}, limit: limit})
+  function isControversial(likes, dislikes, UPPER_LIMIT, LOWER_LIMIT) {
+    const likePercentage = (likes / (likes + dislikes)) * 100;
+    if(likePercentage <= UPPER_LIMIT && likePercentage >= LOWER_LIMIT) {
+      //this.controversyIndex = Math.abs(likePercentage - 50);
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  Post.find(
+    {createdAt: {$gte: fromDate, $lte: toDate}, $where: function() {
+      console.log(103);
+      return isControversial(this.likeCount, this.dislikeCount, UPPER_LIMIT, LOWER_LIMIT);
+    }}, 
+    {}, 
+    {limit: limit}
+    )
     .then((posts) => {
-      for (const post of posts) {
-        const likePercentage = (likeCount / (post.likeCount + post.dislikeCount)) * 100;
-        if (likePercentage <= UPPER_LIMIT && likePercentage >= LOWER_LIMIT) {
-          //mark post as Controversial
-          //controversy index, the closer to 0 the more even spread between likes and dislikes
-          let controversyIndex = Math.abs(likePercentage - 50);
-          let ControversialPost = {...post.toObject(), controversyIndex: controversyIndex};
-          ControversialPosts.push(ControversialPost);
-        }
-      }
       //sort the Controversial Post(s) based on controversyIndex
-      ControversialPosts.sort((a, b) => {
-        return a - b;
+      /*
+      posts.sort((a, b) => {
+        let keyA = a.controversyIndex;
+        let keyB = b.controversyIndex;
+        return keyA - keyB
       })
-      return Promise.resolve(ControversialPosts);
+      */
+      return Promise.resolve(posts);
     })
     .catch((error) => {
       console.error(error);
+      return error;
     })
   //should sort and return posts with top elements being closest to 1.0 most Controversial
 }
@@ -128,9 +141,9 @@ export const executePostQuery = (params, postSearchOptions) => {
     case(postSearchOptions.filter.trending): 
       //probably should be most liked or commented in a time period
       return getTrendingPosts({fromDate: fromDate, toDate: toDate, limit: limit});
-    case(postSearchOptions.filter.heated): 
-      //Psts which have a close Like/Dislike ratio.
-      return getHeatedPosts({fromDate: fromDate, toDate: toDate, limit: limit});
+    case("controversial"): 
+      //Posts which have a close Like/Dislike ratio.
+      return getControversialPosts({fromDate: fromDate, toDate: toDate, limit: limit});
     case(postSearchOptions.filter.discussed): 
       return getDisccussedPosts({fromDate: fromDate, toDate: toDate, limit: limit});
     default: 

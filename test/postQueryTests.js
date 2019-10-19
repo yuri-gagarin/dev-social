@@ -371,28 +371,28 @@ describe("Post Query Tests", function() {
   // controversial Post(s) //
   describe("GET {controversial} Post(s)", function() {
     describe("General GET request for {controversial} Post(s) without a date", function() {
-      let posts = [];
+      let posts = [], dayOldPosts = [], weekOldPosts = [], monthOldPosts = [], yearOldPosts = [];
       before("Create some controversial Post(s)", function(done) {
        User.find({})
         .then((users) => {
-          return Promise.all(
+          return Promise.all([
             createControversialPosts(users, 3, rewind.withinOneDay()),
             createControversialPosts(users, 3, rewind.withinOneWeek()),
             createControversialPosts(users, 3, rewind.withinOneMonth()),
             createControversialPosts(users, 3, rewind.withinOneYear())
-          );
+          ]);
         })
-        .then((createdPosts) => {
-          posts = [...createdPosts];
-          done()
+        .then((posts) => {
+          dayOldPosts = [...posts[0]];
+          weekOldPosts = [...posts[1]];
+          monthOldPosts = [...posts[2]];
+          yearOldPosts = [...posts[3]];
+          done();
         })
         .catch((error) => {
           done(error);
         });
       });
-      it("Should log the new Post(s)", function(done) {
-        done();
-      })
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
@@ -402,16 +402,20 @@ describe("Post Query Tests", function() {
             expect(response).to.have.status(200);
             expect(response.body.posts).to.be.an('array');
             posts = [...response.body.posts];
+            console.log(posts);
             done();
           });
       });
+      /*
       it("Should return sorted Post(s) by controversy", function(done) {
         for (let i = 1; i < posts.length; i++) {
           expect(post[i - 1].controversyIndex).to.be.lte(posts[i].controversyIndex);
           done();
         }
       });
+      */
     });
+    /*
     // within a day //
     describe("{controversial} Post(s) within a day", function() {
       let posts = [], newPosts = [];
@@ -478,5 +482,6 @@ describe("Post Query Tests", function() {
         done();
       });
     });
+    */
   });
 });
