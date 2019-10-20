@@ -98,14 +98,11 @@ const getControversialPosts = (options) => {
       return false;
     }
   }
+  function calcControversy(model, UPPER_LIMIT, LOWER_LIMIT) {
+   const like = [];
+  }
   Post.find(
-    {createdAt: {$gte: fromDate, $lte: toDate}, $where: function() {
-      console.log(103);
-      return isControversial(this.likeCount, this.dislikeCount, UPPER_LIMIT, LOWER_LIMIT);
-    }}, 
-    {}, 
-    {limit: limit}
-    )
+    {createdAt: {$gte: fromDate, $lte: toDate}})
     .then((posts) => {
       //sort the Controversial Post(s) based on controversyIndex
       /*

@@ -7,6 +7,7 @@ import {createPost} from "./helpers/postHelpers.js";
 import seedDB from "./seeds/seedDB.js";
 import PostLike from "../models/PostLike.js";
 import PostDislike from "../models/PostDislike.js";
+import { calcControversy } from "../controllers/controller_helpers/likeHelpers.js";
 
 chai.use(chaiHttp);
 
@@ -122,12 +123,15 @@ describe("PostLike Tests", function() {
   // end guest user //
   // Logged in User tests //
   describe("A logged in User", function() {
-    let post1, post2, post1LikeCount, post2LikeCount, post2DislikeCount,  PostLikes, PostDislikes;
+    let post1, post2, post1LikeCount, post2LikeCount, 
+        post1ControversyIndex, post2ControversyIndex,
+        post2DislikeCount,  PostLikes, PostDislikes;
     before("Create a Post", function(done) {
       createPost(user)
         .then((createdPost) => {
           post1 = createdPost;
           post1LikeCount = createdPost.likeCount;
+          post1ControversyIndex = createdPost.controversyIndex;
           return PostLike.countDocuments({});
         })
         .then((value) => {
@@ -163,6 +167,18 @@ describe("PostLike Tests", function() {
               done(error);
             })
         });
+        it("Should change the Post.controversyIndex", function(done) {
+          Post.findOne({_id: post1._id})
+            .then((post) => {
+              expect(post.controversyIndex).to.be.a("number");
+              expect(post.controversyIndex).to.not.equal(post1ControversyIndex);
+              post1ControversyIndex = post.controversyIndex;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
+        });
         it("Should add a PostLike", function(done) {
           PostLike.countDocuments({})
             .then((value) => {
@@ -185,11 +201,13 @@ describe("PostLike Tests", function() {
             })
             .then((response) => {
               post2.dislikeCount += 1;
+              post2.controversyIndex = calcControversy({likeCount: post2.likeCount, dislikeCount: post2.dislikeCount});
               return post2.save();
             })
             .then((post) => {
               post2DislikeCount = post.dislikeCount;
               post2LikeCount = post.likeCount;
+              post2ControversyIndex = post.controversyIndex;
               return PostDislike.countDocuments({});
             })
             .then((value) => {
@@ -233,6 +251,28 @@ describe("PostLike Tests", function() {
               done(error);
             })
         });
+        it("Should increment number of Post.likeCount by 1", function(done) {
+          Post.findOne({_id: post2._id})
+            .then((post) => {
+              expect(post.likeCount).to.equal(post2LikeCount + 1);
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
+        });
+        it("Should change Post.controversyIndex", function(done) {
+          Post.findOne({_id: post2._id})
+            .then((post) => {
+              expect(post.controversyIndex).to.be.a("number");
+              expect(post.controversyIndex).to.not.equal(post2ControversyIndex);
+              post2ControversyIndex = post.controversyIndex;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
+        });
         it("Should add a PostLike", function(done) {
           PostLike.countDocuments()
             .then((value) => {
@@ -244,16 +284,7 @@ describe("PostLike Tests", function() {
               done(error);
             });
         });
-        it("Should increment number of Post.likeCount by 1", function(done) {
-          Post.findOne({_id: post2._id})
-            .then((post) => {
-              expect(post.likeCount).to.equal(post2LikeCount + 1);
-              done();
-            })
-            .catch((error) => {
-              done(error);
-            });
-        });
+       
       });
       // end disliked Post
       // A liked Post
@@ -272,6 +303,17 @@ describe("PostLike Tests", function() {
           Post.findOne({_id: post1._id})
             .then((post) => {
               expect(post.likeCount).to.equal(post1LikeCount);
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
+        });
+        it("Should NOT change the Post.controversyIndex", function(done) {
+          Post.findOne({_id: post1._id})
+            .then((post) => {
+              expect(post.controversyIndex).to.be.a("number")
+              expect(post.controversyIndex).to.equal(post1.controversyIndex);
               done();
             })
             .catch((error) => {
@@ -314,6 +356,18 @@ describe("PostLike Tests", function() {
               done(error);
             });
         });
+        it("Should change the Post.controversyIndex", function(done) {
+          Post.findOne({_id: post1._id})
+            .then((post) => {
+              expect(post.controversyIndex).to.be.a("number");
+              expect(post1ControversyIndex).to.not.equal(post1ControversyIndex);
+              post1ControversyIndex = post.controversyIndex;
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
+        });
         it("Should remove one PostLike", function(done) {
           PostLike.countDocuments({})
             .then((value) => {
@@ -347,6 +401,16 @@ describe("PostLike Tests", function() {
               done(error);
             });
         });
+        it("Shoult NOT change Post.controversyIndex", function(done) {
+          Post.findOne({_id: post1._id})
+            .then((post) => {
+              expect(post.controversyIndex).to.equal(post1ControversyIndex);
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
+        })
         it("Should NOT remove a PostLike", function(done) {
           PostLike.countDocuments({})
             .then((value) => {

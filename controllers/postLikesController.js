@@ -2,6 +2,9 @@ import Post from "../models/Post.js";
 import PostLike from "../models/PostLike.js";
 import PostDislike from "../models/PostDislike.js";
 
+import {calcControversy} from "./controller_helpers/likeHelpers";
+
+
 export default {
   createLike: (req, res) => {
     const userId = req.user._id;
@@ -52,6 +55,8 @@ export default {
       })
       .then((postLike) => {
         editedPost.likeCount += 1;
+        // set new controversy index
+        editedPost.controversyIndex = calcControversy({likeCount: editedPost.likeCount, dislikeCount: editedPost.dislikeCount});
         return editedPost.save();
       })
       .then((post) => {
@@ -94,6 +99,8 @@ export default {
         if(response.ok && response.deletedCount === 1) {
           //deleted a PostLike
           editedPost.likeCount -= 1;
+          editedPost.controversyIndex = calcControversy({likeCount: editedPost.likeCount, 
+                                                         dislikeCount: editedPost.dislikeCount});
           return editedPost.save();
         }
         else if (response.ok && response.deletedCount === 0) {
