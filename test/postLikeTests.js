@@ -15,7 +15,7 @@ describe("PostLike Tests", function() {
   let user, userToken;
   before("Populate DB", function(done) {
     this.timeout(10000);
-    seedDB({numberOfUsers: 1, numberOfPostsPerUser: 0, maxCommentsPerPost: 0})
+    seedDB({numberOfUsers: 1, numberOfPostsPerUser: 1, maxCommentsPerPost: 0})
       .then((result) => {
         user = result.users.firstUser;
         done();
@@ -39,12 +39,13 @@ describe("PostLike Tests", function() {
 
   //Guest user tests - not logged in //
   describe("A guest User", function() {
-    let post1, post1LikeCount, PostLikes;
+    let post1, post1LikeCount, post1ControversyIndex, PostLikes;
     before("Create a Post", function(done) {
       createPost(user)
         .then((post) => {
           post1 = post
           post1LikeCount = post.likeCount;
+          post1ControversyIndex = post.controversyIndex;
           return PostLike.countDocuments({});
         })
         .then((value) => {
@@ -76,6 +77,16 @@ describe("PostLike Tests", function() {
             done(error);
           });
       });
+      it("Shoult NOT change the Post.controversyIndex", function(done) {
+        Post.findOne({_id: post1._id})
+          .then((post) => {
+            expect(post.controversyIndex).to.equal(post1ControversyIndex);
+            done();
+          })
+          .catch((error) => {
+            done(error);
+          });
+      })
       it("Should NOT add a PostLike", function(done) {
         PostLike.countDocuments({})
           .then((value) => {
@@ -313,7 +324,7 @@ describe("PostLike Tests", function() {
           Post.findOne({_id: post1._id})
             .then((post) => {
               expect(post.controversyIndex).to.be.a("number")
-              expect(post.controversyIndex).to.equal(post1.controversyIndex);
+              expect(post.controversyIndex).to.equal(post1ControversyIndex);
               done();
             })
             .catch((error) => {
@@ -334,6 +345,7 @@ describe("PostLike Tests", function() {
     });
     describe("DELETE /api/posts/unlike_post/:postId", function() {
       describe("User unliking a post they liked", function() {
+       
         it("Should be able to unlike a post", function(done) {
           chai.request(app)
             .delete("/api/posts/unlike_post/" + post1._id)
@@ -359,8 +371,7 @@ describe("PostLike Tests", function() {
         it("Should change the Post.controversyIndex", function(done) {
           Post.findOne({_id: post1._id})
             .then((post) => {
-              expect(post.controversyIndex).to.be.a("number");
-              expect(post1ControversyIndex).to.not.equal(post1ControversyIndex);
+              expect(post.controversyIndex).to.not.equal(post1ControversyIndex);
               post1ControversyIndex = post.controversyIndex;
               done();
             })

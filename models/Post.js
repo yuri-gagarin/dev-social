@@ -34,6 +34,11 @@ const PostSchema = new Schema({
     required: true,
     default: 0
   },
+  controversyIndex: {
+    type: Number,
+    required: false,
+    default: null,
+  },
   comments: [
     { 
       type: Schema.Types.ObjectId,
