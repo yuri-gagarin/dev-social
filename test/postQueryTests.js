@@ -4,14 +4,14 @@ import app from "../server.js";
 import seedDB from "./seeds/seedDB.js";
 chai.use(chaiHttp);
 
-import {rewind} from "../helpers/timeHelpers.js";
+//import {rewind} from "../helpers/timeHelpers.js";
 import {postSearchOptions} from "../controllers/controller_helpers/queryOptions.js";
 import {seedPosts, likePosts, createControversialPosts} from "./helpers/postHelpers.js";
 import User from "../models/User.js";
 
 describe("Post Query Tests", function() {
-  this.timeout(40000);
   before("Set up database", function(done) {
+    this.timeout(40000);
     seedDB({
       numberOfUsers: 25,
       numberOfPostsPerUser: 1,
@@ -402,7 +402,6 @@ describe("Post Query Tests", function() {
             expect(response).to.have.status(200);
             expect(response.body.posts).to.be.an('array');
             posts = [...response.body.posts];
-            console.log(posts);
             done();
           });
       });

@@ -1,4 +1,5 @@
 import Post from "../../models/Post.js";
+import { rewind } from "../../client/src/helpers/time_helpers/timeHelpers.js";
 
 const getTrendingPosts = (fromDate, toDate) => {
   //hot posts should be recent, well discussed and liked.  
@@ -8,6 +9,29 @@ const getTrendingPosts = (fromDate, toDate) => {
     {sort: {createdAt: -1}, limit: 10}
   );
 }
+
+/**
+   * Sorts the passed in model array by {model.controversyIndex}.
+   * @param {Object[]} models - The model array to use for sorting. 
+   * @returns {Object[]} The array of 'model' objects sorted by its controversyIndex.
+   */
+  function sortByControversy(models) {
+    if(!Array.isArray(models)) {
+      throw new TypeError(`Expected the first argument to be an 'array`);
+    }
+    function compare(a, b) {
+      if(Math.abs(a.controversyIndex - 1) < Math.abs(b.controversyIndex - 1)) {
+        return -1;
+      }
+      if(Math.abs(a.controversyIndex - 1) > Math.abs(b.controversyIndex - 1)) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    return models.sort(compare);
+  }
 /**
  * Returns dated Post(s) between specific dates or newest Post(s).
  * @param {object} options Options object.
@@ -82,42 +106,62 @@ const getDisccussedPosts = (options) => {
  * @returns {Promise} Mongoose query promise for Post model.
  */
 const getControversialPosts = (options) => {
-  console.info("Calling controversial")
   const {fromDate, toDate, limit=10} = options;
-  const UPPER_LIMIT = 65;
-  const LOWER_LIMIT = 35;
-  const controversialPosts = [];
-  //this should have a somewhat close ration between likes and dislikes.
-  function isControversial(likes, dislikes, UPPER_LIMIT, LOWER_LIMIT) {
-    const likePercentage = (likes / (likes + dislikes)) * 100;
-    if(likePercentage <= UPPER_LIMIT && likePercentage >= LOWER_LIMIT) {
-      //this.controversyIndex = Math.abs(likePercentage - 50);
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-  function calcControversy(model, UPPER_LIMIT, LOWER_LIMIT) {
-   const like = [];
-  }
-  Post.find(
-    {createdAt: {$gte: fromDate, $lte: toDate}})
-    .then((posts) => {
-      //sort the Controversial Post(s) based on controversyIndex
-      /*
-      posts.sort((a, b) => {
-        let keyA = a.controversyIndex;
-        let keyB = b.controversyIndex;
-        return keyA - keyB
+
+  // our limites for controversy
+  const UPPER_LIMIT = 0.75;
+  const LOWER_LIMIT = 1.25;
+  if (fromDate && toDate) {
+    Post.find(
+      {createdAt: {$gte: fromDate, $lte: toDate}, controversyIndex: {$gte: LOWER_LIMIT, $lte: UPPER_LIMIT}},
+      {}, //custom fields to return
+      {limit: limit})
+      .then((posts) => {
+        if (posts) {
+          return Promise.resolve(sortByControversy(posts));
+        }
+        else {
+          return Promise.reject(new Error("Didnt get any posts back"));
+        }
       })
-      */
-      return Promise.resolve(posts);
+      .catch((error) => {
+        return error;
+      });
+  }
+  else if (fromDate && !toDate) {
+    Post.find(
+      {createdAt: {$gte: fromDate}, controversyIndex: {$gte: LOWER_LIMIT, $lte: UPPER_LIMIT}},
+      {},
+      {limit: limit}
+    )
+    .then((posts) => {
+      if (posts) {
+        return Promise.resolve(sortByControversy(posts));
+      }
+      else {
+        return Promise.reject(new Error("Didnt get any posts back"));
+      }
     })
     .catch((error) => {
-      console.error(error);
       return error;
-    })
+    });
+  } 
+  else {
+    const oneDayAgo = rewind.goBackOneDay();
+    Post.find({created: {Sgte: oneDayAgo}},{},{limit: limit})
+      .then((posts) => {
+        if (posts) {
+          return Promise.resolve(sortByControversy(posts));
+        }
+        else {
+          return Promise.reject(new Error("Didnt get any posts back"));
+        }
+      })
+      .catch((error) => {
+        return error;
+      });
+  }
+  
   //should sort and return posts with top elements being closest to 1.0 most Controversial
 }
 
@@ -138,7 +182,7 @@ export const executePostQuery = (params, postSearchOptions) => {
     case(postSearchOptions.filter.trending): 
       //probably should be most liked or commented in a time period
       return getTrendingPosts({fromDate: fromDate, toDate: toDate, limit: limit});
-    case("controversial"): 
+    case(postSearchOptions.filter.controversial): 
       //Posts which have a close Like/Dislike ratio.
       return getControversialPosts({fromDate: fromDate, toDate: toDate, limit: limit});
     case(postSearchOptions.filter.discussed): 
