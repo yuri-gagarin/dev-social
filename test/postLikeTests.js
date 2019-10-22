@@ -130,6 +130,16 @@ describe("PostLike Tests", function() {
             done(error);
           });
       });
+      it("Should NOT change the Post.controversyIndex", function(done) {
+        Post.findOne({_id: post1._id})
+          .then((post) => {
+            expect(post.controversyIndex).to.equal(post1ControversyIndex);
+            done();
+          })
+          .catch((error) => {
+            done(error);
+          });
+      });
     });
   });
   // end guest user //

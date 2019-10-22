@@ -1,5 +1,5 @@
 import Post from "../../models/Post.js";
-import { rewind } from "../../client/src/helpers/time_helpers/timeHelpers.js";
+import { rewind } from "../../helpers/timeHelpers";
 
 const getTrendingPosts = (fromDate, toDate) => {
   //hot posts should be recent, well discussed and liked.  
