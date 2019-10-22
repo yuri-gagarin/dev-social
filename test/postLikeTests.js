@@ -49,7 +49,7 @@ describe("PostLike Tests", function() {
           return PostLike.countDocuments({});
         })
         .then((value) => {
-          post1LikeCount = value;
+          PostLikes = value;
           done();
         })
         .catch((error) => {
@@ -63,6 +63,7 @@ describe("PostLike Tests", function() {
           .post("/api/posts/like_post/" + post1._id)
           .end((error, response) => {
             expect(error).to.be.null;
+            console.info(response.status);
             expect(response).to.have.status(401);
             done();
           });
@@ -90,7 +91,7 @@ describe("PostLike Tests", function() {
       it("Should NOT add a PostLike", function(done) {
         PostLike.countDocuments({})
           .then((value) => {
-            expect(value).to.equal(post1LikeCount);
+            expect(value).to.equal(PostLikes);
             done();
           })
           .catch((error) => {
@@ -122,7 +123,7 @@ describe("PostLike Tests", function() {
       it("Should NOT remove a PostLike", function(done) {
         PostLike.countDocuments({})
           .then((value) => {
-            expect(value).to.equal(post1LikeCount);
+            expect(value).to.equal(PostLikes);
             done();
           })
           .catch((error) => {

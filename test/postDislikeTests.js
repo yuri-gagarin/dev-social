@@ -125,6 +125,7 @@ describe("PostDislike Tests", function() {
         Post.findOne({_id: post1._id})
           .then((post) => {
             expect(post.controversyIndex).to.equal(postControversyIndex);
+            done();
           })
           .catch((error) => {
             done(error);
@@ -302,7 +303,7 @@ describe("PostDislike Tests", function() {
         it("Should change the Post.controversyIndex", function(done) {
           Post.findOne({_id: post2.id})
             .then((post) => {
-              expect(post.controversyIndex).to.be.a(number);
+              expect(post.controversyIndex).to.be.a("number");
               expect(post.controversyIndex).to.not.equal(post2.controversyIndex);
               post2ControversyIndex = post.controversyIndex;
               done();
@@ -390,7 +391,18 @@ describe("PostDislike Tests", function() {
             })
             .catch((error) => {
               done(error);
+            });
+        });
+        it("Should change the Post.controversyIndex", function(done) {
+          Post.findOne({_id: post1._id})
+            .then((post) => {
+              expect(post.controversyIndex).to.not.equal(post1ControversyIndex);
+              post1ControversyIndex = post.controversyIndex;
+              done();
             })
+            .catch((error) => {
+              done(error);
+            });
         });
       });
       describe("User removing a Dislike from a Post they did NOT dislike", function() {
@@ -417,6 +429,16 @@ describe("PostDislike Tests", function() {
           PostDislike.countDocuments({})
             .then((value) => {
               expect(value).to.equal(PostDislikes);
+              done();
+            })
+            .catch((error) => {
+              done(error);
+            });
+        });
+        it("Should NOT change the Post.controversyIndex", function(done) {
+          Post.findOne({_id: post1._id})
+            .then((post) => {
+              expect(post.controversyIndex).to.equal(post1ControversyIndex);
               done();
             })
             .catch((error) => {

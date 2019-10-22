@@ -1,6 +1,7 @@
 import PostDislike from "../models/PostDislike.js";
 import Post from "../models/Post.js";
 import PostLike from "../models/PostLike.js";
+import { calcControversy } from "./controller_helpers/likeHelpers.js";
 
 
 export default {
@@ -54,6 +55,7 @@ export default {
       })
       .then((newDislike) => {
         editedPost.dislikeCount += 1;
+        editedPost.controversyIndex = calcControversy({likeCount: editedPost.likeCount, dislikeCount: editedPost.dislikeCount});
         return editedPost.save()
       })
       .then((post) => {
@@ -94,6 +96,8 @@ export default {
       .then((response) => {
         if(response.ok && response.deletedCount === 1) {
           editedPost.dislikeCount -= 1;
+          editedPost.controversyIndex = calcControversy({likeCount: editedPost.likeCount, 
+                                                         dislikeCount: editedPost.dislikeCount});
           return editedPost.save();
         }
         else if(response.ok && response.deletedCount === 0) {
