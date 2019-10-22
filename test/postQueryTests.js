@@ -4,7 +4,7 @@ import app from "../server.js";
 import seedDB from "./seeds/seedDB.js";
 chai.use(chaiHttp);
 
-//import {rewind} from "../helpers/timeHelpers.js";
+import {rewind} from "../helpers/timeHelpers.js";
 import {postSearchOptions} from "../controllers/controller_helpers/queryOptions.js";
 import {seedPosts, likePosts, createControversialPosts} from "./helpers/postHelpers.js";
 import User from "../models/User.js";
@@ -373,7 +373,8 @@ describe("Post Query Tests", function() {
     describe("General GET request for {controversial} Post(s) without a date", function() {
       let posts = [], dayOldPosts = [], weekOldPosts = [], monthOldPosts = [], yearOldPosts = [];
       before("Create some controversial Post(s)", function(done) {
-       User.find({})
+        this.timeout(10000);
+        User.find({})
         .then((users) => {
           return Promise.all([
             createControversialPosts(users, 3, rewind.withinOneDay()),

@@ -2,6 +2,7 @@ import faker from "faker";
 import Post from "../../models/Post.js";
 import PostLike from "../../models/PostLike.js";
 import PostDislike from "../../models/PostDislike.js";
+import { calcControversy } from "../../controllers/controller_helpers/likeHelpers.js";
 /**
  * Generates Post data.
  * 
@@ -12,6 +13,7 @@ export const generatePost = (user)=> {
     title: faker.lorem.word(),
     text: faker.lorem.paragraphs(2),
     likeCount: 0,
+    dislikeCount: 0,
   };
   return post;
 };
@@ -20,21 +22,16 @@ export const generatePost = (user)=> {
  * @param {object} user - User model object.
  * @returns {Promise} A Promise which either resolves to a new Post object or NULL.
  */
-export const createPost = async(user) => {
+export const createPost = (user) => {
   const post = {
     user: user._id,
     author: user.name + " " + user.lastName,
     title: faker.lorem.word(),
     text: faker.lorem.paragraphs(2),
     likeCount: 0,
+    dislikeCount: 0,
   };
-  try {
-    return await Post.create(post);
-  }
-  catch (error) {
-    console.error(error);
-    return null;
-  }
+  return Post.create(post);
 };
 /**
  * Creates a specific number of Post(s).
@@ -68,7 +65,7 @@ export const seedPosts = async (count, users, createdDate=null) => {
           posts.push(newPost);
         }
         catch (error) {
-          console.error(error);
+          return(error);
         }
       }
     }
@@ -85,14 +82,15 @@ export const seedPosts = async (count, users, createdDate=null) => {
 export const likePosts = async (posts, users, createdDate=null) => {
   let postLikeCount = 0;
   let now = new Date();
-  for (let i = 0; i < posts.length; i++) {
-    // set a random number of max likes;
-    // will always be <= users.length;
-    const numOfLikes = Math.floor(Math.random() * (users.length + 1));
-    for (let j = 0; j < numOfLikes; j++) {
-      try {
+  let post;
+  try {
+    for (let i = 0; i < posts.length; i++) {
+      // set a random number of max likes;
+      // will always be <= users.length;
+      post = await Post.findOne({_id: posts[i]._id});
+      const numOfLikes = Math.floor(Math.random() * (users.length + 1));
+      for (let j = 0; j < numOfLikes; j++) {
         let createdAt;
-        let post = await Post.findOne({_id: posts[i]._id});
         //check for a function to create a specific date
         if (typeof createdDate === "function") {
           createdAt = createdDate(post.createdAt, now);
@@ -101,17 +99,17 @@ export const likePosts = async (posts, users, createdDate=null) => {
           createdAt = createdDate;
         }
         await PostLike.create({postId: posts[i]._id, userId: users[j]._id, createdAt: createdAt});
-        post.likeCount +=1;
-        await post.save();
-        postLikeCount+=1;
+        post.likeCount += 1;
+        postLikeCount += 1;
       }
-      catch(error) {
-        console.error(error);
-        return null;
-      }
+      post.controversyIndex = calcControversy({likeCount: post.likeCount, dislikeCount: post.dislikeCount});
+      await post.save()
     }
-  };
-  return postLikeCount;
+    return postLikeCount;
+  }
+  catch (error) {
+    return error;
+  }
 };
 /*
 export const likePostNumOfTimes = async(post, users, createdDate=null) => {
@@ -136,16 +134,23 @@ export const likePostNumOfTimes = async(post, users, createdDate=null) => {
   return post.save();
 };
 */
-
+/**
+ * Creates a random number of PostDislike(s) per Post (the number will always be <= Users).
+ * @param {Object[]} posts - An Array with Post objects. 
+ * @param {Object[]} users - An Array with User objects.
+ * @param {function} createdDate - Date when PostDislike was created  or a Function for random Date (optional).
+ * @returns {Promise} A promise which resolves to either the number of Postdislike(s) created or NULL.
+ */
 export const dislikePosts = async(posts, users, createdDate=null) => {
   let postDislikeCount = 0;
   let now  = new Date();
-  for (let i = 0; i < posts.length; i++) {
-    const numOfDislikes = Math.floor(Math.random() * (users.length + 1));
-    for (let j = 0; j < numOfDislikes; j++) {
-      try {
+  let post;
+  try {
+    for (let i = 0; i < posts.length; i++) {
+      const numOfDislikes = Math.floor(Math.random() * (users.length + 1));
+      post = await Post.findOne({_id: posts[i]._id});
+      for (let j = 0; j < numOfDislikes; j++) {
         let createdAt;
-        let post = await Post.findOne({_id: posts[i]._id});
         if (typeof createdDate === "function") {
           // this creates a dislike between the Post.createdAt and now
           createdAt = createdDate(post.createdAt, now);
@@ -153,18 +158,18 @@ export const dislikePosts = async(posts, users, createdDate=null) => {
         else {
           createdAt = createdAt;
         }
-        await PostDislike.create({postId: posts[i]._id, usrId: users[j]._id, createdAt: createdAt});
+        await PostDislike.create({postId: posts[i]._id, userId: users[j]._id, createdAt: createdAt});
         post.dislikeCount += 1;
-        await post.save();
         postDislikeCount +=1;
       }
-      catch(error) {
-        console.error(error)
-        return null;
-      }
+      post.controversyIndex = calcControversy({likeCount: post.likeCount, dislikeCount: post.dislikeCount});
+      await post.save();
     }
+    return postDislikeCount;
   }
-  return postDislikeCount;
+  catch (error) {
+    return error;
+  }
 };
 
 export const dislikePostNumOfTimes = async(post, numOfDislikes, createdDate=null) => {
@@ -199,7 +204,10 @@ export const dislikePostNumOfTimes = async(post, numOfDislikes, createdDate=null
         createdAt = createdDate;
       }
       await PostDislike.create({userId: userId, postId: post._id, createdAt: createdAt});
+      post.dislikeCount +=1;
     }
+    post.controversyIndex = calcControversy({likeCount: post.likeCount, dislikeCount: post.dislikeCount});
+    await Post.findByIdAndUpdate(post._id, {controversyIndex: post.controversyIndex, dislikeCount: post.dislikeCount});
     return PostDislike.countDocuments({});
   }
   catch(error) {

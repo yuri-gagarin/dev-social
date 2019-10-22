@@ -109,6 +109,8 @@ const getControversialPosts = (options) => {
   const {fromDate, toDate, limit=10} = options;
 
   // our limites for controversy
+  console.log(112);
+  console.log(options);
   const UPPER_LIMIT = 0.75;
   const LOWER_LIMIT = 1.25;
   if (fromDate && toDate) {
@@ -129,12 +131,15 @@ const getControversialPosts = (options) => {
       });
   }
   else if (fromDate && !toDate) {
+    console.log(134)
     Post.find(
       {createdAt: {$gte: fromDate}, controversyIndex: {$gte: LOWER_LIMIT, $lte: UPPER_LIMIT}},
       {},
       {limit: limit}
     )
     .then((posts) => {
+      console.log(141);
+      console.log(posts);
       if (posts) {
         return Promise.resolve(sortByControversy(posts));
       }

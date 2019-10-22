@@ -7,7 +7,7 @@ import PostLike from "../../models/PostLike.js";
 import Comment from "../../models/Comment.js";
 
 import {createUsers} from "../helpers/authHelpers.js";
-import {seedPosts, likePosts} from "../helpers/postHelpers.js";
+import {seedPosts, likePosts, dislikePosts} from "../helpers/postHelpers.js";
 import {seedComments} from "../helpers/commentHelpers.js";
 
 import {rewind, withinTimeConstraint} from "../../helpers/timeHelpers.js";
@@ -45,11 +45,16 @@ const seedDB = async (options) => {
     console.log("Creating Users");
     const usersCreated = await createUsers(options.numberOfUsers);
     console.log(`Created ${usersCreated.length} Users`);
+    // create some users for dislikes //
+    console.log("Creating Users for dislikes");
+    const usersForDislikes = await createUsers(options.numberOfUsers);
+    console.log("Finished")
     // create some recent posts //
     if(options.withinADay) {
-      console.log("Creating some new Posts, Comments, Likes");
+      console.log("Creating some new Posts, Comments, Likes, Dislikes");
       const newPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, rewind.withinOneDay);
       const postLikes = await likePosts(newPosts, usersCreated, withinTimeConstraint);
+      const postDislikes = await dislikePosts(newPosts, usersForDislikes, withinTimeConstraint);
       const postComments = await seedComments(usersCreated, newPosts, options.maxCommentsPerPost, withinTimeConstraint);
       console.log("Finished");
     }
@@ -58,6 +63,7 @@ const seedDB = async (options) => {
       console.log("Creating one week old Posts, Comments, Likes");
       const weekOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, rewind.withinOneWeek);
       const postLikes = await likePosts(weekOldPosts, usersCreated, withinTimeConstraint);
+      const postDislikes = await dislikePosts(weekOldPosts, usersForDislikes, withinTimeConstraint);
       const postComments = await seedComments(usersCreated, weekOldPosts, options.maxCommentsPerPost, withinTimeConstraint)
       console.log("Finished");
     }
@@ -66,6 +72,7 @@ const seedDB = async (options) => {
       console.log("Creating one month old Posts, Comments, Likes ");
       const monthOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, rewind.withinOneMonth);
       const postLikes = await likePosts(monthOldPosts, usersCreated, withinTimeConstraint);
+      const postDislikes = await dislikePosts(monthOldPosts, usersForDislikes, withinTimeConstraint);
       const postComments = await seedComments(usersCreated, monthOldPosts, options.maxCommentsPerPost, withinTimeConstraint);
       console.log("Finished");
     }
@@ -74,6 +81,7 @@ const seedDB = async (options) => {
       console.log("Creating one year old Posts, Comments, Likes");
       const yearOldPosts = await seedPosts(options.numberOfPostsPerUser, usersCreated, rewind.withinOneYear);
       const postLikes = await likePosts(yearOldPosts, usersCreated, withinTimeConstraint);
+      const postDislikes = await dislikePosts(yearOldPosts, usersForDislikes, withinTimeConstraint);
       const postComments = await seedComments(usersCreated, yearOldPosts, options.maxCommentsPerPost,withinTimeConstraint);
       console.log("Finished");
     }
@@ -82,6 +90,7 @@ const seedDB = async (options) => {
       console.log("Creating Posts, Comments, Likes")
       const posts = await seedPosts(options.numberOfPostsPerUser, usersCreated);
       const postLikes = await likePosts(posts, usersCreated);
+      const postDislikes = await dislikePosts(posts, usersForDislikes);
       const postComments = await seedComments(usersCreated, posts, options.maxCommentsPerPost);
       console.log("Finished");
     }
