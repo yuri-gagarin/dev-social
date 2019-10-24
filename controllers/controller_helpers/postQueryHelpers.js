@@ -1,5 +1,6 @@
 import Post from "../../models/Post.js";
 import { rewind } from "../../helpers/timeHelpers";
+import {POST_CON_UPPER, POST_CON_LOWER} from "./controllerConstants";
 
 const getTrendingPosts = (fromDate, toDate) => {
   //hot posts should be recent, well discussed and liked.  
@@ -107,17 +108,17 @@ const getDisccussedPosts = (options) => {
  * @param {string} options.fromDate - Lower limit date for the query. 
  * @param {string} options.toDate - Upper limit date for the query.
  * @param {number} options.limit - A limit for the query.
+ * @param {object} controversyLimits - An objects for upper and lower controversy constraints.
+ * @param {number} controversyLimits.POST_CON_LOWER - Lower limit floating point constraint.
+ * @param {number} controversyLimits.POST_CON_UPPER - Upper limit floating point constraint.
  * @returns {Promise} Mongoose query promise for Post model.
  */
-const getControversialPosts = (options) => {
+const getControversialPosts = (options, controversyLimits) => {
   const {fromDate, toDate, limit=10} = options;
-
-  // our limites for controversy
-  const LOWER_LIMIT = 0.75;
-  const UPPER_LIMIT = 1.25;
+  const {POST_CON_LOWER, POST_CON_UPPER} = controversyLimits;
   if (fromDate && toDate) {
     return Post.find(
-      {createdAt: {$gte: fromDate, $lte: toDate}, controversyIndex: {$gte: LOWER_LIMIT, $lte: UPPER_LIMIT}},
+      {createdAt: {$gte: fromDate, $lte: toDate}, controversyIndex: {$gte: POST_CON_LOWER, $lte: POST_CON_UPPER}},
       {}, //custom fields to return
       {limit: limit})
       .then((posts) => {
@@ -134,7 +135,7 @@ const getControversialPosts = (options) => {
   }
   else if (fromDate && !toDate) {
     return Post.find(
-      {createdAt: {$gte: fromDate}, controversyIndex: {$gte: 0.75, $lte: 1.5}},
+      {createdAt: {$gte: fromDate}, controversyIndex: {$gte: POST_CON_LOWER, $lte: POST_CON_UPPER}},
       {},
       {limit: limit})
       .then((posts) => {
@@ -151,7 +152,9 @@ const getControversialPosts = (options) => {
   } 
   else {
     const oneDayAgo = rewind.goBackOneDay();
-    return Post.find({created: {Sgte: oneDayAgo}},{},{limit: limit})
+    return Post.find({created: {Sgte: oneDayAgo}, controversyIndex: {$gte: POST_CON_LOWER, $lte: POST_CON_UPPER}},
+      {},
+      {limit: limit})
       .then((posts) => {
         if (posts) {
           return sortByControversy(posts);
@@ -186,7 +189,8 @@ export const executePostQuery = (params, postSearchOptions) => {
       return getTrendingPosts({fromDate: fromDate, toDate: toDate, limit: limit});
     case(postSearchOptions.filter.controversial): 
       //Posts which have a close Like/Dislike ratio.
-      return getControversialPosts({fromDate: fromDate, toDate: toDate, limit: limit});
+      return getControversialPosts({fromDate: fromDate, toDate: toDate, limit: limit},
+                                   {POST_CON_LOWER: POST_CON_LOWER, POST_CON_UPPER: POST_CON_UPPER});
     case(postSearchOptions.filter.discussed): 
       return getDisccussedPosts({fromDate: fromDate, toDate: toDate, limit: limit});
     default: 
