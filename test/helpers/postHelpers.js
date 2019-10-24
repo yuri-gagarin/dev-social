@@ -257,6 +257,7 @@ export const createControversialPosts = async(users, postsPerUser=10, createdDat
       }
     }
     for (const post of createdPosts) {
+      post.controversyIndex = calcControversy({likeCount: post.likeCount, dislikeCount: post.dislikeCount});
       let updatedPost = await post.save();
       updatedPosts.push(updatedPost);
     }

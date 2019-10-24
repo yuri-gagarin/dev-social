@@ -13,24 +13,28 @@ const getTrendingPosts = (fromDate, toDate) => {
 /**
    * Sorts the passed in model array by {model.controversyIndex}.
    * @param {Object[]} models - The model array to use for sorting. 
-   * @returns {Object[]} The array of 'model' objects sorted by its controversyIndex.
+   * @returns {Promise} The array of 'model' objects sorted by its controversyIndex.
    */
   function sortByControversy(models) {
-    if(!Array.isArray(models)) {
-      throw new TypeError(`Expected the first argument to be an 'array`);
-    }
-    function compare(a, b) {
-      if(Math.abs(a.controversyIndex - 1) < Math.abs(b.controversyIndex - 1)) {
-        return -1;
+    return new Promise((resolve, reject) => {
+
+      if(!Array.isArray(models)) {
+        reject(new TypeError(`Expected the first argument to be an 'array`));
       }
-      if(Math.abs(a.controversyIndex - 1) > Math.abs(b.controversyIndex - 1)) {
-        return 1;
+      function compare(a, b) {
+        if(Math.abs(a.controversyIndex - 1) < Math.abs(b.controversyIndex - 1)) {
+          return -1;
+        }
+        if(Math.abs(a.controversyIndex - 1) > Math.abs(b.controversyIndex - 1)) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
       }
-      else {
-        return 0;
-      }
-    }
-    return models.sort(compare);
+      models.sort(compare);
+      resolve(models);
+    });
   }
 /**
  * Returns dated Post(s) between specific dates or newest Post(s).
@@ -109,18 +113,16 @@ const getControversialPosts = (options) => {
   const {fromDate, toDate, limit=10} = options;
 
   // our limites for controversy
-  console.log(112);
-  console.log(options);
   const UPPER_LIMIT = 0.75;
   const LOWER_LIMIT = 1.25;
   if (fromDate && toDate) {
-    Post.find(
+    return Post.find(
       {createdAt: {$gte: fromDate, $lte: toDate}, controversyIndex: {$gte: LOWER_LIMIT, $lte: UPPER_LIMIT}},
       {}, //custom fields to return
       {limit: limit})
       .then((posts) => {
         if (posts) {
-          return Promise.resolve(sortByControversy(posts));
+          return sortByControversy(posts);
         }
         else {
           return Promise.reject(new Error("Didnt get any posts back"));
@@ -131,32 +133,28 @@ const getControversialPosts = (options) => {
       });
   }
   else if (fromDate && !toDate) {
-    console.log(134)
-    Post.find(
-      {createdAt: {$gte: fromDate}, controversyIndex: {$gte: LOWER_LIMIT, $lte: UPPER_LIMIT}},
+    return Post.find(
+      {createdAt: {$gte: fromDate}, controversyIndex: {$gte: 0.75, $lte: 1.5}},
       {},
-      {limit: limit}
-    )
-    .then((posts) => {
-      console.log(141);
-      console.log(posts);
-      if (posts) {
-        return Promise.resolve(sortByControversy(posts));
-      }
-      else {
-        return Promise.reject(new Error("Didnt get any posts back"));
-      }
-    })
-    .catch((error) => {
-      return error;
-    });
+      {limit: limit})
+      .then((posts) => {
+        if (posts) {
+          return sortByControversy(posts);     
+        }
+        else {
+          return Promise.reject(new Error("Didnt get any posts back"));
+        }
+      })
+      .catch((error) => {
+        return error;
+      });
   } 
   else {
     const oneDayAgo = rewind.goBackOneDay();
-    Post.find({created: {Sgte: oneDayAgo}},{},{limit: limit})
+    return Post.find({created: {Sgte: oneDayAgo}},{},{limit: limit})
       .then((posts) => {
         if (posts) {
-          return Promise.resolve(sortByControversy(posts));
+          return sortByControversy(posts);
         }
         else {
           return Promise.reject(new Error("Didnt get any posts back"));
@@ -166,7 +164,6 @@ const getControversialPosts = (options) => {
         return error;
       });
   }
-  
   //should sort and return posts with top elements being closest to 1.0 most Controversial
 }
 

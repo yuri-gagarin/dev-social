@@ -127,10 +127,9 @@ describe("Post Query Tests", function() {
       });
       it("Should return Post(s) within 24Hrs", function(done) {
         const oneDayAgo = rewind.goBackOneDay();
-        posts.forEach((post) => {
-          const postDate = new Date(post.createdAt);
-          expect(postDate).to.be.gte(oneDayAgo);
-        });
+        for (const post of posts) {
+          expect(new Date(post.createdAt)).to.be.gte(oneDayAgo);
+        }
         done();
       });
       it("Should return sorted Post(s) by number of Comment(s) in descending order", function(done) {
@@ -373,7 +372,8 @@ describe("Post Query Tests", function() {
     describe("General GET request for {controversial} Post(s) without a date", function() {
       let posts = [], dayOldPosts = [], weekOldPosts = [], monthOldPosts = [], yearOldPosts = [];
       before("Create some controversial Post(s)", function(done) {
-        this.timeout(10000);
+        this.timeout(15000);
+        console.log("Creating controversial Posts");
         User.find({})
         .then((users) => {
           return Promise.all([
@@ -388,6 +388,7 @@ describe("Post Query Tests", function() {
           weekOldPosts = [...posts[1]];
           monthOldPosts = [...posts[2]];
           yearOldPosts = [...posts[3]];
+          console.log("Finished");
           done();
         })
         .catch((error) => {
@@ -406,30 +407,37 @@ describe("Post Query Tests", function() {
             done();
           });
       });
-      /*
       it("Should return sorted Post(s) by controversy", function(done) {
+        // controversy is as close to 1 as possible from left or right
         for (let i = 1; i < posts.length; i++) {
-          expect(post[i - 1].controversyIndex).to.be.lte(posts[i].controversyIndex);
-          done();
+          let a = Math.abs(posts[i-1].controversyIndex - 1);
+          let b = Math.abs(posts[i].controversyIndex - 1);
+          expect(a).to.be.lte(b);
         }
+        done();
       });
-      */
     });
-    /*
     // within a day //
     describe("{controversial} Post(s) within a day", function() {
       let posts = [], newPosts = [];
       const limit = 5;
-      before("create new not controversial posts", async function() {
-        try {
-          const users = await User.find({}).lean();
-          //these are posts not dicussed
-          newPosts = await seedPosts(2, users, new Date());
-          likedPosts = await likePosts(users, newPosts)
-        }
-        catch (error) {
-          console.error(error);
-        }
+      before("create new not controversial posts",  function(done) {
+        let usersArr;
+        User.find({}).limit(5).lean()
+          .then((users) => {
+            usersArr = users;
+            return seedPosts(2, users, rewind.withinOneDay);
+          })
+          .then((posts) => {
+            newPosts = [...posts];
+            return likePosts(posts, usersArr, rewind.withinOneDay);
+          })
+          .then((numOfLikes) => {
+            done()
+          })
+          .catch((error) => {
+            done(error);
+          });
       });
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
@@ -445,10 +453,9 @@ describe("Post Query Tests", function() {
       });
       it("Should return Post(s) within 24Hrs", function(done) {
         const oneDayAgo = rewind.goBackOneDay();
-        posts.forEach((post) => {
-          const postDate = new Date(post.createdAt);
-          expect(postDate).to.be.gte(oneDayAgo);
-        });
+        for (const post of posts) {
+          expect(post.createdAt).to.be.gte(oneDayAgo);
+        }
         done();
       });
       it("Should return sorted Post(s) by Post.controversyIndex in descending order", function(done) {
@@ -482,6 +489,5 @@ describe("Post Query Tests", function() {
         done();
       });
     });
-    */
   });
 });
