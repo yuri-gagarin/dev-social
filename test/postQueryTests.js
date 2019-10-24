@@ -626,7 +626,68 @@ describe("Post Query Tests", function() {
     // end within a month //
     // within a year //
     describe("Get {controversial} Post(s) within a year", function() {
-      
+      let posts = [];
+      const limit = 5;
+      it("Should return a Post(s) Array", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneYear()})
+          .end((error, response) => {
+            if(error) {done(error)};
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            posts = [...response.body.posts];
+            done();
+          });
+      });
+      it("Should return Posts(s) dated within a year", function(done) {
+        let aYearAgo = rewind.goBackOneYear();
+        for (const post of posts) {
+          expect(new Date(post.createdAt)).to.be.gte(aYearAgo);
+        }
+        done();
+      });
+      it("Should only return Post(s) which fall within a controversy index", function(done) {
+        for (const post of posts) {
+          let controversyIndex = post.controversyIndex;
+          expect(controversyIndex).to.satisfy(function(controversyIndex) {
+            if((controversyIndex >= POST_CON_LOWER) || (controversyIndex <= POST_CON_UPPER)) {
+              return true;
+            }
+            else {
+              console.log(controversyIndex);
+              return false;
+            }
+          });
+        }
+        done();
+      });
+      it("Should sort the Post(s) by controversy", function(done) {
+        for (let i = 1; i < posts.length; i++) {
+          let a = Math.abs(posts[i-1].controversyIndex - 1);
+          let b = Math.abs(posts[i].controversyIndex - 1);
+          expect(a).to.be.lte(b);
+        }
+        done();
+      });
+      it("Should have a default limit of 10", function(done) {
+        expect(posts.length).to.be.lte(10);
+        done();
+      });
+      it("Should return a specified query limit", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneYear(), limit: limit})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            expect(response.body.posts.length).to.equal(limit);
+            done();
+          })
+      });
     })
+    // end a year //
   });
 });
