@@ -6,6 +6,8 @@ chai.use(chaiHttp);
 
 import {rewind} from "../helpers/timeHelpers.js";
 import {postSearchOptions} from "../controllers/controller_helpers/queryOptions.js";
+import {POST_CON_UPPER, POST_CON_LOWER} from "../controllers/controller_helpers/controllerConstants";
+
 import {seedPosts, likePosts, createControversialPosts} from "./helpers/postHelpers.js";
 import User from "../models/User.js";
 
@@ -418,7 +420,7 @@ describe("Post Query Tests", function() {
       });
     });
     // within a day //
-    describe("{controversial} Post(s) within a day", function() {
+    describe("GET {controversial} Post(s) within a day", function() {
       let posts = [], newPosts = [];
       const limit = 5;
       before("create new not controversial posts",  function(done) {
@@ -454,13 +456,15 @@ describe("Post Query Tests", function() {
       it("Should return Post(s) within 24Hrs", function(done) {
         const oneDayAgo = rewind.goBackOneDay();
         for (const post of posts) {
-          expect(post.createdAt).to.be.gte(oneDayAgo);
+          expect(new Date(post.createdAt)).to.be.gte(oneDayAgo);
         }
         done();
       });
       it("Should return sorted Post(s) by Post.controversyIndex in descending order", function(done) {
         for (let i = 1; i < posts.length; i++) {
-          expect(post[i-1].controversyIndex).to.be.gte(posts[i].controversyIndex);
+          let a = Math.abs(posts[i-1].controversyIndex - 1);
+          let b = Math.abs(posts[i].controversyIndex - 1);
+          expect(a).to.be.lte(b);
         }
         done();
       });
@@ -489,5 +493,68 @@ describe("Post Query Tests", function() {
         done();
       });
     });
+    // done within a day //
+    // within a week //
+    describe("GET {controversial} Posts(s) within a week", function() {
+      it("Should return a Post(s) Array", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneWeek()})
+          .end((error, response) => {
+            if(error) {done(error)};
+            expect(error).to.null;
+            expect(response).to.have.status(200)
+            expect(response.body.posts).to.be.an("array");
+            posts = [...response.body.posts];
+            done();
+          });
+      });
+      it("Should return Post(s) within a week", function(done) {
+        const aWeekAgo = rewind.goBackOneWeek();
+        for (const post of posts) {
+          expect(new Date(post.createdAt)).to.be.gte(aWeekAgo);
+        }
+        done();
+      });
+      it("Should only return Posts which fall within a controversy index", function(done) {
+        for (const post of posts) {
+          let controversyInd = post.controversyIndex;
+          expect(controversyInd).to.satisfy(function(controversyInd) {
+            if((controversyInd >= POST_CON_LOWER) && (controversyInd <= POST_CON_UPPER)) {
+              return true;
+            }
+            else {
+              console.log(controversyInd);
+              return false;
+            }
+          });
+        }
+        done();
+      });
+      it("Should sort the Post(s) by controversy", function(done) {
+        for (let i = 1; i < posts.length; i ++) {
+          let a = Math.abs(posts[i-1].controversyIndex - 1);
+          let b = Math.abs(posts[i].controversyIndex - 1);
+          expect(a).to.be.lte(b);
+        }
+        done();
+      });
+      it("Should have a default limit of 10", function(done) {
+        expect(posts.length).to.be.lte(10);
+        done();
+      });
+      it("Should return a specified query limit", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneDay(), limit: limit})
+          .end((error, response) => {
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            expect(response.body.posts.length).to.equal(limit);
+            done();
+          })
+      });
+    })
   });
 });

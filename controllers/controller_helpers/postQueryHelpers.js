@@ -113,8 +113,8 @@ const getControversialPosts = (options) => {
   const {fromDate, toDate, limit=10} = options;
 
   // our limites for controversy
-  const UPPER_LIMIT = 0.75;
-  const LOWER_LIMIT = 1.25;
+  const LOWER_LIMIT = 0.75;
+  const UPPER_LIMIT = 1.25;
   if (fromDate && toDate) {
     return Post.find(
       {createdAt: {$gte: fromDate, $lte: toDate}, controversyIndex: {$gte: LOWER_LIMIT, $lte: UPPER_LIMIT}},
