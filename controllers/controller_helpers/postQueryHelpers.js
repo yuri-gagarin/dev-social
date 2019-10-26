@@ -1,5 +1,5 @@
 import Post from "../../models/Post.js";
-import { rewind } from "../../helpers/timeHelpers";
+import { rewind, convertTimeQuery } from "../../helpers/timeHelpers";
 import {POST_CON_UPPER, POST_CON_LOWER} from "./controllerConstants";
 
 const getTrendingPosts = (fromDate, toDate) => {
@@ -174,13 +174,14 @@ const getControversialPosts = (options, controversyLimits) => {
  * Creates a post query from Post navbar options.
  * @param {object} queryOptions - Options for the Mongo query.
  * @param {string} queryOptions.filter - A filter constant for the query (default - new).
- * @param {string} queryOptions.toDate - An Upper limit date for Post query.
+ * @param {string} queryOptions.from - An Upper limit date for Post query.
  * @param {string} queryOptions.fromDate - A Lower limit date for Post query. 
  * @returns {Promise} A Post query Promise.
 */
 export const executePostQuery = (params, postSearchOptions) => {
   //some type checking
-  const {filter, fromDate, toDate, limit} = params;
+  const {filter, from, toDate, limit} = params;
+  const fromDate = convertTimeQuery(from);
   switch (filter) {
     case(postSearchOptions.filter.new):
       return getDatedPosts({fromDate: fromDate, limit: limit});

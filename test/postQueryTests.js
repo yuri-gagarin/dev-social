@@ -2,14 +2,14 @@ import chai, {expect} from "chai";
 import chaiHttp from "chai-http";
 import app from "../server.js";
 import seedDB from "./seeds/seedDB.js";
-chai.use(chaiHttp);
 
 import {rewind} from "../helpers/timeHelpers.js";
-import {postSearchOptions} from "../controllers/controller_helpers/queryOptions.js";
-import {POST_CON_UPPER, POST_CON_LOWER} from "../controllers/controller_helpers/controllerConstants";
+import {POST_CON_UPPER, POST_CON_LOWER, POST_QUERY_OPTIONS} from "../controllers/controller_helpers/controllerConstants";
 
 import {seedPosts, likePosts, createControversialPosts} from "./helpers/postHelpers.js";
 import User from "../models/User.js";
+
+chai.use(chaiHttp);
 
 describe("Post Query Tests", function() {
   before("Set up database", function(done) {
@@ -111,7 +111,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.discussed})
+          .query({filter: POST_QUERY_OPTIONS.filter.discussed})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -142,7 +142,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneDay()})
+          .query({filter: POST_QUERY_OPTIONS.filter.discussed, from: POST_QUERY_OPTIONS.time.day})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -169,7 +169,7 @@ describe("Post Query Tests", function() {
       it("Should return a specified query limit", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneDay(), limit: limit})
+          .query({filter: POST_QUERY_OPTIONS.filter.discussed, from: POST_QUERY_OPTIONS.time.day, limit: limit})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -196,7 +196,7 @@ describe("Post Query Tests", function() {
         try {
           const users = await User.find({}).lean();
           //these are posts not dicussed
-          newPosts = await seedPosts(2, users, rewind.withinOneWeek());
+          newPosts = await seedPosts(2, users, rewind.withinOneWeek);
         }
         catch (error) {
           console.error(error);
@@ -205,7 +205,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneWeek()})
+          .query({filter: POST_QUERY_OPTIONS.filter.discussed, from: POST_QUERY_OPTIONS.time.week})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -237,7 +237,7 @@ describe("Post Query Tests", function() {
       it("Should return a specified query limit", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.discussed, createdAt: rewind.goBackOneWeek(), limit: limit})
+          .query({filter: POST_QUERY_OPTIONS.filter.discussed, from: POST_QUERY_OPTIONS.time.week, limit: limit})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -264,7 +264,7 @@ describe("Post Query Tests", function() {
         try {
           const users = await User.find({}).lean();
           //these are posts not dicussed
-          newPosts = await seedPosts(2, users, rewind.withinOneMonth());
+          newPosts = await seedPosts(2, users, rewind.withinOneMonth);
         }
         catch (error) {
           console.error(error);
@@ -273,7 +273,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneMonth()})
+          .query({filter: POST_QUERY_OPTIONS.filter.discussed, from: POST_QUERY_OPTIONS.time.month})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -305,7 +305,7 @@ describe("Post Query Tests", function() {
       it("Should return a specified query limit", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.discussed, createdAt: rewind.goBackOneWeek(), limit: limit})
+          .query({filter: POST_QUERY_OPTIONS.filter.discussed, from: POST_QUERY_OPTIONS.time.month, limit: limit})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -332,7 +332,7 @@ describe("Post Query Tests", function() {
         try {
           const users = await User.find({}).lean();
           //these are posts not dicussed
-          newPosts = await seedPosts(2, users, rewind.withinOneYear());
+          newPosts = await seedPosts(2, users, rewind.withinOneYear);
         }
         catch (error) {
           console.error(error);
@@ -341,7 +341,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app) 
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.discussed, fromDate: rewind.goBackOneYear()})
+          .query({filter: POST_QUERY_OPTIONS.filter.discussed, from: POST_QUERY_OPTIONS.time.year})
           .end((error, response) => {
             if (error) {done(error)};
             expect(error).to.be.null;
@@ -372,7 +372,7 @@ describe("Post Query Tests", function() {
       it("Should return a specified query limit", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.discussed, createdAt: rewind.goBackOneYear(), limit: limit})
+          .query({filter: POST_QUERY_OPTIONS.filter.discussed, from: POST_QUERY_OPTIONS.time.year, limit: limit})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -400,7 +400,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.controversial})
+          .query({filter: POST_QUERY_OPTIONS.filter.controversial})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -444,7 +444,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneDay()})
+          .query({filter: POST_QUERY_OPTIONS.filter.controversial, from: POST_QUERY_OPTIONS.time.day})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -460,7 +460,22 @@ describe("Post Query Tests", function() {
         }
         done();
       });
-      it("Should return sorted Post(s) by Post.controversyIndex in descending order", function(done) {
+      it("Should only return Posts which fall within a controversy index", function(done) {
+        for (const post of posts) {
+          let controversyIndex = post.controversyIndex;
+          expect(controversyIndex).to.satisfy(function(controversyIndex) {
+            if((controversyIndex >= POST_CON_LOWER) && (controversyIndex <= POST_CON_UPPER)) {
+              return true;
+            }
+            else {
+              console.log(controversyIndex);
+              return false;
+            }
+          });
+        }
+        done();
+      });
+      it("Should return sorted Post(s) by Post.controversyIndex in ascending order", function(done) {
         for (let i = 1; i < posts.length; i++) {
           let a = Math.abs(posts[i-1].controversyIndex - 1);
           let b = Math.abs(posts[i].controversyIndex - 1);
@@ -475,7 +490,7 @@ describe("Post Query Tests", function() {
       it("Should return a specified query limit", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneDay(), limit: limit})
+          .query({filter: POST_QUERY_OPTIONS.filter.controversial, from: POST_QUERY_OPTIONS.time.day, limit: limit})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -483,14 +498,6 @@ describe("Post Query Tests", function() {
             expect(response.body.posts.length).to.equal(limit);
             done();
           })
-      });
-      it("Should not include any new not controversial Post(s)", function(done) {
-        for (const post of posts) {
-          for (const newPost of newPosts) {
-            expect(newPost._id.toString()).to.not.equal(post._id.toString());
-          }
-        }
-        done();
       });
     });
     // done within a day //
@@ -501,7 +508,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneWeek()})
+          .query({filter: POST_QUERY_OPTIONS.filter.controversial, from: POST_QUERY_OPTIONS.time.week})
           .end((error, response) => {
             if(error) {done(error)};
             expect(error).to.null;
@@ -520,20 +527,20 @@ describe("Post Query Tests", function() {
       });
       it("Should only return Posts which fall within a controversy index", function(done) {
         for (const post of posts) {
-          let controversyInd = post.controversyIndex;
-          expect(controversyInd).to.satisfy(function(controversyInd) {
-            if((controversyInd >= POST_CON_LOWER) && (controversyInd <= POST_CON_UPPER)) {
+          let controversyIndex = post.controversyIndex;
+          expect(controversyIndex).to.satisfy(function(controversyIndex) {
+            if((controversyIndex >= POST_CON_LOWER) && (controversyIndex <= POST_CON_UPPER)) {
               return true;
             }
             else {
-              console.log(controversyInd);
+              console.log(controversyIndex);
               return false;
             }
           });
         }
         done();
       });
-      it("Should sort the Post(s) by controversy", function(done) {
+      it("Should return sorted Post(s) by Post.controversyIndex in ascending order", function(done) {
         for (let i = 1; i < posts.length; i ++) {
           let a = Math.abs(posts[i-1].controversyIndex - 1);
           let b = Math.abs(posts[i].controversyIndex - 1);
@@ -548,7 +555,7 @@ describe("Post Query Tests", function() {
       it("Should return a specified query limit", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneWeek(), limit: limit})
+          .query({filter: POST_QUERY_OPTIONS.filter.controversial, from: POST_QUERY_OPTIONS.time.week, limit: limit})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -566,7 +573,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneMonth()})
+          .query({filter: POST_QUERY_OPTIONS.filter.controversial, from: POST_QUERY_OPTIONS.time.month})
           .end((error, response) => {
             if(error) {done(error)};
             expect(error).to.be.null;
@@ -613,7 +620,7 @@ describe("Post Query Tests", function() {
       it("Should return a specified query limit", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneMonth(), limit: limit})
+          .query({filter: POST_QUERY_OPTIONS.filter.controversial, from: POST_QUERY_OPTIONS.time.month, limit: limit})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);
@@ -631,7 +638,7 @@ describe("Post Query Tests", function() {
       it("Should return a Post(s) Array", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneYear()})
+          .query({filter: POST_QUERY_OPTIONS.filter.controversial, from: POST_QUERY_OPTIONS.time.year})
           .end((error, response) => {
             if(error) {done(error)};
             expect(error).to.be.null;
@@ -678,7 +685,7 @@ describe("Post Query Tests", function() {
       it("Should return a specified query limit", function(done) {
         chai.request(app)
           .get("/api/posts")
-          .query({filter: postSearchOptions.filter.controversial, fromDate: rewind.goBackOneYear(), limit: limit})
+          .query({filter: POST_QUERY_OPTIONS.filter.controversial, from: POST_QUERY_OPTIONS.time.year, limit: limit})
           .end((error, response) => {
             expect(error).to.be.null;
             expect(response).to.have.status(200);

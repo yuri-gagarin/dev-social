@@ -83,20 +83,25 @@ export const withinTimeConstraint = (from, to) => {
 /**
  * Converts a string time query to a Date.
  * @param {string} timeQuery - A string representing the lower time constraint for the MongoDB query.
- * @param {object} queryOptions - A query options object to compare the passed in time query.
+ * @param {Object} queryOptions - A query options object to compare the passed in time query.
  * @returns {Date} A Date object for the query.
  */
 export const convertTimeQuery = (timeQuery, queryOptions) => {
-  switch (timeQuery) {
-    case(queryOptions.time.day):
-      return rewind.goBackOneDay();
-    case(queryOptions.time.week):
-      return rewind.goBackOneWeek();
-    case (queryOptions.time.month):
-      return rewind.goBackOneMonth();
-    case (queryOptions.time.year):
-      return rewind.goBackOneYear();
-    default:
-      return rewind.goBackOneWeek();
-  } 
+  if(timeQuery && (typeof timeQuery === "string")) {
+    switch (timeQuery.toLowerCase()) {
+      case(queryOptions.time.day):
+        return rewind.goBackOneDay();
+      case(queryOptions.time.week):
+        return rewind.goBackOneWeek();
+      case (queryOptions.time.month):
+        return rewind.goBackOneMonth();
+      case (queryOptions.time.year):
+        return rewind.goBackOneYear();
+      default:
+        return rewind.goBackOneDay();
+    } 
+  }
+  else {
+    return rewind.goBackOneDay();
+  }
 };

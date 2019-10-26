@@ -5,7 +5,8 @@ import Comment from "../models/Comment.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
 import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
 
-import {rewind} from "../helpers/timeHelpers.js";
+import {rewind, convertTimeQuery} from "../helpers/timeHelpers.js";
+import {POST_QUERY_OPTIONS} from "./controller_helpers/controllerConstants";
 
 
 //some indexting ideas for schema 
@@ -53,20 +54,15 @@ export default {
       });
   },
   index: (req, res) => {
-    let {fromDate, toDate, filter, limit} = req.query
+    let {from, toDate, filter, limit} = req.query
     //check for null required values
     //maybe remove to a separate function
-    if (!fromDate) {
-      fromDate = rewind.goBackOneMonth();
-    }
-    else {
-      fromDate = new Date(fromDate);
-    }
+    let fromDate = convertTimeQuery(from, POST_QUERY_OPTIONS);
     if (filter && typeof filter === 'string') {
       filter = filter.toLowerCase();
     } 
     else {
-      filter = postSearchOptions.filter.new;
+      filter = POST_QUERY_OPTIONS.filter.new;
     }
     if (limit) {
       limit = parseInt(limit, 10);

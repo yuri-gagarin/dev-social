@@ -6,10 +6,10 @@ export const postSearchOptions = {
     discussed: "discussed",
   },
   time: {
-    day: "24 Hours",
-    week: "7 Days",
-    month: "30 Days",
-    allTime: "All Time",
+    day: "day",
+    week: "week",
+    month: "month",
+    allTime: "all",
     none: "---",
   },
 }
