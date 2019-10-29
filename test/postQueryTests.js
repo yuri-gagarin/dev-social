@@ -4,7 +4,9 @@ import app from "../server.js";
 import seedDB from "./seeds/seedDB.js";
 
 import {rewind} from "../helpers/timeHelpers.js";
-import {POST_CON_UPPER, POST_CON_LOWER, POST_QUERY_OPTIONS} from "../controllers/controller_helpers/controllerConstants";
+import {POST_CON_UPPER, POST_CON_LOWER, POST_QUERY_OPTIONS,
+        TREND_POST_COMMENT_MIN, TREND_POST_LIKE_MIN, 
+        TREND_POST_LIKE_RATIO} from "../controllers/controller_helpers/controllerConstants";
 
 import {seedPosts, likePosts, createControversialPosts} from "./helpers/postHelpers.js";
 import User from "../models/User.js";
@@ -225,7 +227,7 @@ describe("Post Query Tests", function() {
       it("Should return sorted Post(s) by number of Comment(s) in descending order", function(done) {
         for(let i = 0; i < posts.length; i++) {
           if(posts[i]-1) {
-            expect(posts[i-1].commentsCount).to.be.gte(posts[i].commentsCount);
+            expect(posts[i-1].commentCount).to.be.gte(posts[i].commentCount);
           }
         }
         done();
@@ -293,7 +295,7 @@ describe("Post Query Tests", function() {
       it("Should return sorted Post(s) by number of Comment(s) in descending order", function(done) {
         for(let i = 0; i < posts.length; i++) {
           if(posts[i]-1) {
-            expect(posts[i-1].commentsCount).to.be.gte(posts[i].commentsCount);
+            expect(posts[i-1].commentCount).to.be.gte(posts[i].commentCount);
           }
         }
         done();
@@ -697,4 +699,52 @@ describe("Post Query Tests", function() {
     })
     // end a year //
   });
+  // end {controversial} Post(s) tests //
+  // {trending} Post(s) Tests //
+  describe("GET {trending} Post(s)", function() {
+    // Post(s) where there are at least a certain number of likes, comments and a positive like ratio
+    let posts = [];
+    describe("General GET request for trendint Post(s)", function() {
+      it("Should return a Post(s) array", function(done) {
+        chai.request(app)
+          .get("/api/posts")
+          .query({})
+          .end((error, response) => {
+            if(error) {done(error)};
+            expect(error).to.be.null;
+            expect(response).to.have.status(200);
+            expect(response.body.posts).to.be.an("array");
+            posts = [...posts];
+            done();
+          })
+      });
+      it("Should return Post(s) with a minimum amount of comments", function(done) {
+        for (const post of posts) {
+          expect(post.commentCount).to.be.gte(TREND_POST_COMMENT_MIN);
+        }
+        done();
+      });
+      it("Should return Post(s) with a minimum amount of Likes", function(done) {
+        for(const post of posts) {
+          expect(post.likeCount).to.be.gte(TREND_POST_LIKE_MIN);
+        }
+        done();
+      });
+      it("Should return Post(s) with a low controversy index", function(done) {
+        for(const post of posts) {
+          expect(post.controversyIndex).to.be.gte(TREND_POST_LIKE_RATIO);
+        }
+        done();
+      });
+      //Post(s) should be newer
+      it("Should return Post(s) after a certain date", function(done) {
+        const MIN_DATE = rewind.goBackOneWeek();
+        for(const post of posts) {
+          expect(new Date(post.createdAt)).to.be.gte(MIN_DATE);
+        }
+        done();
+      });
+    });
+  });
+  // end {trending} Post(s) tests //
 });
