@@ -1,0 +1,182 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostNavbar test Component renders 1`] = `
+<div
+  className="ui postsNavbar menu"
+  style={
+    Object {
+      "marginTop": "50px",
+      "width": "100vw",
+    }
+  }
+>
+  <div
+    aria-expanded={false}
+    className="ui button floating labeled pointing dropdown sortPostsDropdown"
+    onBlur={[Function]}
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onMouseDown={[Function]}
+    role="listbox"
+    tabIndex={0}
+  >
+    <div
+      aria-atomic={true}
+      aria-live="polite"
+      className="text"
+      role="alert"
+    >
+      Filter Posts
+    </div>
+    <i
+      aria-hidden="true"
+      className="caret square down icon"
+      onClick={[Function]}
+    />
+    <div
+      className="menu transition menuDropdown"
+      style={
+        Object {
+          "margin": "0em !important",
+        }
+      }
+    >
+      <div
+        className="header"
+      >
+        <i
+          aria-hidden="true"
+          className="filter icon"
+          onClick={[Function]}
+        />
+        Filter by type
+      </div>
+      <div
+        className="divider"
+      />
+      <div
+        className="item"
+        onClick={[Function]}
+        role="option"
+      >
+        <i
+          aria-hidden="true"
+          className="bullhorn icon right floated"
+          onClick={[Function]}
+        />
+        New
+      </div>
+      <div
+        className="item"
+        onClick={[Function]}
+        role="option"
+      >
+        <i
+          aria-hidden="true"
+          className="heartbeat icon right floated"
+          onClick={[Function]}
+        />
+        Trending
+      </div>
+      <div
+        className="item"
+        onClick={[Function]}
+        role="option"
+      >
+        <i
+          aria-hidden="true"
+          className="fire icon right floated"
+          onClick={[Function]}
+        />
+        Heated
+      </div>
+      <div
+        className="item"
+        onClick={[Function]}
+        role="option"
+      >
+        <i
+          aria-hidden="true"
+          className="conversation icon right floated"
+          onClick={[Function]}
+        />
+        Discussed
+      </div>
+    </div>
+  </div>
+  <div
+    className="sortValue"
+  >
+    New
+  </div>
+  <div
+    aria-expanded={false}
+    className="ui button floating labeled pointing dropdown sortPostsTime"
+    onBlur={[Function]}
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onMouseDown={[Function]}
+    role="listbox"
+    tabIndex={0}
+  >
+    <div
+      aria-atomic={true}
+      aria-live="polite"
+      className="text"
+      role="alert"
+    >
+      Time
+    </div>
+    <i
+      aria-hidden="true"
+      className="time icon"
+      onClick={[Function]}
+    />
+    <div
+      className="menu transition"
+    >
+      <div
+        className="header"
+      >
+        Filter Time
+      </div>
+      <div
+        className="divider"
+      />
+      <div
+        className="item"
+        onClick={[Function]}
+        role="option"
+      >
+        24 Hours
+      </div>
+      <div
+        className="item"
+        onClick={[Function]}
+        role="option"
+      >
+        7 Days
+      </div>
+      <div
+        className="item"
+        onClick={[Function]}
+        role="option"
+      >
+        30 Days
+      </div>
+      <div
+        className="item"
+        onClick={[Function]}
+        role="option"
+      >
+        All Time
+      </div>
+    </div>
+  </div>
+  <div
+    className="sortValue"
+  />
+</div>
+`;

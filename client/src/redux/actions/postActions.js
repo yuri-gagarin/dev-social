@@ -38,6 +38,7 @@ export const fetchPosts = (options={}) => {
     });
   }
 };
+//seccess response here
 
 export const fetchTrendingPosts = () => {
   return function(dispatch) {
