@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {postSearchOptions  as options} from "../../../redux/searchOptions.js";
+import {postSearchOptions as options} from "../../../redux/searchOptions.js";
 import { Menu, Dropdown, Icon } from "semantic-ui-react";
 import {rewind, convertTimeQuery} from "../../../helpers/time_helpers/timeHelpers.js";
 import styles from "../../../assets/stylesheets/posts/post.scss";
@@ -10,7 +10,7 @@ class PostsNavbar extends Component {
     super(props);
     this.state = {
       filter: options.filter.new,
-      fromDate: options.time.day,
+      from: options.time.day,
       filterBarDisabled: false,
       timeBarDisabled: true,
     }
@@ -18,23 +18,31 @@ class PostsNavbar extends Component {
 
   handleSortClick = (e, {value}) => {
     if(value === options.filter.new) {
-      this.setState({filter: value, fromDate: options.time.none, timeBarDisabled: true}, () => {
-        const fromDate = convertTimeQuery(this.state.fromDate, options);
+      this.setState({filter: value, from: options.time.none, timeBarDisabled: true}, () => {
         const fetchOptions = {
           filter: this.state.filter,
-          fromDate: fromDate,
-          limit: this.state.limit || 10,
+          from: fromDate,
+          limit: this.state.limit,
         };
         this.props.fetchPosts(fetchOptions)
       });
     }
-    else {
-      this.setState({filter: value, timeDisabled: false}, () => {
-        const fromDate = convertTimeQuery(this.state.fromDate, options).toString();
+    else if(value === options.filter.trending) {
+      this.setState({filter: value, from: options.time.none, timeBarDisabled: true}, () => {
         const fetchOptions = {
           filter: this.state.filter,
-          fromDate: fromDate,
-          limit: this.state.limit || 10,
+          from: null,
+          limit: this.state.limit,
+        };
+        this.props.fetchPosts(fetchOptions);
+      })
+    }
+    else {
+      this.setState({filter: options.filter.new, timeDisabled: true}, () => {
+        const fetchOptions = {
+          filter: this.state.filter,
+          from: postSearchOptions.time.day,
+          limit: this.state.limit,
         };
         this.props.fetchPosts(fetchOptions);
       });
@@ -42,14 +50,12 @@ class PostsNavbar extends Component {
   }
 
   handleTimeClick = (e, {value}) => {
-    console.log(value)
-    this.setState({fromDate: value} , () => {
+    this.setState({from: value} , () => {
       //convert the time filter
-      const fromDate = convertTimeQuery(this.state.fromDate, options).toString();
       const fetchOptions = {
         filter: this.state.filter,
-        fromDate: fromDate,
-        limit: this.state.limit || 10,
+        from: from,
+        limit: this.state.limit,
       };
       this.props.fetchPosts(fetchOptions);
     });

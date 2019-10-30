@@ -5,7 +5,7 @@ import {postSearchOptions} from "../searchOptions.js";
 
 export const fetchPosts = (options={}) => {
   const params = {
-    fromDate: options.fromDate || null,
+    from: options.from || null,
     toDate: options.toDate || null,
     filter: options.filter || postSearchOptions.filter.new,
     limit: options.limit || 10,
