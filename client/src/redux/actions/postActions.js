@@ -1,7 +1,27 @@
-import {FETCH_POSTS,FETCH_TRENDING_POSTS, LIKE_POST, UNLIKE_POST, LIST_ERRORS} from "../cases.js";
+import {FETCH_POSTS, FETCH_POSTS_REQUEST, FETCH_POSTS_SUCCESS, FETCH_TRENDING_POSTS, LIKE_POST, UNLIKE_POST, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_FAILURE} from "../cases.js";
 import {trimString} from "../../helpers/rendering/displayHelpers.js";
 import axios from "axios";
 import {postSearchOptions} from "../searchOptions.js";
+
+
+export const postsRequest = () => {
+  return {
+    type: POSTS_REQUEST,
+    payload: null,
+  };
+};
+export const postsSuccess = (data) => {
+  return {
+    type: POSTS_SUCCESS,
+    payload: data,
+  };
+};
+export const postsFailure = (error) => {
+  return {
+    type: POSTS_FAILURE,
+    payload: error,
+  };
+};
 
 export const fetchPosts = (options={}) => {
   const params = {
@@ -12,7 +32,8 @@ export const fetchPosts = (options={}) => {
   };
 
   return function(dispatch) {
-    axios({
+    dispatch(postsRequest);
+    return axios({
       method: "get",
       url: `/api/posts`,
       params: {...params},
@@ -25,20 +46,14 @@ export const fetchPosts = (options={}) => {
         message: response.data.message,
         posts: posts,
       };
-      dispatch({
-        type: FETCH_POSTS,
-        payload: postState,
-      });
+      return dispatch(postsSuccess(postState));
     })
     .catch((error) => {
-      dispatch({
-        type: LIST_ERRORS,
-        payload: error,
-      })
+      return dispatch(postsFailure(error));
     });
   }
 };
-//seccess response here
+
 
 export const fetchTrendingPosts = () => {
   return function(dispatch) {
