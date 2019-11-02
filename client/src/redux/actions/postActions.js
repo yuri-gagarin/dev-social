@@ -39,12 +39,9 @@ export const fetchPosts = (options={}) => {
       params: {...params},
     })
     .then((response) => {
-      const posts = response.data.posts.map((post) => {
-        return {...post, text: trimString(post.text, 100)};
-      });
       const postState = {
         message: response.data.message,
-        posts: posts,
+        posts: response.data.posts,
       };
       return dispatch(postsSuccess(postState));
     })

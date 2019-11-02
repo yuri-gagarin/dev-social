@@ -25,27 +25,54 @@ describe("Post Navbar Tests", () => {
     for (let i = 0; i < 5; i++) {
       posts.push(generatePost())
     }
+    const payload = {
+      message: "success",
+      posts: [...posts],
+    }
     moxios.wait(() => {
       let request = moxios.requests.mostRecent();
       request.respondWith({
         status: 200,
-        response: {
-          message: "success",
-          posts: [...posts],
-        }
+        response: payload,
       });
     });
 
-    const expectedTypes = [
+    const expectedActions = [
       {type: types.FETCH_POSTS},
+      {type: types.POSTS_SUCCESS},
     ];
 
-    const store = mockStore({posts: []});
+    const store = mockStore({postsState: []});
 
     return store.dispatch(actions.fetchPosts())
       .then(() => {
-        console.log(store.getActions());
-      })
+        expect(store.getActions()).toEqual(expectedActions);
+      });
 
+  })
+
+  it("throws an error when the request fails", () => {
+    const data = {
+      message: "Error",
+      error: new Error("Something went wrong")
+    };
+
+    moxios.wait(() => {
+      let request = mocies.requests.mostRecent();
+      request.respondWith({
+        status: 500,
+        response: data,
+      });
+
+      const expectedActions = [
+        {type: types.FETCH_POSTS},
+        {type: types.POSTS_FAILURE, payload: data},
+      ];
+      const store = mockStore({postsState: []});
+      return store.dispatch(actions.fetchPosts())
+        .then(() => {
+          expect(store.getActions()).toEqual(expectedActions);
+        });
+    });
   })
 });
