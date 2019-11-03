@@ -1,4 +1,4 @@
-import {FETCH_POSTS, FETCH_POSTS_REQUEST, FETCH_POSTS_SUCCESS, FETCH_TRENDING_POSTS, LIKE_POST, UNLIKE_POST, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_FAILURE} from "../cases.js";
+import {FETCH_TRENDING_POSTS, LIKE_POST, UNLIKE_POST, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_FAILURE} from "../cases.js";
 import {trimString} from "../../helpers/rendering/displayHelpers.js";
 import axios from "axios";
 import {postSearchOptions} from "../searchOptions.js";
@@ -7,7 +7,9 @@ import {postSearchOptions} from "../searchOptions.js";
 export const postsRequest = () => {
   return {
     type: POSTS_REQUEST,
-    payload: null,
+    payload: {
+      message: "Loading",
+    }
   };
 };
 export const postsSuccess = (data) => {
@@ -19,7 +21,10 @@ export const postsSuccess = (data) => {
 export const postsFailure = (error) => {
   return {
     type: POSTS_FAILURE,
-    payload: error,
+    payload: {
+      message: error.message,
+      error: error,
+    }
   };
 };
 
@@ -32,7 +37,7 @@ export const fetchPosts = (options={}) => {
   };
 
   return function(dispatch) {
-    dispatch(postsRequest);
+    dispatch(postsRequest());
     return axios({
       method: "get",
       url: `/api/posts`,

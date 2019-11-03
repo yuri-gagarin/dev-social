@@ -25,7 +25,8 @@ describe("Post Navbar Tests", () => {
     for (let i = 0; i < 5; i++) {
       posts.push(generatePost())
     }
-    const payload = {
+    const fetchRequest = actions.postsRequest();
+    const response = {
       message: "success",
       posts: [...posts],
     }
@@ -33,13 +34,13 @@ describe("Post Navbar Tests", () => {
       let request = moxios.requests.mostRecent();
       request.respondWith({
         status: 200,
-        response: payload,
+        response: response,
       });
     });
 
     const expectedActions = [
-      {type: types.FETCH_POSTS},
-      {type: types.POSTS_SUCCESS},
+      {type: types.POSTS_REQUEST, payload: fetchRequest.payload},
+      {type: types.POSTS_SUCCESS, payload: response},
     ];
 
     const store = mockStore({postsState: []});
@@ -52,27 +53,30 @@ describe("Post Navbar Tests", () => {
   })
 
   it("throws an error when the request fails", () => {
-    const data = {
-      message: "Error",
-      error: new Error("Something went wrong")
+
+    const API_Error = new Error("Something went wrong");
+    const errorResponse = {
+      message: API_Error.message,
+      error: API_Error,
     };
-
     moxios.wait(() => {
-      let request = mocies.requests.mostRecent();
-      request.respondWith({
-        status: 500,
-        response: data,
-      });
-
-      const expectedActions = [
-        {type: types.FETCH_POSTS},
-        {type: types.POSTS_FAILURE, payload: data},
-      ];
-      const store = mockStore({postsState: []});
-      return store.dispatch(actions.fetchPosts())
-        .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
-        });
+      let request = moxios.requests.mostRecent();
+      request.reject(API_Error)
     });
-  })
+    const {payload} = actions.postsRequest();
+
+    const expectedActions = [
+      {type: types.POSTS_REQUEST, payload: payload},
+      {type: types.POSTS_FAILURE, payload: errorResponse},
+    ];
+    const store = mockStore({postsState: []});
+    return store.dispatch(actions.fetchPosts())
+      .then(() => {
+        console.log("Actual")
+        console.log(store.getActions())
+        console.log("Expected")
+        console.log(expectedActions);
+        expect(store.getActions()).toEqual(expectedActions);
+      })
+  });
 });
