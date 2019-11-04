@@ -20,7 +20,7 @@ describe("Post Navbar Tests", () => {
     moxios.uninstall();
   });
 
-  it("successfully creates post store", () => {
+  it("successfuly fetches some posts", () => {
     const posts = [];
     for (let i = 0; i < 5; i++) {
       posts.push(generatePost())
@@ -38,9 +38,14 @@ describe("Post Navbar Tests", () => {
       });
     });
 
+    const payload = {
+      ...response,
+      loading: false,
+    }
+
     const expectedActions = [
       {type: types.POSTS_REQUEST, payload: fetchRequest.payload},
-      {type: types.POSTS_SUCCESS, payload: response},
+      {type: types.POSTS_SUCCESS, payload: payload},
     ];
 
     const store = mockStore({postsState: []});
@@ -58,6 +63,7 @@ describe("Post Navbar Tests", () => {
     const errorResponse = {
       message: API_Error.message,
       error: API_Error,
+      loading: false,
     };
     moxios.wait(() => {
       let request = moxios.requests.mostRecent();
@@ -67,7 +73,7 @@ describe("Post Navbar Tests", () => {
 
     const expectedActions = [
       {type: types.POSTS_REQUEST, payload: payload},
-      {type: types.POSTS_FAILURE, payload: errorResponse},
+      {type: types.POSTS_ERROR, payload: errorResponse},
     ];
     const store = mockStore({postsState: []});
     return store.dispatch(actions.fetchPosts())
