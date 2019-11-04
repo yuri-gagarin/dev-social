@@ -72,10 +72,6 @@ describe("Post Navbar Tests", () => {
     const store = mockStore({postsState: []});
     return store.dispatch(actions.fetchPosts())
       .then(() => {
-        console.log("Actual")
-        console.log(store.getActions())
-        console.log("Expected")
-        console.log(expectedActions);
         expect(store.getActions()).toEqual(expectedActions);
       })
   });

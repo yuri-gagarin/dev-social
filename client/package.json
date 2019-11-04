@@ -7,7 +7,7 @@
     "start": "webpack-dev-server --mode development --hot",
     "develop": "webpack --mode development --watch",
     "build": "NODE_ENV=production webpack --mode production",
-    "test": "jest",
+    "test": "jest --verbose",
     "test:watch": "npm test -- --watch"
   },
   "jest": {
