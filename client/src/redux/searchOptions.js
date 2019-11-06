@@ -11,7 +11,7 @@ export const postSearchOptions = {
     month: "month",
     year: "year",
     allTime: "all",
-    none: "---",
+    none: "",
   },
 };
 

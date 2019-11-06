@@ -22,7 +22,7 @@ class PostsNavbar extends Component {
       this.setState({filter: value, from: options.time.none, timeBarDisabled: true}, () => {
         const fetchOptions = {
           filter: this.state.filter,
-          from: fromDate,
+          from: this.state.time,
           limit: this.state.limit,
         };
         this.props.fetchPosts(fetchOptions)
@@ -32,27 +32,27 @@ class PostsNavbar extends Component {
       this.setState({filter: value, from: options.time.none, timeBarDisabled: true}, () => {
         const fetchOptions = {
           filter: this.state.filter,
-          from: null,
+          from: this.state.time,
           limit: this.state.limit,
         };
         this.props.fetchPosts(fetchOptions);
       });
     }
     else if(value === options.filter.controversial) {
-      this.setState({filter: options.filter.controversial, timeBarDisabled: false},  () => {
+      this.setState({filter: options.filter.controversial, from: options.time.day, timeBarDisabled: false},  () => {
         const fetchOptions = {
           filter: this.state.filter,
-          from: options.time.day,
+          from: this.state.time,
           limit: this.state.limit,
         };
         this.props.fetchPosts(fetchOptions);
       });
     }
     else if(value === options.filter.discussed) {
-      this.setState({filter: options.filter.discussed, timeBarDisabled: false}, () => {
+      this.setState({filter: options.filter.discussed, from: options.time.day, timeBarDisabled: false}, () => {
         const fetchOptions = {
           fitler: this.state.filter,
-          from: options.time.day,
+          from: this.state.time,
           limit: this.state.limit,
         };
         this.props.fetchPosts(fetchOptions);

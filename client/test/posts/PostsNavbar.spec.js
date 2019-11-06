@@ -7,7 +7,9 @@ import { postSearchOptions } from "../../src/redux/searchOptions";
 
 describe("PostNavbar Tests", function() {
   const mockFetchPosts = (options) => {
-    console.log("fetching posts");
+    return {
+      posts: "some posts"
+    }
   };
   const authState = {
     loggedIn: true,
@@ -45,10 +47,38 @@ describe("PostNavbar Tests", function() {
     const filterDropdown = wrapper.find(`[data-test="nav-filter"]`);
     const filterOptions = filterDropdown.find(".item");
     filterOptions.forEach((node) => {
-      console.log(node.prop('data-value'));
+      //console.log(node.prop('data-value'));
       node.simulate('click');
-      console.log(wrapper.state());
-    })
-  })
+      expect(wrapper.state().filter).toEqual(node.prop("data-value"));
+      //console.log(wrapper.state().filter);
+    });
+  });
+
+  it("does not activate the time filter option if fetching {new} || {trending}", () => {
+    const wrapper = mount(<PostsNavbar fetchPosts={mockFetchPosts} />);
+    const filterDropdown = wrapper.find(`[data-test="nav-filter"]`);
+    const filterOptions = filterDropdown.find(".item");
+    filterOptions.forEach((node) => {
+      const clickValue = node.prop("data-value");
+      node.simulate("click");
+      if(clickValue === postSearchOptions.filter.new || clickValue === postSearchOptions.filter.trending) {
+        expect(wrapper.state().timeBarDisabled).toEqual(true);
+        expect(wrapper.state().from).toEqual(postSearchOptions.time.none);
+      }
+    });
+  });
+  it("activates the time filter option if fetching (discussed} || {controversial}", () => {
+    const wrapper = mount(<PostsNavbar fetchPosts={mockFetchPosts} />);
+    const filterDropdown = wrapper.find(`[dta-test="nav-filter"]`);
+    const filterOptions = filterDropdown.find(".item");
+    filterOptions.forEach((node) => {
+      const clickValue = node.prop("data-value");
+      node.simulate("click");
+      if(clickValue === postSearchOptions.filter.discussed || clickValue === postSearchOptions.filter.controversial) {
+        expect(wrapper.state().timeBarDisabled).toEqual(false);
+        expect(wrapper.state().from).toEqual(postSearchOptions.time.day);
+      }
+    });
+  });
 
 })
