@@ -5,32 +5,35 @@ import { shallow, mount } from "enzyme";
 import { Menu, Dropdown } from "semantic-ui-react";
 import { postSearchOptions } from "../../src/redux/searchOptions";
 
-describe("PostNavbar test", function() {
+describe("PostNavbar Tests", function() {
+  const mockFetchPosts = (options) => {
+    console.log("fetching posts");
+  };
+  const authState = {
+    loggedIn: true,
+  };
   const component = renderer.create(<PostsNavbar/>);
   let tree = component.toJSON();
   test("Component renders", () => {
    // expect(tree).toMatchSnapshot();
   });
   it("renders the component", () => {
-    const wrapper = shallow(<PostsNavbar />);
+    const wrapper = shallow(<PostsNavbar fetchPosts={mockFetchPosts}/>);
   });
   it("has a Menu component", () => {
-    const wrapper = mount(<PostsNavbar />);
+    const wrapper = mount(<PostsNavbar fetchPosts={mockFetchPosts}/>);
     expect(wrapper.find(Menu).length).toEqual(1)
   });
   it("has two Dropdown components", () => {
-    const wrapper = mount(<PostsNavbar />);
+    const wrapper = mount(<PostsNavbar fetchPosts={mockFetchPosts}/>);
     expect(wrapper.find(Dropdown).length).toEqual(2);
   });
   it("Accepts an {authState} props object", () => {
-    const authState = {
-      loggedIn: true,
-    };
-    const wrapper = mount(<PostsNavbar  authState={authState}/>)
+    const wrapper = mount(<PostsNavbar  authState={authState} fetchPosts={mockFetchPosts}/>)
     expect(wrapper.props().authState).toEqual(authState);
   });
   it("sets the default state", () => {
-    const wrapper = mount(<PostsNavbar />);
+    const wrapper = mount(<PostsNavbar fetchPosts={mockFetchPosts}/>);
     expect(wrapper.state().filter).toEqual(postSearchOptions.filter.new);
     expect(wrapper.state().from).toEqual(postSearchOptions.time.day);
     expect(wrapper.state().filterBarDisabled).toEqual(false);
@@ -38,13 +41,13 @@ describe("PostNavbar test", function() {
   });
 
   it("successfully changes filter state", () => {
-    const wrapper = mount(<PostsNavbar />);
+    const wrapper = mount(<PostsNavbar fetchPosts={mockFetchPosts}/>);
     const filterDropdown = wrapper.find(`[data-test="nav-filter"]`);
     const filterOptions = filterDropdown.find(".item");
     filterOptions.forEach((node) => {
-      console.log(45)
-      console.log(node);
-      console.log(node.html());
+      console.log(node.prop('data-value'));
+      node.simulate('click');
+      console.log(wrapper.state());
     })
   })
 

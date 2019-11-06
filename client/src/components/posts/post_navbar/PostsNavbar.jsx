@@ -16,7 +16,8 @@ class PostsNavbar extends Component {
     }
   }
 
-  handleSortClick = (e, {value}) => {
+  handleSortClick = (e) => {
+    const value = e.target.getAttribute("data-value");
     if(value === options.filter.new) {
       this.setState({filter: value, from: options.time.none, timeBarDisabled: true}, () => {
         const fetchOptions = {
@@ -35,13 +36,33 @@ class PostsNavbar extends Component {
           limit: this.state.limit,
         };
         this.props.fetchPosts(fetchOptions);
-      })
+      });
     }
-    else {
-      this.setState({filter: options.filter.new, timeDisabled: true}, () => {
+    else if(value === options.filter.controversial) {
+      this.setState({filter: options.filter.controversial, timeBarDisabled: false},  () => {
         const fetchOptions = {
           filter: this.state.filter,
-          from: postSearchOptions.time.day,
+          from: options.time.day,
+          limit: this.state.limit,
+        };
+        this.props.fetchPosts(fetchOptions);
+      });
+    }
+    else if(value === options.filter.discussed) {
+      this.setState({filter: options.filter.discussed, timeBarDisabled: false}, () => {
+        const fetchOptions = {
+          fitler: this.state.filter,
+          from: options.time.day,
+          limit: this.state.limit,
+        };
+        this.props.fetchPosts(fetchOptions);
+      });
+    }
+    else {
+      this.setState({filter: options.filter.new, timeBarDisabled: true}, () => {
+        const fetchOptions = {
+          filter: this.state.filter,
+          from: options.time.day,
           limit: this.state.limit,
         };
         this.props.fetchPosts(fetchOptions);
@@ -74,19 +95,19 @@ class PostsNavbar extends Component {
           <Dropdown.Menu className={styles.menuDropdown} style={{margin: "0em !important"}} data-test="nav-filter">
             <Dropdown.Header icon='filter' content='Filter by type' />
             <Dropdown.Divider />
-            <Dropdown.Item onClick={this.handleSortClick} value={options.filter.new}>
+            <Dropdown.Item onClick={this.handleSortClick} data-value={options.filter.new}>
               <Icon name="bullhorn" className="right floated" />
               {options.filter.new}
             </Dropdown.Item>
-            <Dropdown.Item onClick={this.handleSortClick} value={options.filter.trending}>
+            <Dropdown.Item onClick={this.handleSortClick} data-value={options.filter.trending}>
               <Icon name='heartbeat' className='right floated' />
               {options.filter.trending}
             </Dropdown.Item>
-            <Dropdown.Item onClick={this.handleSortClick} value={options.filter.controversial}>
+            <Dropdown.Item onClick={this.handleSortClick} data-value={options.filter.controversial}>
               <Icon name='fire' className='right floated' />
               {options.filter.heated}
             </Dropdown.Item>
-            <Dropdown.Item onClick={this.handleSortClick} value={options.filter.discussed}>
+            <Dropdown.Item onClick={this.handleSortClick} data-value={options.filter.discussed}>
               <Icon name='conversation' className='right floated' />
               {options.filter.discussed}
             </Dropdown.Item>
@@ -126,6 +147,7 @@ class PostsNavbar extends Component {
 
 PostsNavbar.propTypes = {
   authstate: PropTypes.object,
+  fetchPosts: PropTypes.func.isRequired,
 };
 
 export default PostsNavbar;
