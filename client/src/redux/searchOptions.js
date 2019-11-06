@@ -1,15 +1,17 @@
 export const postSearchOptions = {
   filter: {
-    new: "New",
-    trending: "Trending",
-    heated: "Heated",
-    discussed: "Discussed",
+    new: "new",
+    trending: "trending",
+    controversial: "controversial",
+    discussed: "discussed",
   },
   time: {
-    day: "24 Hours",
-    week: "7 Days",
-    month: "30 Days",
-    allTime: "All Time",
+    day: "day",
+    week: "week",
+    month: "month",
+    year: "year",
+    allTime: "all",
     none: "---",
   },
-}
+};
+

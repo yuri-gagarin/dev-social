@@ -64,14 +64,14 @@ class PostsNavbar extends Component {
   render() {
     return (
       <Menu className={styles.postsNavbar} style={{marginTop: "50px", width: "100vw"}}>
-        <Dropdown className={styles.sortPostsDropdown}
+        <Dropdown className={styles.sortPostsDropdown} 
           text="Filter Posts"
           icon="caret square down"
           pointing
           floating
           labeled
           button >
-          <Dropdown.Menu className={styles.menuDropdown} style={{margin: "0em !important"}}>
+          <Dropdown.Menu className={styles.menuDropdown} style={{margin: "0em !important"}} data-test="nav-filter">
             <Dropdown.Header icon='filter' content='Filter by type' />
             <Dropdown.Divider />
             <Dropdown.Item onClick={this.handleSortClick} value={options.filter.new}>
@@ -82,7 +82,7 @@ class PostsNavbar extends Component {
               <Icon name='heartbeat' className='right floated' />
               {options.filter.trending}
             </Dropdown.Item>
-            <Dropdown.Item onClick={this.handleSortClick} value={options.filter.heated}>
+            <Dropdown.Item onClick={this.handleSortClick} value={options.filter.controversial}>
               <Icon name='fire' className='right floated' />
               {options.filter.heated}
             </Dropdown.Item>
@@ -93,7 +93,7 @@ class PostsNavbar extends Component {
           </Dropdown.Menu>
         </Dropdown>
         <div className={styles.sortValue}>{this.state.filter}</div>
-        <Dropdown className={styles.sortPostsTime}
+        <Dropdown className={styles.sortPostsTime} data-test="nav-test-time"
           text="Time"
           icon="time"
           pointing
@@ -125,7 +125,7 @@ class PostsNavbar extends Component {
 };
 
 PostsNavbar.propTypes = {
-  fetchPosts: PropTypes.func.isRequired,
+  authstate: PropTypes.object,
 };
 
 export default PostsNavbar;
