@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {postSearchOptions as options} from "../../../redux/searchOptions.js";
 import { Menu, Dropdown, Icon } from "semantic-ui-react";
-import {rewind, convertTimeQuery} from "../../../helpers/time_helpers/timeHelpers.js";
 import styles from "../../../assets/stylesheets/posts/post.scss";
 
 class PostsNavbar extends Component {
@@ -11,62 +10,63 @@ class PostsNavbar extends Component {
     this.state = {
       filter: options.filter.new,
       from: options.time.day,
-      filterBarDisabled: false,
-      timeBarDisabled: true,
+      filterBarEnabled: true,
+      timeBarEnabled: false,
     }
   }
 
   handleSortClick = (e) => {
     const value = e.target.getAttribute("data-value");
-    if(value === options.filter.new) {
-      this.setState({filter: value, from: options.time.none, timeBarDisabled: true}, () => {
-        const fetchOptions = {
-          filter: this.state.filter,
-          from: this.state.time,
-          limit: this.state.limit,
-        };
-        this.props.fetchPosts(fetchOptions)
-      });
-    }
-    else if(value === options.filter.trending) {
-      this.setState({filter: value, from: options.time.none, timeBarDisabled: true}, () => {
-        const fetchOptions = {
-          filter: this.state.filter,
-          from: this.state.time,
-          limit: this.state.limit,
-        };
-        this.props.fetchPosts(fetchOptions);
-      });
-    }
-    else if(value === options.filter.controversial) {
-      this.setState({filter: options.filter.controversial, from: options.time.day, timeBarDisabled: false},  () => {
-        const fetchOptions = {
-          filter: this.state.filter,
-          from: this.state.time,
-          limit: this.state.limit,
-        };
-        this.props.fetchPosts(fetchOptions);
-      });
-    }
-    else if(value === options.filter.discussed) {
-      this.setState({filter: options.filter.discussed, from: options.time.day, timeBarDisabled: false}, () => {
-        const fetchOptions = {
-          fitler: this.state.filter,
-          from: this.state.time,
-          limit: this.state.limit,
-        };
-        this.props.fetchPosts(fetchOptions);
-      });
-    }
-    else {
-      this.setState({filter: options.filter.new, timeBarDisabled: true}, () => {
-        const fetchOptions = {
-          filter: this.state.filter,
-          from: options.time.day,
-          limit: this.state.limit,
-        };
-        this.props.fetchPosts(fetchOptions);
-      });
+    switch (value) {
+      case options.filter.new:
+        this.setState({filter: value, from: options.time.none, timeBarEnabled: false}, () => {
+          const fetchOptions = {
+            filter: this.state.filter,
+            from: this.state.time,
+            limit: this.state.limit,
+          };
+          this.props.fetchPosts(fetchOptions)
+        });
+        break;
+      case options.filter.trending:
+        this.setState({filter: value, from: options.time.none, timeBarEnabled: false}, () => {
+          const fetchOptions = {
+            filter: this.state.filter,
+            from: this.state.time,
+            limit: this.state.limit,
+          };
+          this.props.fetchPosts(fetchOptions);
+        });
+        break;
+      case options.filter.controversial:
+        this.setState({filter: options.filter.controversial, from: options.time.day, timeBarEnabled: true},  () => {
+          const fetchOptions = {
+            filter: this.state.filter,
+            from: this.state.time,
+            limit: this.state.limit,
+          };
+          this.props.fetchPosts(fetchOptions);
+        });
+        break;
+      case options.filter.discussed:
+        this.setState({filter: options.filter.discussed, from: options.time.day, timeBarEnabled: true}, () => {
+          const fetchOptions = {
+            fitler: this.state.filter,
+            from: this.state.time,
+            limit: this.state.limit,
+          };
+          this.props.fetchPosts(fetchOptions);
+        });
+        break;
+      default:
+        this.setState({filter: options.filter.new, from: options.time.none, timeBarEnabled: false}, () => {
+          const fetchOptions = {
+            filter: this.state.filter,
+            from: this.state.time,
+            limit: this.state.limit,
+          };
+          this.props.fetchPosts(fetchOptions);
+        });
     }
   }
 

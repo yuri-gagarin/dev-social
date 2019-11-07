@@ -38,8 +38,8 @@ describe("PostNavbar Tests", function() {
     const wrapper = mount(<PostsNavbar fetchPosts={mockFetchPosts}/>);
     expect(wrapper.state().filter).toEqual(postSearchOptions.filter.new);
     expect(wrapper.state().from).toEqual(postSearchOptions.time.day);
-    expect(wrapper.state().filterBarDisabled).toEqual(false);
-    expect(wrapper.state().timeBarDisabled).toEqual(true);
+    expect(wrapper.state().filterBarEnabled).toEqual(true);
+    expect(wrapper.state().timeBarEnabled).toEqual(false);
   });
 
   it("successfully changes filter state", () => {
@@ -54,7 +54,7 @@ describe("PostNavbar Tests", function() {
     });
   });
 
-  it("does not activate the time filter option if fetching {new} || {trending}", () => {
+  it("does NOT activate the time filter option if fetching {new} || {trending}", () => {
     const wrapper = mount(<PostsNavbar fetchPosts={mockFetchPosts} />);
     const filterDropdown = wrapper.find(`[data-test="nav-filter"]`);
     const filterOptions = filterDropdown.find(".item");
@@ -62,7 +62,7 @@ describe("PostNavbar Tests", function() {
       const clickValue = node.prop("data-value");
       node.simulate("click");
       if(clickValue === postSearchOptions.filter.new || clickValue === postSearchOptions.filter.trending) {
-        expect(wrapper.state().timeBarDisabled).toEqual(true);
+        expect(wrapper.state().timeBarEnabled).toEqual(false);
         expect(wrapper.state().from).toEqual(postSearchOptions.time.none);
       }
     });
@@ -75,7 +75,7 @@ describe("PostNavbar Tests", function() {
       const clickValue = node.prop("data-value");
       node.simulate("click");
       if(clickValue === postSearchOptions.filter.discussed || clickValue === postSearchOptions.filter.controversial) {
-        expect(wrapper.state().timeBarDisabled).toEqual(false);
+        expect(wrapper.state().timeBarEnabled).toEqual(true);
         expect(wrapper.state().from).toEqual(postSearchOptions.time.day);
       }
     });
