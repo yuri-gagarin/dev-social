@@ -17,6 +17,6 @@ export const POST_QUERY_OPTIONS = {
     month: "month",
     year: "year",
     allTime: "all",
-    none: "---",
+    none: "",
   },
 }

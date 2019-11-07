@@ -70,12 +70,13 @@ class PostsNavbar extends Component {
     }
   }
 
-  handleTimeClick = (e, {value}) => {
+  handleTimeClick = (e) => {
+    const value = e.target.getAttribute("data-value");
     this.setState({from: value} , () => {
       //convert the time filter
       const fetchOptions = {
         filter: this.state.filter,
-        from: from,
+        from: this.state.from,
         limit: this.state.limit,
       };
       this.props.fetchPosts(fetchOptions);
@@ -85,14 +86,14 @@ class PostsNavbar extends Component {
   render() {
     return (
       <Menu className={styles.postsNavbar} style={{marginTop: "50px", width: "100vw"}}>
-        <Dropdown className={styles.sortPostsDropdown} 
+        <Dropdown className={styles.sortPostsDropdown} data-test="nav-filter"
           text="Filter Posts"
           icon="caret square down"
           pointing
           floating
           labeled
           button >
-          <Dropdown.Menu className={styles.menuDropdown} style={{margin: "0em !important"}} data-test="nav-filter">
+          <Dropdown.Menu className={styles.menuDropdown} style={{margin: "0em !important"}}>
             <Dropdown.Header icon='filter' content='Filter by type' />
             <Dropdown.Divider />
             <Dropdown.Item onClick={this.handleSortClick} data-value={options.filter.new}>
@@ -114,27 +115,30 @@ class PostsNavbar extends Component {
           </Dropdown.Menu>
         </Dropdown>
         <div className={styles.sortValue}>{this.state.filter}</div>
-        <Dropdown className={styles.sortPostsTime} data-test="nav-test-time"
+        <Dropdown className={styles.sortPostsTime} data-test="post-time-filter"
           text="Time"
           icon="time"
           pointing
           floating
           labeled
-          disabled={this.state.timeDisabled}
+          disabled={!this.state.timeBarEnabled}
           button >
           <Dropdown.Menu>
             <Dropdown.Header content="Filter Time"/>
             <Dropdown.Divider />
-            <Dropdown.Item onClick={this.handleTimeClick} value={options.time.day}>
+            <Dropdown.Item onClick={this.handleTimeClick} data-value={options.time.day}>
               {options.time.day}
             </Dropdown.Item>
-            <Dropdown.Item onClick={this.handleTimeClick} value={options.time.week}>
+            <Dropdown.Item onClick={this.handleTimeClick} data-value={options.time.week}>
               {options.time.week}
             </Dropdown.Item>
-            <Dropdown.Item onClick={this.handleTimeClick} value={options.time.month}>
+            <Dropdown.Item onClick={this.handleTimeClick} data-value={options.time.month}>
               {options.time.month}
             </Dropdown.Item>
-            <Dropdown.Item onClick={this.handleTimeClick} value={options.time.allTime}>
+            <Dropdown.Item onClick={this.handleTimeClick} data-value={options.time.year}>
+              {options.time.year}
+            </Dropdown.Item>
+            <Dropdown.Item onClick={this.handleTimeClick} data-value={options.time.allTime}>
               {options.time.allTime}
             </Dropdown.Item>
           </Dropdown.Menu>
