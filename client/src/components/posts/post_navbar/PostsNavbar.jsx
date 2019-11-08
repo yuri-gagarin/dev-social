@@ -85,7 +85,7 @@ class PostsNavbar extends Component {
 
   render() {
     return (
-      <Menu className={styles.postsNavbar} style={{marginTop: "50px", width: "100vw"}}>
+      <Menu className={styles.postsNavbar} style={{marginTop: "50px", width: "100vw"}} data-test={"posts-navbar"}>
         <Dropdown className={styles.sortPostsDropdown} data-test="nav-filter"
           text="Filter Posts"
           icon="caret square down"
