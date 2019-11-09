@@ -38,3 +38,10 @@ export const trimString = (text, length) => {
   let trimmed = text.substring(0, length) + "...";
   return trimmed;
 };
+/**
+ * Converts an ISO date string into a readable format
+ * @param {string} date - ""
+ */
+const displayPostDate = (date) => {
+
+};

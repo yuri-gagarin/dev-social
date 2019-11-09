@@ -8,8 +8,8 @@ describe("PostComponent tests", () => {
     title: faker.lorem.word(),
     text: faker.lorem.paragraph(2),
     author: faker.name.firstName(1),
-    createdAt: faker.date.past(1).toString(),
-    editedAt: faker.date.recent(1).toString(),
+    createdAt: faker.date.past(1).toISOString(),
+    editedAt: faker.date.recent(1).toISOString(),
     defaultImage: "",
     likeCount: 1,
     dislikeCount: 0,
@@ -33,16 +33,27 @@ describe("PostComponent tests", () => {
     console.log(wrapper.instance());
   })
   */
-  it("Should set a default image url if no post images", () => {
-    const wrapper = shallow(<PostComponent  post={post}/>);
-    const itemImage = wrapper.find(`[data-test="default-post-image"]`);
-    // default image should be set inline
-    const itemImageInlineStyle = itemImage.children().at(0).props().style;
-    expect(itemImageInlineStyle).toBeDefined();
-    expect(itemImageInlineStyle.backgroundImage).toBeDefined();
-    expect(typeof itemImageInlineStyle === "string");
-  })
-  it("Should use a default image if provided", () => {
-
+  describe("Component should correctly process a default image", () => {
+    it("Should set a default image url if no post images", () => {
+      const wrapper = shallow(<PostComponent  post={post}/>);
+      const itemImage = wrapper.find(`[data-test="default-post-image"]`);
+      // default image should be set inline
+      const itemImageInlineStyle = itemImage.children().at(0).props().style;
+      expect(itemImageInlineStyle).toBeDefined();
+      expect(itemImageInlineStyle.backgroundImage).toBeDefined();
+      expect(typeof itemImageInlineStyle === "string");
+    });
+    it("Should use a default image if provided", () => {
+      let postWithImage = {...post, defaultImage: "wwww.myimageurl.com"};
+      const wrapper = shallow(<PostComponent post={postWithImage} />)
+      const itemImage = wrapper.find(`[data-test="default-post-image"]`);
+      const itemImageInlineStyle = itemImage.children().at(0).props().style;
+      expect(itemImageInlineStyle).toBeDefined();
+      expect(itemImageInlineStyle.backgroundImage).toBeDefined();
+      expect(itemImageInlineStyle.backgroundImage).toEqual(`url(${postWithImage.defaultImage})`);
+    });
+  });
+  describe("The component should correctly process dates", () => {
+    
   })
 })
