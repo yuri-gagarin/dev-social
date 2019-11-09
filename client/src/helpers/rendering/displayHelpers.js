@@ -1,18 +1,26 @@
 /**
  * Sets a default image for the Post thumbnail or item.
  * @param {Object} post - A Post object.
- * @returns {string} A url string which resolves an Image path.
+ * @returns {string} A CSS string for background image url property.
  */
 export const setPostImage = (post) => {
-
+  let imagePath;
   if (post && post.images) {
     //do something here if has post images
+    imagePath = posts.images[0];
+
+  }
+  else if (post && !post.defaultImage) {
+    //set a default post image
+    imagePath = "http://localhost:3000/assets/images/posts/stock_post.jpg";
+  }
+  else  if(post && post.defaultImage) {
+    imagePath = post.defaultImage;
   }
   else {
-    //set a default post image
-    const imagePath = "http://localhost:3000/assets/images/posts/stock_post.jpg";
-    return imagePath;
+    imagePath = "http://localhost:3000/assets/images/posts/stock_post.jpg";
   }
+  return `url(${imagePath})`;
 };
 /**
  * Trims the text specified to length value.

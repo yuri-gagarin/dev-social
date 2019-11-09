@@ -7,22 +7,20 @@ import {likePost, unlikePost} from "../../redux/actions/postActions.js" //need t
 
 import {setPostImage} from "../../helpers/rendering/displayHelpers.js";
 const PostComponent = (props) => {
-  const {authState, postState, post} = props;
+  const { authState = {}, post = {} } = props;
   //should be a function to set the image for the post item or use default from server
   //posts should have images assigned to them
-  
-
   //should set a post
   const setPost = () => {
     
   };
   //blueprint -- not ready
   return (
-    <Item className={style.postItem}>
+    <Item className={style.postItem} data-test={"post-component"}>
       <span className={style.postCreated}>Created At: {post.createdAt}</span>
       <span className={style.postEdited}>Edited At: {post.editedAt}</span>
-      <Item.Image size="small"style={{border: "3px solid red"}}>
-        <div className={style.postImage} style={{backgroundImage: `url(${setPostImage(post)}`}}></div>
+      <Item.Image size="small"style={{border: "3px solid red"}} data-test="default-post-image">
+        <div className={style.postImage} style={{backgroundImage: `${setPostImage(post)}`}}></div>
       </Item.Image>
       <Item.Content>
         <Item.Header as="a">{post.title}</Item.Header>
@@ -39,11 +37,16 @@ const PostComponent = (props) => {
 
 PostComponent.propTypes = {
   authState: PropTypes.object.isRequired,
-  errorState: PropTypes.object.isRequired,
   post: PropTypes.object.isRequired,
   //likePost: PropTypes.func.isRequired,
   //unlikePost: PropTypes.func.isRequired,
 };
+
+PostComponent.defaultProps = {
+  authState: {},
+  post: {},
+};
+
 
 
 export default PostComponent;

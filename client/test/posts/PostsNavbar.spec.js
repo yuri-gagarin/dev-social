@@ -1,6 +1,5 @@
 import React from "react";
 import PostsNavbar from "../../src/components/posts/post_navbar/PostsNavbar";
-import renderer from "react-test-renderer";
 import { shallow, mount } from "enzyme";
 import { Menu, Dropdown } from "semantic-ui-react";
 import { postSearchOptions } from "../../src/redux/searchOptions";
