@@ -1,6 +1,7 @@
 import React from "react";
 import PostComponent from "../../src/components/posts/PostComponent";
 import {mount, shallow} from "enzyme";
+import {displayPostDate} from "../../src/helpers/rendering/displayHelpers";
 import faker from "faker";
 
 describe("PostComponent tests", () => {
@@ -54,6 +55,13 @@ describe("PostComponent tests", () => {
     });
   });
   describe("The component should correctly process dates", () => {
-    
+    it("Should correctly display createdAt date", () => {
+      const wrapper = shallow(<PostComponent post={post} />);
+      const postCreatedAt = displayPostDate(post.createdAt, {military: false});
+      console.log(postCreatedAt);
+    })
+    it("should correctly display the editedAt date", () => {
+
+    })
   })
 })
