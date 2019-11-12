@@ -3,6 +3,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import {Item, Icon, Grid, Image} from "semantic-ui-react";
 import style from "../../assets/stylesheets/posts/post.scss";
+import {formatDate} from "../../helpers/rendering/displayHelpers";
 import {likePost, unlikePost} from "../../redux/actions/postActions.js" //need to be finished
 
 import {setPostImage} from "../../helpers/rendering/displayHelpers.js";
@@ -14,11 +15,13 @@ const PostComponent = (props) => {
   const setPost = () => {
     
   };
+  const createdAt = formatDate(post.createdAt, {military: false});
+  const editedAt = formatDate(post.editedAt, {military: false});
   //blueprint -- not ready
   return (
     <Item className={style.postItem} data-test={"post-component"}>
-      <span className={style.postCreated}>Created At: {post.createdAt}</span>
-      <span className={style.postEdited}>Edited At: {post.editedAt}</span>
+      <span className={style.postCreated} data-test="post-created-date">Created At: {createdAt}</span>
+      <span className={style.postEdited} data-test="post-edited-date">Edited At: {editedAt}</span>
       <Item.Image size="small"style={{border: "3px solid red"}} data-test="default-post-image">
         <div className={style.postImage} style={{backgroundImage: `${setPostImage(post)}`}}></div>
       </Item.Image>

@@ -78,7 +78,10 @@ export const trimString = (text, length) => {
  * @param {boolean} options.military - "An option for a 24hr format".
  * @returns {string} - A readable format for a post.
  */
-export const displayPostDate = (date, options) => {
+export const formatDate = (date, options) => {
+  if(!date) {
+    return "";
+  }
   if(typeof date !== "string") {
     throw new TypeError(`Expected a ISO date string instead saw ${typeof date}`);
   }

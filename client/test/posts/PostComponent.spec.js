@@ -1,7 +1,7 @@
 import React from "react";
 import PostComponent from "../../src/components/posts/PostComponent";
 import {mount, shallow} from "enzyme";
-import {displayPostDate} from "../../src/helpers/rendering/displayHelpers";
+import {formatDate} from "../../src/helpers/rendering/displayHelpers";
 import faker from "faker";
 
 describe("PostComponent tests", () => {
@@ -57,11 +57,28 @@ describe("PostComponent tests", () => {
   describe("The component should correctly process dates", () => {
     it("Should correctly display createdAt date", () => {
       const wrapper = shallow(<PostComponent post={post} />);
-      const postCreatedAt = displayPostDate(post.createdAt, {military: false});
-      console.log(postCreatedAt);
-    })
+      const postCreatedAt = formatDate(post.createdAt, {military: false});
+      const createdDate = wrapper.find(`[data-test="post-created-date"]`);
+      expect(createdDate.props().children[1]).toEqual(postCreatedAt);
+    });
     it("should correctly display the editedAt date", () => {
+      const wrapper= shallow(<PostComponent post={post} />);
+      const postEditedAt = formatDate(post.editedAt, {military: false});
+      const editedDate = wrapper.find(`[data-test="post-edited-date"]`);
+      expect(editedDate.props().children[1]).toEqual(postEditedAt);
+    });
+    it("Should display an empty string if no createdAt date", () => {
+      const wrapper = shallow(<PostComponent post={{...post, createdAt: null}} />);
+      const postCreatedAt = formatDate(null, {military: false});
+      const createdDate = wrapper.find(`[data-test="post-created-date"]`);
+      expect(createdDate.props().children[1]).toEqual(postCreatedAt);
+    });
+    it("Should display an empty string if no editedAt date", () => {
+      const wrapper = shallow(<PostComponent post={{...post, editedAt: null}} />);
+      const postEditedAt = formatDate(null, {military: false});
+      const editedDate = wrapper.find(`[data-test="post-edited-date"]`);
+      expect(editedDate.props().children[1]).toEqual(postEditedAt);
+    });
 
-    })
   })
 })
