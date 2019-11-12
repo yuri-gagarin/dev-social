@@ -8,7 +8,7 @@ import {likePost, unlikePost} from "../../redux/actions/postActions.js" //need t
 
 import {setPostImage} from "../../helpers/rendering/displayHelpers.js";
 const PostComponent = (props) => {
-  const { authState = {}, post = {} } = props;
+  const { authState = {}, post = {}, toggleLike, toggleDislike } = props;
   //should be a function to set the image for the post item or use default from server
   //posts should have images assigned to them
   //should set a post
@@ -18,6 +18,7 @@ const PostComponent = (props) => {
   const createdAt = formatDate(post.createdAt, {military: false});
   const editedAt = formatDate(post.editedAt, {military: false});
   //blueprint -- not ready
+
   return (
     <Item className={style.postItem} data-test={"post-component"}>
       <span className={style.postCreated} data-test="post-created-date">Created At: {createdAt}</span>
@@ -30,7 +31,10 @@ const PostComponent = (props) => {
         <Item.Extra>By: {post.author}   <Icon name="user circle" link></Icon></Item.Extra>
         <Item.Description>{post.text}</Item.Description>
         <Item.Extra as="a">More...</Item.Extra>
-        <span>Likes: {post.likeCount}</span>
+        <div className="" data-test="like-count"><i></i>{post.likeCount}</div>
+        <div className="" data-test="like-post-toggle" onClick={(post) => toggleLike(post) }>Like</div>
+        <div className="" data-test="dislike-count"><i></i>{post.dislikeCount}</div>
+        <div className="" data-test="dislike-post-toggle" onClick={(post) => toggleDislike(post)}>Dislike</div>
       </Item.Content>
       
     </Item>
@@ -41,8 +45,8 @@ const PostComponent = (props) => {
 PostComponent.propTypes = {
   authState: PropTypes.object.isRequired,
   post: PropTypes.object.isRequired,
-  //likePost: PropTypes.func.isRequired,
-  //unlikePost: PropTypes.func.isRequired,
+  toggleLike: PropTypes.func.isRequired,
+  toggleDislike: PropTypes.func.isRequired,
 };
 
 PostComponent.defaultProps = {
