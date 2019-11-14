@@ -40,8 +40,9 @@ const NavbarDesktop = (props) => {
         </Menu.Menu>
       </Menu>
 
-      <Sidebar.Pushable style={{transform: "none"}}>
+      <Sidebar.Pushable style={{transform: "none"}} data-test="main-sidebar">
         <InnerMainMenu
+          data-test="inner-main-menu"
           authState={authState}
           navState={navState}
           history={history}
@@ -50,6 +51,7 @@ const NavbarDesktop = (props) => {
           fetchData={fetchData}
         />
         <MainMenu
+          data-test="main-menu"
           authState={authState}
           navState={navState}
           closeMain={closeMain}
@@ -70,5 +72,6 @@ const NavbarDesktop = (props) => {
     </Fragment>
   );
 };
+
 
 export default (withRouter(NavbarDesktop));
