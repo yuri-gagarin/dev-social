@@ -3,10 +3,20 @@ import React from 'react';
 import {Sidebar, Menu, Segment, Icon} from "semantic-ui-react";
 import style from "../../../assets/stylesheets/navbar/menus.scss";
 
+const toggleClose = (event) => {
+
+}
+
 const MainMenu = (props) => {
   const {authState, navState, closeMain, openInnerMain} = props;
+
+  const closesMain = () => {
+
+  };
+
   return(
-    <Sidebar
+    <Sidebar 
+      data-test="main-menu-sidebar"
       as={Menu}
       animation="overlay"
       visible={navState.mainVisible}
@@ -15,8 +25,9 @@ const MainMenu = (props) => {
       id={style.mainMenu}>
       <Menu.Item
         as={Segment}
-        onClick={closeMain}
-        className={""} >
+        onClick={toggleClose}
+        className={""}
+        data-test="main-menu-close">
         <div><Icon name={"arrow left"}></Icon></div>
         <div>Back</div>
       </Menu.Item>
@@ -26,8 +37,9 @@ const MainMenu = (props) => {
             <Menu.Item
             {...item}
               onClick={openInnerMain}
-              data-inner={item.content}>
-            </Menu.Item>
+              data-inner={item.content}
+              data-test={"main-menu-clickable"} 
+            />
           );
         })
       }

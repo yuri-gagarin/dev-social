@@ -8,7 +8,10 @@ describe("DesktopNavbar tests", () => {
   const navProps = {
     history: {},
     authState: {},
-    navState: {},
+    navState: {
+      innerMainItems: [{name: "a", key: 1}],
+      mainItems: [{name: "a", key: 1}]
+    },
     children: [],
     openMain: () => "",
     closeMain: () => "",
