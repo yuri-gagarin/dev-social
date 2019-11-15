@@ -27,7 +27,8 @@ const MainMenu = (props) => {
         as={Segment}
         onClick={toggleClose}
         className={""}
-        data-test="main-menu-close">
+        data-test="main-menu-close"
+        data-value="main-menu-close">
         <div><Icon name={"arrow left"}></Icon></div>
         <div>Back</div>
       </Menu.Item>

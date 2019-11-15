@@ -26,8 +26,13 @@ describe("DesktopNavbar tests", () => {
 
   it("Should render the Navabar", () => {
     const wrapper = shallow(<NavbarDesktop.WrappedComponent {...navProps} />);
-    const mainSidebar = wrapper.find(`[data-test="main-sidebar"]`);
-    console.log(mainSidebar.html());
-    console.log(mainSidebar.props());
+    expect(wrapper).toBeDefined();
+  })
+  describe("Main Sidebar", () => {
+    const wrapper = shallow(<NavbarDesktop.WrappedComponent {...navProps} />);
+    
+  })
+  describe("Inner Main Sidebar", () => {
+
   })
 })
