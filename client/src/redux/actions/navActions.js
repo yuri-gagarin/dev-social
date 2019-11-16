@@ -11,19 +11,15 @@ const openMain = (authState) => {
   else {
     mainData = guestNav.main.data;
   }
-  return function(dispatch) {
-    dispatch({
+  return {
       type: OPEN_MAIN,
       payload: mainData,
-    });
   };
 };
 const closeMain = () => {
-  return function(dispatch) {
-    dispatch({
-      type: CLOSE_MAIN,
-      payload: null,
-    })
+  return {
+    type: CLOSE_MAIN,
+    payload: null,
   };
 };
 const openInnerMain = (authState, content) => {
@@ -34,19 +30,15 @@ const openInnerMain = (authState, content) => {
   else {
     innerMainData = guestNav.innerMain[content];
   }
-  return function(dispatch) {
-    dispatch({
-      type: OPEN_INNER_MAIN,
-      payload: innerMainData,
-    });
+  return {
+    type: OPEN_INNER_MAIN,
+    payload: innerMainData,
   };
 };
 const closeInnerMain = () => {
-  return function(dispatch) {
-    dispatch({
-      type: CLOSE_INNER_MAIN,
-      payload: null, 
-    });
+  return {
+    type: CLOSE_INNER_MAIN,
+    payload: null, 
   };
 };
 const openDash = (authState) => {

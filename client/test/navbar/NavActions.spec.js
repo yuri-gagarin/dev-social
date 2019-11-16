@@ -14,6 +14,20 @@ describe("Nav Action tests", () => {
   describe("Toggle buttons", () => {
     const mockOpenElement = React.createElement("div", {onClick: toggleOpen, "data-value": "mock-open" });
     const mockCloseElement = React.createElement("div", {onClick: toggleClose, "data-value": "mock-close" });
+    const mockEvent = {target: {"data-value": "open-main", 
+                                getAttribute(val) {
+                                  //console.log(this);
+                                  //return this.target["data-value"];
+                                  return this["data-value"];
+                                }
+                              }
+                            };
+  
+
+    it("Should fire off an event", () => {
+      const wrapper = shallow(mockOpenElement)
+      wrapper.simulate("click", mockEvent);
+    })
     
     let mainMenu, innerMainMenu
     const props = {
@@ -29,10 +43,8 @@ describe("Nav Action tests", () => {
     });
     it("Should toggle open", () => {
       const wrapper = shallow(mockOpenElement).html();
-      console.log(wrapper);
     })
     it("should toggle open the main menu", () => {
-      console.log(mainMenu.props());
       mainMenu.simulate("click");
       expect(1).toEqual(1);
     });

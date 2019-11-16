@@ -1,19 +1,13 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
 import {Sidebar, Menu, Segment, Icon} from "semantic-ui-react";
 import style from "../../../assets/stylesheets/navbar/menus.scss";
+import {closeMain, openInnerMain} from "../helpers/toggleButtons";
 
-const toggleClose = (event) => {
-
-}
 
 const MainMenu = (props) => {
-  const {authState, navState, closeMain, openInnerMain} = props;
-
-  const closesMain = () => {
-
-  };
-
+  const {authState, navState} = props;
   return(
     <Sidebar 
       data-test="main-menu-sidebar"
@@ -25,10 +19,10 @@ const MainMenu = (props) => {
       id={style.mainMenu}>
       <Menu.Item
         as={Segment}
-        onClick={toggleClose}
+        onClick={closeMain}
         className={""}
         data-test="main-menu-close"
-        data-value="main-menu-close">
+      >
         <div><Icon name={"arrow left"}></Icon></div>
         <div>Back</div>
       </Menu.Item>
@@ -47,5 +41,11 @@ const MainMenu = (props) => {
     </Sidebar>
   );
 };
+
+MainMenu.propTypes = {
+  authState: PropTypes.object.isRequired,
+  navState: PropTypes.object.isRequired,
+};
+
 
 export default MainMenu;

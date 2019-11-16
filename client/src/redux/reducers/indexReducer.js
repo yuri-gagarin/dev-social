@@ -6,9 +6,9 @@ import testReducer from "./testReducer.js";
 import errorReducer from "./errorReducer.js";
 
 export default combineReducers({
-  auth: authReducer,
-  nav: navReducer,
-  posts: postReducer,
+  authState: authReducer,
+  navState: navReducer,
+  postsState: postReducer,
   test: testReducer,
   error: errorReducer
 });
