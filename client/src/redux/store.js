@@ -4,8 +4,11 @@ import indexReducer from "./reducers/indexReducer.js";
 
 const middleware = [thunk];
 
+const composeEnhancers = process.env === "development" 
+    ? window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    : compose;
+
 export default createStore(
-    indexReducer, compose(applyMiddleware(...middleware), 
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+    indexReducer, compose(applyMiddleware(...middleware), composeEnhancers)
 );
 
