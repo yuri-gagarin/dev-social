@@ -87,3 +87,20 @@ export const userNav = {
     {as: "a", content: "My Acccount", key: "my_account"},
   ],
 };
+
+export const dashData = {
+  guestDash: [
+
+  ],
+  userDash: [
+    {as: "a", content: "Profile", key: "profile"},
+    {as: "a", content: "My Posts", key: "myposts"},
+    {as: "a", content: "My Comments", key: "mycomments"},
+  ],
+  moderatorDash: [
+    //todo a moderator dashboard
+  ],
+  adminDash: [
+    //todo an administrator dashboard
+  ]
+}

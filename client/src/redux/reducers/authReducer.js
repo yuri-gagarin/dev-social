@@ -1,7 +1,11 @@
 import {REGISTER, LOGIN, LOGOUT, SET_USER} from "../cases.js";
 import isEmpty from "../../helpers/validators/isEmpty.js";
 
-export default function(state={}, action) {
+const initialState = {
+  userLoggedIn: false,
+};
+
+export default function(state=initialState, action) {
   switch(action.type){
     case REGISTER:
       return ({

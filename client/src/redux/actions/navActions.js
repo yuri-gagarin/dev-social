@@ -87,27 +87,47 @@ const closeInnerMain = () => {
   };
 };
 //dashboard
-const openDash = (authState) => {
-  return function(dispatch) {
-    //should come from the server depending on user type
-    //api call?
-    const dashData = {
-      user: "user",
-      type: "admin",
-      options: {
-      }
-    };
-    dispatch({
+/**
+ * 
+ * @param {Object} authState - Authorization state of the whole app.
+ * @param {Object} dashData - Dashboard data.
+ */
+const openDash = (authState, dashData) => {
+  let error, dashItems;
+  if(!authState) {
+    error = new Error("Authstate is not defined");
+  };
+  if(!dashData || !dashData.userDash) {
+    error = new Error("Can't fetch the dashboard data");
+  }
+  
+  if(authState.userLoggedIn) {
+    dashItems = dashData.userDash;
+  }
+  //other cases for moderators? admins?
+  else {
+    dashItems = [];
+  }
+
+  if(!error) {
+    return {
       type: OPEN_DASH,
-      payload: dashData,
-    })
+      payload: dashItems,
+    };
+  }
+  else {
+    //error present
+    return {
+      type: NAV_ERROR,
+      payload: error,
+    };
   }
 };
 
 const closeDash = () => {
   return {
     type: CLOSE_DASH, 
-    payload: null,
+    payload: [],
   }
 };
 export {openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash};
