@@ -28,6 +28,8 @@ export const navReducer = (state=navState, action) =>{
     case OPEN_INNER_MAIN: 
       return {
         ...state,
+        pusherVisible: true,
+        mainVisible: true,
         innerMainVisible: true,
         innerMainItems: [...action.payload],
       };
@@ -35,6 +37,7 @@ export const navReducer = (state=navState, action) =>{
       return {
         ...state,
         innerMainVisible: false,
+        innerMainItems: [...action.payload],
       };
     case OPEN_DASH:
       return {

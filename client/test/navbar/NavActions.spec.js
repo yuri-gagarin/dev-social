@@ -1,121 +1,216 @@
 import * as navActions from "../../src/redux/actions/navActions";
 import * as cases from "../../src/redux/cases";
-
 import {guestNav, userNav} from "../../src/components/navbar/nav_data/navData.js";
+import mocksStore from "../mockStore";
 
-
-import React from "react";
-import MainMenu from "../../src/components/navbar/nav_components/MainMenu";
-import InnerMainMenu from "../../src/components/navbar/nav_components/InnerMainMenu";
-
-import {shallow} from "enzyme";
-
-import mockStore from "../mockStore";
+const store = mocksStore({
+  authState: {
+    userLoggedIn: false,
+  },  
+  navState: {
+  },
+  postState: {},
+});
 
 describe("Nav Action tests", () => {
   describe("Toggle button unit test", () => {
     //
   })
-  describe("{openMain} action test", () => {
-    afterEach(() => {
-      mockStore.clearActions();
-    });
-    it("Should dispatch an open main action", () => {
-      const expectedActions = [
-        {type: cases.OPEN_MAIN, payload: guestNav.main.data}
-      ]
-      const {authState} = mockStore.getState();
-      mockStore.dispatch(navActions.openMain(authState, {guestNav: guestNav, userNav: userNav}));
-      expect(mockStore.getActions()).toEqual(expectedActions);
-    });
-    it("Should pass a payload array to the reducer", () => {
-      const {authState} = mockStore.getState();
-      mockStore.dispatch(navActions.openMain(authState, {guestNav: guestNav, userNav: userNav}));
-      const actionPayload = mockStore.getActions()[0].payload;
-      expect(Array.isArray(actionPayload)).toEqual(true);
-    });
-  })
-  describe("{openInnerMain} action test", () => {
-    afterEach(() => {
-      mockStore.clearActions();
-    });
-    const contentToOpen = guestNav.innerMain;
-    const {authState} = mockStore.getState();
-    it("Should dispatch an open inner main action", () => {
-      for (let target in contentToOpen) {
-        mockStore.clearActions();
-        const expectedActions = [
-          {type: cases.OPEN_INNER_MAIN, payload: guestNav.innerMain[target]}
-        ];
-        mockStore.dispatch(navActions.openInnerMain(authState, {guestNav: guestNav, userNav: userNav}, target));
-        expect(mockStore.getActions()).toEqual(expectedActions);
-      } 
-    });
-    it("Should pass a payload array to the reducer", () => {
-      for (let target in contentToOpen) {
-        mockStore.clearActions();
-        mockStore.dispatch(navActions.openInnerMain(authState, {guestNav: guestNav, userNav: userNav}, target));
-        const actionPayload = mockStore.getActions()[0].payload;
-        expect(Array.isArray(actionPayload)).toEqual(true);
-      }
-    });
-    it("Should dispatch an error it can't build a menu", () => {
-      const {authState} = mockStore.getState();
-      mockStore.dispatch(navActions.openMain(authState, undefined));
-      const expectedActions = [
-        {type: cases.NAV_ERROR, payload: new Error("Cant get menu data")}
-      ];
-      expect(mockStore.getActions()).toEqual(expectedActions);
-      expect(mockStore.getActions()[0].payload instanceof Error).toEqual(true);
-    });
-  });
-  /** 
-  describe("Toggle buttons", () => {
-    const mockOpenElement = React.createElement("div", {onClick: toggleOpen, "data-value": "mock-open" });
-    const mockCloseElement = React.createElement("div", {onClick: toggleClose, "data-value": "mock-close" });
-    const mockEvent = {target: {"data-value": "open-main", 
-                                getAttribute(val) {
-                                  //console.log(this);
-                                  //return this.target["data-value"];
-                                  return this["data-value"];
-                                }
-                              }
-                            };
-  
+  describe("Menu sidebars actions toggle tests", () => {
+    //logged in user
+    describe("Guest user, not logged in", () => {
+      describe("{openMain} action test", () => {
+        const {authState} = store.getState();
+        afterEach(() => {
+          store.clearActions();
+        });
+        it(`Should dispatch an ${cases.OPEN_MAIN} action`, () => {
+          const expectedActions = [
+            {type: cases.OPEN_MAIN, payload: guestNav.main.data}
+          ]        
+          store.dispatch(navActions.openMain(authState, {guestNav: guestNav, userNav: userNav}));
+          expect(store.getActions()).toEqual(expectedActions);
+        });
+        it("Should pass a payload array to the reducer for guest menus", () => {
+          store.dispatch(navActions.openMain(authState, {guestNav: guestNav, userNav: userNav}));
+          const actionPayload = store.getActions()[0].payload;
+          expect(Array.isArray(actionPayload)).toEqual(true);
+          expect(actionPayload).toEqual(guestNav.main.data);
 
-    it("Should fire off an event", () => {
-      const wrapper = shallow(mockOpenElement)
-      wrapper.simulate("click", mockEvent);
-    })
+        });
+        it(`Should dispatch a ${cases.NAV_ERROR} action if can't build a menu`, () => {
+          const expectedActions = [
+            {type: cases.NAV_ERROR, payload: new Error("Can't get menu data")}
+          ];
+          store.dispatch(navActions.openMain(authState, undefined));
+          const actionPayload = store.getActions()[0].payload;
+          expect(store.getActions()).toEqual(expectedActions);
+          expect(actionPayload instanceof Error).toEqual(true);
+        });
+      });
+      describe("{openInnerMain} action test", () => {
+        afterEach(() => {
+          store.clearActions();
+        });
+        const contentToOpen = guestNav.innerMain;
+        const {authState} = store.getState();
+        it(`Should dispatch an ${cases.OPEN_INNER_MAIN} action`, () => {
+          for (let target in contentToOpen) {
+            store.clearActions();
+            const expectedActions = [
+              {type: cases.OPEN_INNER_MAIN, payload: guestNav.innerMain[target]}
+            ];
+            store.dispatch(navActions.openInnerMain(authState, {guestNav: guestNav, userNav: userNav}, target));
+            expect(store.getActions()).toEqual(expectedActions);
+          } 
+        });
+        it("Should pass a payload array to the reducer", () => {
+          for (let target in contentToOpen) {
+            store.clearActions();
+            store.dispatch(navActions.openInnerMain(authState, {guestNav: guestNav, userNav: userNav}, target));
+            const actionPayload = store.getActions()[0].payload;
+            expect(Array.isArray(actionPayload)).toEqual(true);
+            expect(actionPayload).toEqual(guestNav.innerMain[target]);
+          }
+        });
+        it("Should return an empty array if no nav items available", () => {
+          const misClicked = "this doesn't exist";
+          store.dispatch(navActions.openInnerMain(authState, {guestNav: guestNav, userNav: userNav}, misClicked))
+          const expectedPayload = store.getActions()[0].payload;
+          expect(Array.isArray(expectedPayload)).toEqual(true);
+          expect(expectedPayload.length).toEqual(0);
+        });
+        it(`Should dispatch a ${cases.NAV_ERROR} action if it can't build a menu`, () => {
+          store.dispatch(navActions.openInnerMain(authState, undefined, "news"));
+          const expectedActions = [
+            {type: cases.NAV_ERROR, payload: new Error("Can't get menu data")}
+          ];
+          const actionPayload = store.getActions()[0].payload
+          expect(store.getActions()).toEqual(expectedActions);
+          expect(actionPayload instanceof Error).toEqual(true);
+        });
+      });
+    });
+    // end guest user
+    describe("Logged in user", () => {
+      describe("{openMain} action test", () => {
+        const {authState} = store.getState();
+        afterEach(() => {
+          store.clearActions();
+        });
+        beforeEach(() => {
+          authState.userLoggedIn = true;
+        })
+        it(`Should dispatch an ${cases.OPEN_MAIN} action`, () => {
+          const expectedActions = [
+            {type: cases.OPEN_MAIN, payload: userNav.main.data}
+          ]
+          store.dispatch(navActions.openMain(authState, {guestNav: guestNav, userNav: userNav}));
+          expect(store.getActions()).toEqual(expectedActions);
+        });
+        it("Should pass a payload array to the reducer", () => {
+          store.dispatch(navActions.openMain(authState, {guestNav: guestNav, userNav: userNav}));
+          const actionPayload = store.getActions()[0].payload;
+          expect(Array.isArray(actionPayload)).toEqual(true);
+        });
+        it(`Should dispatch a ${cases.NAV_ERROR} action if can't build a menu`, () => {
+          const expectedActions = [
+            {type: cases.NAV_ERROR, payload: new Error("Can't get menu data")}
+          ];
+          store.dispatch(navActions.openMain(authState, undefined));
+          const actionPayload = store.getActions()[0].payload;
+          expect(store.getActions()).toEqual(expectedActions);
+          expect(actionPayload instanceof Error).toEqual(true);
+        });
+      });
+      describe("{openInnerMain} action test", () => {
+        const contentToOpen = userNav.innerMain;
+        const {authState} = store.getState();
+        afterEach(() => {
+          store.clearActions();
+        });
+        beforeEach(() => {
+          authState.userLoggedIn = true;
+        });
+        it(`Should dispatch an ${cases.OPEN_INNER_MAIN} action`, () => {
+          for (let target in contentToOpen) {
+            store.clearActions();
+            const expectedActions = [
+              {type: cases.OPEN_INNER_MAIN, payload: userNav.innerMain[target]}
+            ];
+            store.dispatch(navActions.openInnerMain(authState, {guestNav: guestNav, userNav: userNav}, target));
+            expect(store.getActions()).toEqual(expectedActions);
+          } 
+        });
+        it("Should pass a payload array to the reducer", () => {
+          for (let target in contentToOpen) {
+            store.clearActions();
+            store.dispatch(navActions.openInnerMain(authState, {guestNav: guestNav, userNav: userNav}, target));
+            const actionPayload = store.getActions()[0].payload;
+            expect(Array.isArray(actionPayload)).toEqual(true);
+          }
+        });
+        it("Should return an empty array if no nav items available", () => {
+          const misClicked = "this doesn't exist";
+          store.dispatch(navActions.openInnerMain(authState, {guestNav: guestNav, userNav: userNav}, misClicked))
+          const expectedPayload = store.getActions()[0].payload;
+          expect(Array.isArray(expectedPayload)).toEqual(true);
+          expect(expectedPayload.length).toEqual(0);
+        });
+        it(`Should dispatch a ${cases.NAV_ERROR} action if it can't build a menu`, () => {
+          store.dispatch(navActions.openInnerMain(authState, undefined, "news"));
+          const expectedActions = [
+            {type: cases.NAV_ERROR, payload: new Error("Can't get menu data")}
+          ];
+          const actionPayload = store.getActions()[0].payload
+          expect(store.getActions()).toEqual(expectedActions);
+          expect(actionPayload instanceof Error).toEqual(true);
+        });
+      });
+    });
+
+    //end logged in user //
+    describe("Menu sidebars close actions tests, {authState} is not relevant", () => {
+      describe("{closeMain} action test", () => {
+        afterEach(() => {
+          store.clearActions();
+        });
+        it(`should dispatch a ${cases.CLOSE_MAIN} action`, () => {
+          const expectedActions = [
+            {type: cases.CLOSE_MAIN, payload: []}
+          ];
+          store.dispatch(navActions.closeMain());
+          expect(store.getActions()).toEqual(expectedActions);
+        });
+        it(`Should return an empty array to the payload`, () => {
+          store.dispatch(navActions.closeMain());
+          const expectedPayload = store.getActions()[0].payload;
+          expect(Array.isArray(expectedPayload)).toEqual(true);
+          expect(expectedPayload.length).toEqual(0);
+        }); 
+      });
+      describe("{closeInnerMain} action tests", () => {
+        afterEach(() => {
+          store.clearActions();
+        });
+        it(`should dispatch a ${cases.CLOSE_INNER_MAIN} action`, () => {
+          const expectedActions = [
+            {type: cases.CLOSE_INNER_MAIN, payload: []}
+          ];
+          store.dispatch(navActions.closeInnerMain());
+          expect(store.getActions()).toEqual(expectedActions);
+        });
+        it('Should return an empty array to the payload', () => {
+          store.dispatch(navActions.closeInnerMain());
+          const expectedPayload = store.getActions()[0].payload;
+          expect(Array.isArray(expectedPayload)).toEqual(true);
+          expect(expectedPayload.length).toEqual(0);
+        });
+      });
+    });
+  }); 
     
-    let mainMenu, innerMainMenu
-    const props = {
-      navState: {
-        mainVisible: false,
-        mainItems: [{name: "a", key: 1}],
-        innerMainItems: [{name: "a", key: 1}],
-      }
-    }
-    beforeAll(() => {
-      mainMenu = shallow(<MainMenu {...props}/>);
-      innerMainMenu = shallow(<InnerMainMenu {...props}/>);
-    });
-    it("Should toggle open", () => {
-      const wrapper = shallow(mockOpenElement).html();
-    })
-    it("should toggle open the main menu", () => {
-      mainMenu.simulate("click");
-      expect(1).toEqual(1);
-    });
-    it("should toggle open the inner main menu", () => {
-
-    });
-    it("Should toggle close the main menu", () => {
-
-    });
-    it("Should toggle close the inner main menu", () => {
-
-    })
-  })
-  **/
+  describe("Dashboard toggle actions tests", () => {
+    
+  });
 })

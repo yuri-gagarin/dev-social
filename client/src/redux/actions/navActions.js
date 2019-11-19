@@ -1,5 +1,4 @@
 import {OPEN_MAIN, CLOSE_MAIN, OPEN_INNER_MAIN, CLOSE_INNER_MAIN, OPEN_DASH, CLOSE_DASH, NAV_ERROR} from "../cases.js";
-
 //main menu actions//
 /**
  * Dispatches the open main menu sidebar action.
@@ -12,21 +11,14 @@ const openMain = (authState={}, navData={}) => {
   let mainData;
   let {userNav, guestNav} = navData;
   //possible errors
-  if(!authState) {
-    const error = new TypeError("AuthState is undefined");
-    return {
-      type: NAV_ERROR,
-      payload: error,
-    };
-  }
   if(!userNav || !guestNav || !userNav.main || !guestNav.main) {
-    const error = new Error("Cant get menu data");
+    const error = new Error("Can't get menu data");
     return {
       type: NAV_ERROR,
       payload: error,
     }
   }
-  if(authState.loggedIn) {
+  if(authState.userLoggedIn) {
     mainData = userNav.main.data;
   }
   else {
@@ -77,7 +69,7 @@ const openInnerMain = (authState={}, navData={}, target) => {
       payload: error, 
     };
   }
-  if (authState.loggedIn) {
+  if (authState.userLoggedIn) {
     innerMainData = userNav.innerMain[target];
   }
   else {
