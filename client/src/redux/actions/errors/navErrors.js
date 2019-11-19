@@ -1,0 +1,1 @@
+export const openMainError = new Error();

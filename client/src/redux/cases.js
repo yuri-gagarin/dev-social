@@ -20,6 +20,7 @@ export const OPEN_INNER_MAIN = "OPEN_INNER_MAIN";
 export const CLOSE_INNER_MAIN = "CLOSE_INNER_MAIN";
 export const OPEN_DASH = "OPEN_DASH";
 export const CLOSE_DASH = "CLOSE_DASH";
+export const NAV_ERROR = "NAV_ERROR";
 
 
 //Post action constants
