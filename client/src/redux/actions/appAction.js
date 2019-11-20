@@ -2,7 +2,7 @@ import axios from "axios";
 import pluralize from "pluralize";
 
 import {LIST_ERRORS, MODEL_ERROR, FETCH_DATA, FETCH_POSTS} from "../cases.js";
-import isEmpty from "../../../../helpers/validators/isEmpty.js";
+import isEmpty from "../../helpers/validators/isEmpty";
 
 /**
  * Capitalizes a string. 

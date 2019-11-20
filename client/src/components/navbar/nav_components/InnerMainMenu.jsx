@@ -73,9 +73,6 @@ innerMainMenu.propTypes ={
   authState: PropTypes.object.isRequired,
   navState: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
-  closeInnerMain: PropTypes.func.isRequired,
-  closeMain: PropTypes.func.isRequired,
-  fetchData: PropTypes.func.isRequired,
 };
 
 export default innerMainMenu;

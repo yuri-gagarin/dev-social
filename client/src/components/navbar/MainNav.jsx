@@ -4,13 +4,12 @@ import PropTypes from "prop-types";
 import {withRouter} from "react-router-dom";
 //redux imports
 import {connect} from "react-redux";
-import {fetchData} from "../../redux/actions/appAction.js";
-import {logoutUser} from "../../redux/actions/authActions.js";
-import {openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash} from "../../redux/actions/navActions.js";
+import {fetchData} from "../../redux/actions/appAction";
+import {logoutUser} from "../../redux/actions/authActions";
 
-import NavbarHandheld from "./handheld/NavbarHandheld.jsx";
-import NavbarTablet from "./tablet/NavbarTablet.jsx";
-import NavbarDesktop from "./desktop/NavbarDesktop.jsx";
+import NavbarHandheld from "./handheld/NavbarHandheld";
+import NavbarTablet from "./tablet/NavbarTablet";
+import NavbarDesktop from "./desktop/NavbarDesktop";
 
 
 const NavbarChildren = ({ children }) => {
@@ -28,7 +27,7 @@ const NavbarChildren = ({ children }) => {
 / {NavbarDescktop} for most desktops
 */
 
-class MainNav extends Component {
+export class MainNav extends Component {
   constructor(props) {
     super(props);
   }
@@ -47,37 +46,6 @@ class MainNav extends Component {
       this.props.closeInnerMain();
     }
   };
-  //main menu functions
-  openMain = () => {
-    this.props.openMain(this.props.authState);
-  };
-  closeMain = () => {
-    const {innerMainVisible} = this.props.navState;
-    //this is for larger devices to close both menus smoothly
-    if (innerMainVisible) {
-      setTimeout(() => {
-        this.props.closeMain();
-      }, 500);
-      this.props.closeInnerMain();
-    }
-    else {
-      this.props.closeMain();
-    }
-  };
-  openInnerMain = (event, {content}) => { 
-    this.props.openInnerMain(this.props.authState, content.toLowerCase());
-  };
-  closeInnerMain = () => {
-    this.props.closeInnerMain();
-  };
-  //dashboard functions
-  openDash = () => {
-    this.props.openDash(this.props.authState);
-  };
-  closeDash = () => {
-    this.props.closeDash();
-  };
-  //fetch data from the inner menu click
   fetchData = (options) => {
     this.props.fetchData(options);
   }
@@ -91,28 +59,22 @@ class MainNav extends Component {
     return (
       <Fragment>
         <Responsive maxWidth={0} maxWidth={414}>
-          <NavbarHandheld>
+          <NavbarHandheld data-test="navbar-handheld">
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarHandheld>
         </Responsive>
 
-        <Responsive minWidth={415} maxWidth={1024}>
-          <NavbarTablet>
+        <Responsive minWidth={415} maxWidth={1023}>
+          <NavbarTablet data-test="navbar-tablet">
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarTablet>
 
         </Responsive>
-        <Responsive minWidth={1025} className="">
-          <NavbarDesktop
+        <Responsive minWidth={1024} className="">
+          <NavbarDesktop 
+            data-test="navbar-desktop"
             onPusherToggle={this.onPusherToggle}
-            openMain={this.openMain}
-            closeMain={this.closeMain}
-            openInnerMain={this.openInnerMain}
-            closeInnerMain={this.closeInnerMain}
-            openDash={this.openDash}
-            closeDash={this.closeDash}
             logoutUser={this.logoutUser}
-            fetchData={this.fetchData}
             navState={this.props.navState}
             authState={this.props.authState}
           >
@@ -128,24 +90,11 @@ class MainNav extends Component {
 MainNav.propTypes = {
   authState: PropTypes.object.isRequired,
   navState: PropTypes.object.isRequired,
-  openMain: PropTypes.func.isRequired,
-  closeMain: PropTypes.func.isRequired,
-  openInnerMain: PropTypes.func.isRequired,
-  closeInnerMain: PropTypes.func.isRequired,
-  openDash: PropTypes.func.isRequired,  
-  closeDash: PropTypes.func.isRequired,
-  logoutUser: PropTypes.func.isRequired,
-  fetchData: PropTypes.func.isRequired,
+  //fetchData: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    openMain: (authState) => dispatch(openMain(authState)),
-    closeMain: () => dispatch(closeMain()),
-    openInnerMain: (authState, content) => dispatch(openInnerMain(authState, content)),
-    closeInnerMain: () => dispatch(closeInnerMain()),
-    openDash: (authState) => dispatch(openDash(authState)),
-    closeDash: () => dispatch(closeDash()),
     logoutUser: (userData, history) => dispatch(logoutUser(userData, history)),
     fetchData: (options) => dispatch(fetchData(options)),
   };

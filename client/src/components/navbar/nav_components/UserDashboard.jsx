@@ -33,7 +33,6 @@ const UserDashboard = (props) => {
 UserDashboard.propTypes = {
   navState: PropTypes.object.isRequired,
   authState: PropTypes.object.isRequired,
-  closeDash: PropTypes.func.isRequired,
 };
 
 export default UserDashboard;
