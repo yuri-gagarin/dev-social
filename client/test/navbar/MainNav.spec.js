@@ -2,10 +2,19 @@ import React from "react";
 import {mount, shallow} from "enzyme";
 
 import { MainNav } from "../../src/components/navbar/MainNav";
+import MainNavConnected from "../../src/components/navbar/MainNav";
 
 import {navReducer} from "../../src/redux/reducers/uiReducers";
+
+import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
 import store from "../../src/redux/store";
+
+import mockStore from "../mockStore";
+
+//initial state mock store
+const testStore = mockStore(store.getState());
+
 
 describe("MainNav Component tests", () => {
   describe("Full mount rendering tests", () => {
@@ -43,6 +52,30 @@ describe("MainNav Component tests", () => {
       expect(desktopComp.props().navState).toBeDefined();
      // console.log(desktopComp.props());
     });
-  })
+  });
+  describe("Integration test with child components", () => {
+    //console.log(testStore.getState());
+    const wrapper = mount(
+    <Router>
+      <Provider store={testStore}>
+         <MainNavConnected />
+      </Provider>
+    </Router>
+
+    );
+    it("Should have a wrapper", () => {
+      console.log(wrapper.find(`[data-test="main-nav"]`).debug());
+    })
+    describe("function click simulations pusher", () => {
+
+    });
+    describe("function click simulations {MainMenu}", () => {
+
+    });
+    describe("function click simulations {InnerMainMenu", () => {
+
+    });
+
+  });
       
 });

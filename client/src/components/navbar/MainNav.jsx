@@ -30,6 +30,7 @@ const NavbarChildren = ({ children }) => {
 export class MainNav extends Component {
   constructor(props) {
     super(props);
+    //console.log(props);
   }
   onPusherToggle = () => {
     const {pusherVisible, mainVisible, innerMainVisible, dashOpen} = this.props.navState;
@@ -57,7 +58,7 @@ export class MainNav extends Component {
   render() {
     const children = this.props.children;
     return (
-      <Fragment>
+      <div data-test="main-nav">
         <Responsive maxWidth={0} maxWidth={414}>
           <NavbarHandheld data-test="navbar-handheld">
           <NavbarChildren>{children}</NavbarChildren>
@@ -81,7 +82,7 @@ export class MainNav extends Component {
           <NavbarChildren>{children}</NavbarChildren>
           </NavbarDesktop>
         </Responsive>
-      </Fragment>
+      </div>
     );
   }
 };
@@ -102,8 +103,8 @@ const mapDispatchToProps = (dispatch) => {
 
 const mapStateToProps = (state) => {
   return {
-    authState: state.auth,
-    navState: state.nav,
+    authState: state.authState,
+    navState: state.navState,
   };
 };
 

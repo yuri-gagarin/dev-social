@@ -5,8 +5,7 @@ import {Sidebar, Menu, Segment, Icon} from "semantic-ui-react";
 import style from "../../../assets/stylesheets/navbar/menus.scss";
 import {closeMain, openInnerMain} from "../helpers/toggleButtons";
 
-
-const MainMenu = (props) => {
+export const MainMenu = (props) => {
   const {authState, navState} = props;
   return(
     <Sidebar 
@@ -48,4 +47,4 @@ MainMenu.propTypes = {
 };
 
 
-export default MainMenu;
+export default MainMenu

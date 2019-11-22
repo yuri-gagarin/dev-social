@@ -2,6 +2,8 @@ import React from "react";
 import {shallow, mount} from "enzyme";
 import MainMenu from "../../src/components/navbar/nav_components/MainMenu";
 
+//import  from "../../sr"
+
 describe("Main Menu sidebar test", () => {
   const props = {
     authState: {

@@ -103,6 +103,10 @@ module.exports = {
     ], //end [rules]
   }, //end {this.module}
 
+  resolve: {
+    extensions: ['.js', '.jsx']
+  },
+
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({

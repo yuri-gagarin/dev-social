@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import {Sidebar, Menu, Segment, Icon} from "semantic-ui-react";
 import style from "../../../assets/stylesheets/navbar/menus.scss";
 
-import {handleInnerClick} from "../helpers/toggleButtons";
+import {handleInnerClick, closeInnerMain} from "../helpers/toggleButtons";
 
 const InnerMainMenu = (props) => {
   const {authState, navState, history} = props;
@@ -16,7 +16,9 @@ const InnerMainMenu = (props) => {
     visible={navState.innerMainVisible}
     direction="left"
     vertical
-    id={style.innerMainMenu}>
+    id={style.innerMainMenu}
+    data-test="inner-main-menu"
+  >
     <Menu.Item
       as={Segment}
       onClick={closeInnerMain} 
@@ -31,7 +33,7 @@ const InnerMainMenu = (props) => {
           <Menu.Item
             {...item}
             className={""}
-            onClick={(e) => {handleClick(e, history)} }
+            onClick={(e) => {handleInnerClick(e, history)} }
             data-test="inner-main-menu-clickable"
           />
         );
@@ -40,7 +42,7 @@ const InnerMainMenu = (props) => {
   </Sidebar>
   )
 };
-innerMainMenu.propTypes ={
+InnerMainMenu.propTypes = {
   authState: PropTypes.object.isRequired,
   navState: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,

@@ -2,14 +2,6 @@ import * as navActions from "../../../redux/actions/navActions";
 import store from "../../../redux/store";
 import { fetchData } from "../../../redux/actions/appAction";
 
-
-const buttonConstants = {
-  OPEN_MAIN: "open-main",
-  CLOSE_MAIN: "close-main",
-  OPEN_INNER_MAIN: "open-inner-main",
-  CLOSE_INNER_MAIN: "close-inner-main",
-}
-
 /**
  * Closes sidebar main menu.
  * @param {Object} e - javascript event object.
@@ -40,7 +32,7 @@ export const openMain = (e={}) => {
   store.dispatch(navActions.openMain(authState))
 }
 /**
- * Openssidebar inner main menu.
+ * Opens sidebar inner main menu.
  * @param {Object} event - javascript event object.
  * @returns null.
  */
@@ -54,7 +46,9 @@ export const openInnerMain = (e={}) => {
     store.dispatch(navActions.openInnerMain(authState, targetOpen));
   }
 };
-
+export const closeInnerMain = () => {
+  store.dispatch(navActions.closeInnerMain());
+};
 export const handleInnerClick = (event, history) => {
   if(!event || !history) {
     return false;
