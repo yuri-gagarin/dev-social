@@ -4,11 +4,11 @@ import { Menu, Button, Icon } from "semantic-ui-react";
 import {openDash} from "../helpers/toggleButtons";
 
 
-const DashComponent = (props) => {
+const DashOpenButton = (props) => {
   const {authState} = props;
-  if (authState.loggedIn) {
+  if (authState.userLoggedIn) {
     return (
-      <Menu.Item as={Button} onClick={openDash}>
+      <Menu.Item as={Button} onClick={openDash} data-test="open-dash-btn">
         <Icon name="dashboard">
         </Icon>
         <span>Open Dashboard</span>
@@ -21,4 +21,4 @@ const DashComponent = (props) => {
 
 };
 
-export default DashComponent;
+export default DashOpenButton;

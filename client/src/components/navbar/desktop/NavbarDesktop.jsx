@@ -4,14 +4,14 @@ import {Icon, Image, Sidebar, Menu} from "semantic-ui-react";
 import style from "../../../assets/stylesheets/navbar/navbar.scss";
 import {withRouter} from "react-router-dom";
 
-import MainMenu from "../nav_components/MainMenu.jsx";
-import InnerMainMenu from "../nav_components/InnerMainMenu.jsx";
+import MainMenu from "../nav_components/MainMenu";
+import InnerMainMenu from "../nav_components/InnerMainMenu";
 
 import {openMain} from "../helpers/toggleButtons";
 
-import NavAuthComponent from "../nav_components/NavAuthComponent.jsx";
-import DashComponent from "../nav_components/DashComponent.jsx";
-import UserDashboard from "../nav_components/UserDashboard.jsx";
+import NavAuthComponent from "../nav_components/NavAuthComponent";
+import DashOpenButton from "../nav_components/DashOpenButton";
+import UserDashboard from "../nav_components/UserDashboard";
 
 const NavbarDesktop = (props) => {
   const { history, authState, navState, children} = props;
@@ -33,7 +33,7 @@ const NavbarDesktop = (props) => {
             authState={authState} 
             logoutUser={logoutUser}
           />
-          <DashComponent 
+          <DashOpenButton
             authState={authState}
           />
         </Menu.Menu>

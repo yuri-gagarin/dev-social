@@ -51,8 +51,10 @@ describe("MainNav Component tests", () => {
         </Provider>
       </Router>
     );
-    it("Should have a wrapper", () => {
+    it("Should render the {MainNav} component", () => {
       //console.log(wrapper.find(`[data-test="main-nav"]`).debug());
+      const mainNav = setElem(wrapper, "main-nav");
+      expect(mainNav.exists()).toEqual(true);
     });
     describe("click buttons on nav-menu and pusher", () => {
       const openMainBtn = setElem(wrapper, "desktop-open-main-btn");

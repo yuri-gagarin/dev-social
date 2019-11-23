@@ -4,14 +4,13 @@ import {NavAuthComponent} from "../../src/components/navbar/nav_components/NavAu
 import {shallow} from "enzyme";
 
 import store from "../../src/redux/store";
-import mockStore from "../mockStore";
+//import mockStore from "../mockStore";
 
 import {setElem} from "../helpers/helperFunctions";
 
-const testStore = mockStore(store.getState());
-
+//const testStore = mockStore(store.getState());
 const props = {
-  authState: {...testStore.authState},
+  authState: store.getState().authState,
   history: {},
   logoutUser: () => null,
 };
@@ -20,7 +19,7 @@ describe("NavAuthComponent tests", () => {
   describe("User NOT Logged In", () => {
     const wrapper = shallow(<NavAuthComponent {...props} />);
     it("Should render", () => {
-      expect(wrapper.exists()).toEqual(true);
+      expect(wrapper.find("Fragment").exists()).toEqual(true);
     });
     it("Should render a Login button", () => {
       expect(setElem(wrapper, "login-btn").exists()).toEqual(true);
@@ -50,7 +49,7 @@ describe("NavAuthComponent tests", () => {
     newProps.authState.userLoggedIn = true;
     const wrapper = shallow(<NavAuthComponent {...newProps} />);
     it("Should render", () => {
-      expect(wrapper.exists()).toEqual(true);
+      expect(wrapper.find("Fragment").exists()).toEqual(true);
     });
     it("Should render a Logout button", () => {
       expect(setElem(wrapper, "logout-btn").exists()).toEqual(true);
