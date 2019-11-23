@@ -14,8 +14,8 @@ describe("Nav Action tests", () => {
     describe(`{openMain} function tests`, () => {
       const initialStore = store.getState();
 
-      openMain();
-      const newStore = store.getState();l
+      //openMain();
+      const newStore = store.getState();
     });
     describe(`{closeMain} function tests`, () => {
       

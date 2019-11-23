@@ -13,36 +13,30 @@ describe("PostNavbar Tests", function() {
   const authState = {
     loggedIn: true,
   };
+  const wrapper = shallow(<PostsNavbar fetchPosts={mockFetchPosts} authState={authState} />);
   it("renders the component", () => {
-    const wrapper = shallow(<PostsNavbar />);
     expect(wrapper.find(`[data-test="posts-navbar"]`).exists()).toEqual(true);
   });
   it("has a Menu component", () => {
-    const wrapper = shallow(<PostsNavbar />);
     expect(wrapper.find(Menu).length).toEqual(1)
   });
   it("has two Dropdown components", () => {
-    const wrapper = shallow(<PostsNavbar />);
     expect(wrapper.find(Dropdown).length).toEqual(2);
   });
   it("Accepts an {authState} props object", () => {
-    const wrapper = mount(<PostsNavbar  authState={authState} fetchPosts={mockFetchPosts}/>)
-    expect(wrapper.props().authState).toEqual(authState);
+    expect(wrapper.instance().props.authState).toEqual(authState);
   });
   it("sets the default state", () => {
-    const wrapper = shallow(<PostsNavbar />);
     expect(wrapper.state().filter).toEqual(postSearchOptions.filter.new);
     expect(wrapper.state().from).toEqual(postSearchOptions.time.day);
     expect(wrapper.state().filterBarEnabled).toEqual(true);
     expect(wrapper.state().timeBarEnabled).toEqual(false);
   });
   it("{Dropdown} component disabled property is {true} by default", () => {
-    const wrapper = shallow(<PostsNavbar fetchPosts={mockFetchPosts} />);
     const timeDropdown = wrapper.find(`[data-test="post-time-filter"]`);
     expect(timeDropdown.props().disabled).toEqual(true);
   });
   it("successfully sets the {Dropdown} component {disabled} prop", () => {
-    const wrapper = shallow(<PostsNavbar fetchPosts={mockFetchPosts} />);
     wrapper.setState({timeBarEnabled: true});
     const timeDropdown = wrapper.find(`[data-test="post-time-filter"]`);
     expect(timeDropdown.props().disabled).toEqual(false);

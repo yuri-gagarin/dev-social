@@ -11,36 +11,37 @@ const InnerMainMenu = (props) => {
 
   return (
     <Sidebar
-    as={Menu}
-    animation="overlay"
-    visible={navState.innerMainVisible}
-    direction="left"
-    vertical
-    id={style.innerMainMenu}
-    data-test="inner-main-menu"
-  >
-    <Menu.Item
-      as={Segment}
-      onClick={closeInnerMain} 
-      data-test="inner-main-menu-close"
+      as={Menu}
+      animation="overlay"
+      visible={navState.innerMainVisible}
+      direction="left"
+      vertical
+      id={style.innerMainMenu}
+      data-test="inner-main-menu-sidebar"
     >
-      <div><Icon name="arrow left"></Icon></div>
-      <div>Back</div>
-    </Menu.Item>
-    {   
-      navState.innerMainItems.map((item) => {
-        return (
-          <Menu.Item
-            {...item}
-            className={""}
-            onClick={(e) => {handleInnerClick(e, history)} }
-            data-test="inner-main-menu-clickable"
-          />
-        );
-      })
-    }
-  </Sidebar>
-  )
+      <Menu.Item
+        as="a"
+        onClick={closeInnerMain} 
+        data-test="inner-main-menu-close"
+        id=""
+      >
+        <div><Icon name="arrow left"></Icon></div>
+        <div>Back</div>
+      </Menu.Item>
+      {   
+        navState.innerMainItems.map((item) => {
+          return (
+            <Menu.Item
+              {...item}
+              className={""}
+              onClick={(e) => {handleInnerClick(e, history)} }
+              data-test="inner-main-menu-clickable"
+            />
+          );
+        })
+      }
+    </Sidebar>
+  );
 };
 InnerMainMenu.propTypes = {
   authState: PropTypes.object.isRequired,

@@ -7,24 +7,24 @@ import {withRouter} from "react-router-dom";
 import MainMenu from "../nav_components/MainMenu.jsx";
 import InnerMainMenu from "../nav_components/InnerMainMenu.jsx";
 
+import {openMain} from "../helpers/toggleButtons";
+
 import NavAuthComponent from "../nav_components/NavAuthComponent.jsx";
 import DashComponent from "../nav_components/DashComponent.jsx";
 import UserDashboard from "../nav_components/UserDashboard.jsx";
 
 const NavbarDesktop = (props) => {
   const { history, authState, navState, children} = props;
-  const { openMain, closeMain, openInnerMain, closeInnerMain, openDash, closeDash, onPusherToggle, logoutUser, fetchData} = props;
-
+  const { onPusherToggle, logoutUser} = props;
   const goHome = (history) => {history.push("/")};
 
   return (
     <Fragment>
-
-      <Menu id={style.navbarDesktop} fixed="top">
+      <Menu id={style.navbarDesktop} fixed="top" data-test="desktop-nav-menu">
         <Menu.Item onClick={() => goHome(history)}>
           <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
         </Menu.Item>
-        <Menu.Item onClick={openMain}>
+        <Menu.Item onClick={openMain} data-test="desktop-open-main-btn">
           <Icon name="sliders horizontal"></Icon>
           <span id={style.mainMenuBtn}>Main Menu</span>
         </Menu.Item>
@@ -35,32 +35,25 @@ const NavbarDesktop = (props) => {
           />
           <DashComponent 
             authState={authState}
-            openDash={openDash} 
           />
         </Menu.Menu>
       </Menu>
 
-      <Sidebar.Pushable style={{transform: "none"}} data-test="main-sidebar">
+      <Sidebar.Pushable style={{transform: "none"}} data-test="sidebar">
         <InnerMainMenu
           data-test="inner-main-menu"
           authState={authState}
           navState={navState}
           history={history}
-          closeInnerMain={closeInnerMain}
-          closeMain={closeMain}
-          fetchData={fetchData}
         />
         <MainMenu
           data-test="main-menu"
           authState={authState}
           navState={navState}
-          closeMain={closeMain}
-          openInnerMain={openInnerMain}
         />
         <UserDashboard 
           authState={authState}
           navState={navState}
-          closeDash={closeDash}
         />
         <Sidebar.Pusher
           dimmed={navState.pusherVisible}

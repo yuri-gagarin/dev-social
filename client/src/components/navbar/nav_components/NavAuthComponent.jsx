@@ -5,8 +5,8 @@ import {Menu, Button} from "semantic-ui-react";
 
 import {withRouter} from "react-router-dom";
 
-
-const NavAuthComponent = (props) => {
+//for testing
+export const NavAuthComponent = (props) => {
   const {authState, history, logoutUser} = props;
   
   const toggleLogin = () => {
@@ -23,13 +23,13 @@ const NavAuthComponent = (props) => {
 
   };
 
-  if(authState.loggedIn) {
+  if(authState.userLoggedIn) {
     return (
     <Fragment>
-      <Menu.Item as={Button} onClick={toggleLogout}>
+      <Menu.Item as={Button} onClick={toggleLogout} data-test="logout-btn">
         <span>Logout</span>
       </Menu.Item>
-      <Menu.Item as={Button} onClick={toggleMyProfile}>
+      <Menu.Item as={Button} onClick={toggleMyProfile} data-test="profile-btn">
         <span>My Profile</span>
       </Menu.Item>
     </Fragment>
@@ -38,10 +38,10 @@ const NavAuthComponent = (props) => {
   else {
     return(
       <Fragment>
-        <Menu.Item as={Button} onClick={toggleLogin}>
+        <Menu.Item as={Button} onClick={toggleLogin} data-test="login-btn">
           <span>Login</span>
         </Menu.Item>
-        <Menu.Item as={Button} onClick={toggleRegister}>
+        <Menu.Item as={Button} onClick={toggleRegister} data-test="register-btn">
           <span>Register</span>
         </Menu.Item>
       </Fragment>

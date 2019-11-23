@@ -2,6 +2,9 @@ import * as navActions from "../../../redux/actions/navActions";
 import store from "../../../redux/store";
 import { fetchData } from "../../../redux/actions/appAction";
 
+import {guestNav, userNav} from "../nav_data/navData";
+
+
 /**
  * Closes sidebar main menu.
  * @param {Object} e - javascript event object.
@@ -26,10 +29,10 @@ export const closeMain = (e={}) => {
  */
 export const openMain = (e={}) => {
   const {authState} = store.getState();
-  if(!authState.loggedIn) {
+  if(!authState) {
     return false;
   }
-  store.dispatch(navActions.openMain(authState))
+  store.dispatch(navActions.openMain(authState, {guestNav, userNav}));
 }
 /**
  * Opens sidebar inner main menu.
@@ -38,12 +41,13 @@ export const openMain = (e={}) => {
  */
 export const openInnerMain = (e={}) => {
   e.stopPropagation();
-  const targetOpen = e.target.getAttribute("data-inner");
+  const targetOpen = e.target.getAttribute("data-value");
+  const {authState} = store.getState();
   if(!targetOpen) {
     return false; 
   }
   else {
-    store.dispatch(navActions.openInnerMain(authState, targetOpen));
+    store.dispatch(navActions.openInnerMain(authState, {guestNav, userNav} ,targetOpen));
   }
 };
 export const closeInnerMain = () => {

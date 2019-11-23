@@ -48,6 +48,7 @@ const openInnerMain = (authState={}, navData={}, target) => {
   let innerMainData;
   let {userNav, guestNav} = navData;
   //possible errors
+  //console.log(51);
   if(!authState) {
     const error = new TypeError("AuthState is undefined");
     return {

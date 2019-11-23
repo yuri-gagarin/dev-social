@@ -25,7 +25,7 @@ describe("InnerMainMenu component tests", () => {
       expect(typeof wrapper.html() === "string").toEqual(true);
     });
     it("Should be invisible by default", () => {
-      const innerMainMenu = wrapper.find(`[data-test="inner-main-menu"]`);
+      const innerMainMenu = wrapper.find(`[data-test="inner-main-menu-sidebar"]`);
       expect(innerMainMenu.props().visible).toEqual(false);
     });
     describe("Close inner main menu item", () => {

@@ -1,9 +1,11 @@
 import React from "react";
 import { Menu, Button, Icon } from "semantic-ui-react";
 
+import {openDash} from "../helpers/toggleButtons";
+
 
 const DashComponent = (props) => {
-  const {authState, openDash} = props;
+  const {authState} = props;
   if (authState.loggedIn) {
     return (
       <Menu.Item as={Button} onClick={openDash}>

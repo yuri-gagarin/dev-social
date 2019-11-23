@@ -6,7 +6,9 @@ import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {fetchData} from "../../redux/actions/appAction";
 import {logoutUser} from "../../redux/actions/authActions";
-
+//
+import {closeMain, closeInnerMain} from "./helpers/toggleButtons";
+//
 import NavbarHandheld from "./handheld/NavbarHandheld";
 import NavbarTablet from "./tablet/NavbarTablet";
 import NavbarDesktop from "./desktop/NavbarDesktop";
@@ -35,16 +37,16 @@ export class MainNav extends Component {
   onPusherToggle = () => {
     const {pusherVisible, mainVisible, innerMainVisible, dashOpen} = this.props.navState;
     if (pusherVisible && mainVisible && !innerMainVisible) {
-      this.props.closeMain();
+      closeMain();
     }
     else if (pusherVisible && dashOpen) {
       this.props.closeDash();
     }
     else if (pusherVisible && innerMainVisible) {
       setTimeout(() => {
-        this.props.closeMain();
+        closeMain()
       }, 500);
-      this.props.closeInnerMain();
+      closeInnerMain();
     }
   };
   fetchData = (options) => {

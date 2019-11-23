@@ -1,9 +1,11 @@
 import React from "react";
 import {shallow, mount} from "enzyme";
 import MainMenu from "../../src/components/navbar/nav_components/MainMenu";
+import mockStore from "../mockStore";
+import store from "../../src/redux/store";
 
 //import  from "../../sr"
-
+const testStore = mockStore(store.getState());
 describe("Main Menu sidebar test", () => {
   const props = {
     authState: {
@@ -17,6 +19,8 @@ describe("Main Menu sidebar test", () => {
   it("should render", () => {
     //const wrapper = shallow(<MainMenu {...props} />);
     expect(wrapper).toBeDefined();
+    expect(wrapper.html()).toBeDefined();
+    expect(typeof wrapper.html() === "string").toBe(true);
   });
   describe("Close main menu item", () => {
     it("Should have a a close menu clickable item", () => {
@@ -41,7 +45,7 @@ describe("Main Menu sidebar test", () => {
         expect(item.html()).toBeDefined();
       }
     });
-  })
+  });
   
  
-})
+});

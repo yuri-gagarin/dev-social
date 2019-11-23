@@ -9,15 +9,16 @@ export const MainMenu = (props) => {
   const {authState, navState} = props;
   return(
     <Sidebar 
-      data-test="main-menu-sidebar"
       as={Menu}
       animation="overlay"
       visible={navState.mainVisible}
       direction="left"
       vertical
-      id={style.mainMenu}>
+      id={style.mainMenu}
+      data-test="main-menu-sidebar"
+    >
       <Menu.Item
-        as={Segment}
+        as="a"
         onClick={closeMain}
         className={""}
         data-test="main-menu-close"
@@ -31,8 +32,7 @@ export const MainMenu = (props) => {
             <Menu.Item
             {...item}
               onClick={openInnerMain}
-              data-inner={item.content}
-              data-test={"main-menu-clickable"} 
+              data-test="main-menu-clickable"
             />
           );
         })
