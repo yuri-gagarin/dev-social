@@ -93,9 +93,9 @@ export const dashData = {
 
   ],
   userDash: [
-    {as: "a", content: "Profile", key: "profile"},
-    {as: "a", content: "My Posts", key: "myposts"},
-    {as: "a", content: "My Comments", key: "mycomments"},
+    {as: "a", iconName: "user secret", content: "Profile", key: 1},
+    {as: "a", iconName: "newspaper", content: "My Posts", key: 2},
+    {as: "a", iconName: "comments", content: "My Comments", key: 3},
   ],
   moderatorDash: [
     //todo a moderator dashboard
