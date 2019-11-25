@@ -5,6 +5,7 @@ import { MainNav } from "../../src/components/navbar/MainNav";
 import MainNavConnected from "../../src/components/navbar/MainNav";
 
 import {navReducer} from "../../src/redux/reducers/uiReducers";
+import * as navActions from "../../src/redux/actions/navActions";
 
 import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
@@ -13,6 +14,7 @@ import store from "../../src/redux/store";
 import mockStore from "../mockStore";
 import { MenuItem } from "semantic-ui-react";
 import { ECANCELED } from "constants";
+import { LOGIN_SUCCESS } from "../../src/redux/cases";
 
 jest.useFakeTimers();
 
@@ -138,17 +140,54 @@ describe("MainNav Component tests", () => {
         });
       });
     });
-    describe("User is not logged in", () => {
+    describe("User is NOT logged in", () => {
       const navAuthComponent = wrapper.find("NavAuthComponent");
       it("Should have a {NavAuth} component", () => {
-        expect(navAuthComponent.html()).toBeDefined();
+        expect(navAuthComponent.exists()).toBe(true);
       });
+      it("Should NOT have an {DashOpenButton} component", () => {
+        const dashOpenButton = setElem(wrapper, "dash-open-btn");
+        expect(dashOpenButton.exists()).toBe(false);
+      })
       it("Should pass an {authstate} prop", () => {
         expect(navAuthComponent.props().authState).toBeDefined();
       });
       it("Shoult NOT be logged in by default", () => {
         expect(navAuthComponent.props().authState.userLoggedIn).toEqual(false);
-      })
+      });
+    });
+    describe("User is logged in", () => {
+      beforeAll(() => {
+        const user = {
+          name: "something",
+          role: "user",
+        }
+        store.dispatch({type: LOGIN_SUCCESS, payload: user});
+        wrapper.update();
+        console.log(wrapper.find("MainNav").props());
+      });
+      
+      it("Should have an {DashOpenButton} components", () => {
+        const dashOpenButton = setElem(wrapper, "open-dash-btn");
+        expect(dashOpenButton.exists()).toBe(true);
+      });
+      it("Should have a Logout Button", () => {
+        const logoutButton = setElem(wrapper, "logout-btn");
+        expect(logoutButton.exists()).toBe(true);
+      });
+      it("Should have a My Profile button", () => {
+        const profileBtn = setElem(wrapper, "profile-btn");
+        expect(profileBtn.exists()).toBe(true);
+      });
+      describe("User Dashboard interaction", () => {
+        describe("User click Simulations - Dashboard", () => {
+          const dashOpenButton = setElem(wrapper, "open-dash-btn");
+          dashOpenButton.simulate("click");
+          wrapper.update();
+
+        });
+      });
+
     })
     describe("function click simulations {MainMenu}", () => {
 

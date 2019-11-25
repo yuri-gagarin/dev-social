@@ -80,7 +80,10 @@ describe("DashComponents test", () => {
           const userDashItems = setElem(wrapper, "user-dash-item");
           expect(userDashItems.length).toBe(dashData.userDash.length);
           for (let item of userDashItems) {
-            console.log(1)
+            expect(item.props.onClick).toBeDefined();
+            expect(typeof item.props.onClick).toEqual("function");
+            expect(item.content).toBeDefined();
+            expect(item["data-value"]).toBeDefined();
           }
         });
       });

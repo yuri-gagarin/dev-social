@@ -1,6 +1,6 @@
 import axios from "axios";
 import jwtDecode from "jwt-decode";
-import {REGISTER, LIST_ERRORS, LOGIN, LOGOUT, SET_USER} from "../cases.js";
+import {REGISTER, LIST_ERRORS, LOGIN, LOGIN_SUCCESS, LOGOUT, SET_USER} from "../cases.js";
 import setAuthToken from "../../helpers/setAuthToken.js";
 
 export const registerUserTest = (newUserData) => {
@@ -157,4 +157,11 @@ export const logoutUser = (userData, history) => {
       }
     }))
   }
+};
+
+export const userLoggedIn = (userData) => {
+  return {
+    type: LOGIN_SUCCESS,
+    payload: userData,
+  };
 }

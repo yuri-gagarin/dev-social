@@ -1,4 +1,4 @@
-import {REGISTER, LOGIN, LOGOUT, SET_USER} from "../cases.js";
+import {REGISTER, LOGIN, LOGOUT, LOGIN_SUCCESS, SET_USER} from "../cases.js";
 import isEmpty from "../../helpers/validators/isEmpty.js";
 
 const initialState = {
@@ -21,6 +21,13 @@ export default function(state=initialState, action) {
         loggedIn: !isEmpty(action.payload.data),
         user: action.payload.data,
       });
+    case LOGIN_SUCCESS:
+      return {
+        ...state,
+        userLoggedIn: true,
+        user: action.payload,
+      };
+    
     case SET_USER: 
       return({
         ...state,
