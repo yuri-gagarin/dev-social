@@ -101,7 +101,6 @@ const openDash = (authState, dashData) => {
   if(!dashData || !dashData.userDash) {
     error = new Error("Can't fetch the dashboard data");
   }
-  
   if(authState.userLoggedIn) {
     dashItems = dashData.userDash;
   }

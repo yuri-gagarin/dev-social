@@ -58,15 +58,15 @@ describe("MainNav Component tests", () => {
       const mainNav = setElem(wrapper, "main-nav");
       expect(mainNav.exists()).toEqual(true);
     });
-    describe("click buttons on nav-menu and pusher", () => {
+    describe("{MainMenu}, {InnerMainMenu} simulations", () => {
       const openMainBtn = setElem(wrapper, "desktop-open-main-btn");
-      it("should open main menu and set {MainMenu.props.visible === true}", () => {
+      it("Should open main menu and set {MainMenu.props.visible === true}", () => {
         openMainBtn.at(0).simulate("click");
         wrapper.update();
         const mainMenuVisible = setElem(wrapper, "main-menu-sidebar").at(0).props().visible;
         expect(mainMenuVisible).toBe(true);
       });
-      it("should not open inner main menu, {InnerMainMenu.visible === false", () => {
+      it("Should NOT open inner main menu, {InnerMainMenu.props.visible === false", () => {
         const innerMainMenuVisible = setElem(wrapper, "inner-main-menu-sidebar").at(0).props().visible;
         expect(innerMainMenuVisible).toBe(false);
       });
@@ -101,8 +101,8 @@ describe("MainNav Component tests", () => {
       });
     });
 
-    describe("function click simulations pusher", () => {
-      describe("pusher click when only {MainMenu} open", () => {
+    describe("Pusher <div> simulations", () => {
+      describe("Pusher click when only {MainMenu} open", () => {
         beforeAll(() => {
           const openMainBtn = setElem(wrapper, "desktop-open-main-btn");
           openMainBtn.at(0).simulate("click");
@@ -117,7 +117,7 @@ describe("MainNav Component tests", () => {
           expect(mainMenuVisible).toBe(false);
         })
       })
-      describe("pusher click when both {MainMenu} and {InnerMainMenu} open", () => {
+      describe("Pusher click when both {MainMenu} and {InnerMainMenu} open", () => {
         beforeAll(() => {
           const openMainBtn = setElem(wrapper, "desktop-open-main-btn");
           openMainBtn.at(0).simulate("click");
@@ -164,7 +164,6 @@ describe("MainNav Component tests", () => {
         }
         store.dispatch({type: LOGIN_SUCCESS, payload: user});
         wrapper.update();
-        console.log(wrapper.find("MainNav").props());
       });
       
       it("Should have an {DashOpenButton} components", () => {
@@ -180,11 +179,52 @@ describe("MainNav Component tests", () => {
         expect(profileBtn.exists()).toBe(true);
       });
       describe("User Dashboard interaction", () => {
-        describe("User click Simulations - Dashboard", () => {
-          const dashOpenButton = setElem(wrapper, "open-dash-btn");
-          dashOpenButton.simulate("click");
-          wrapper.update();
-
+        let mainVisible, innerMainVisible;
+        beforeAll(() => {
+          const mainMenu = setElem(wrapper, "main-menu-sidebar");
+          const innerMainMenu = setElem(wrapper, "inner-main-menu-sidebar");
+          mainVisible = mainMenu.at(0).props().visible;
+          innerMainVisible = innerMainMenu.at(0).props().visible;
+        })
+        describe("User click Simulations - Dashboard Open Button", () => {
+          it("Should open the Dashboard", () => {
+            const dashOpenButton = setElem(wrapper, "open-dash-btn");
+            dashOpenButton.at(0).simulate("click");
+            wrapper.update();
+            const userDashboard = setElem(wrapper, "user-dash");
+            expect(userDashboard.at(0).props().visible).toBe(true);
+          });
+          it("Should not alter any other menus", () => {
+            const mainMenu = setElem(wrapper, "main-menu-sidebar");
+            const innerMainMenu = setElem(wrapper, "inner-main-menu-sidebar");
+            expect(mainMenu.at(0).props().visible).toEqual(mainVisible)
+            expect(innerMainMenu.at(0).props().visible).toEqual(innerMainVisible);
+          });
+          it("Should pass props to build the Dashboard", () => {
+            const userDashboardComponent = wrapper.find("UserDashboard");
+            const navState = (userDashboardComponent.at(0).props().navState);
+            expect(navState.dashItems.length > 1).toBe(true);
+          });
+        });
+        describe("User click Simulations - Dashboard Close Button", () => {
+          it("should close the Dashboard", () => {
+            const dashCloseButton = setElem(wrapper,"close-dash-btn");
+            dashCloseButton.at(0).simulate("click");
+            wrapper.update();
+            const userDashboard = setElem(wrapper, "user-dash");
+            expect(userDashboard.at(0).props().visible).toBe(false);
+          });
+          it("Should not alter any other menus", () => {
+            const mainMenu = setElem(wrapper, "main-menu-sidebar");
+            const innerMainMenu = setElem(wrapper, "inner-main-menu-sidebar");
+            expect(mainMenu.at(0).props().visible).toEqual(mainVisible)
+            expect(innerMainMenu.at(0).props().visible).toEqual(innerMainVisible);
+          });
+          it("Should set an empty 'Array' to {navState.dashItems}", () => {
+            const userDashboardComponent = wrapper.find("UserDashboard");
+            const navState = (userDashboardComponent.at(0).props().navState);
+            expect(navState.dashItems.length === 0).toBe(true);
+          });
         });
       });
 

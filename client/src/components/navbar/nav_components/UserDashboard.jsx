@@ -32,7 +32,7 @@ const UserDashboard = (props) => {
         <Menu.Item
           as="a"
           onClick={closeDash} 
-          data-test="close-dash-clickable"
+          data-test="close-dash-btn"
         >
           <Icon name="window close outline"></Icon>
           <div>Close</div>

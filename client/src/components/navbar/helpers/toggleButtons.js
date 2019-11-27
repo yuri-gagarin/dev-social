@@ -2,7 +2,7 @@ import * as navActions from "../../../redux/actions/navActions";
 import store from "../../../redux/store";
 import { fetchData } from "../../../redux/actions/appAction";
 
-import {guestNav, userNav} from "../nav_data/navData";
+import {guestNav, userNav, dashData} from "../nav_data/navData";
 
 
 /**
@@ -76,12 +76,13 @@ export const handleInnerClick = (event, history) => {
   history.push(fetchOptions);
 };
 
-export const openDash = () => {
-
+export const openDash = (e) => {
+  const {authState, navState} = store.getState();
+  store.dispatch(navActions.openDash(authState, dashData));
 };
 
-export const closeDash = () => {
-
+export const closeDash = (e) => {
+  store.dispatch(navActions.closeDash());
 };
 
 

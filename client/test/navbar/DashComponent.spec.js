@@ -58,7 +58,7 @@ describe("DashComponents test", () => {
           expect(userDash.props().visible).toBe(true);
         });
         it("Should have an onClick - {closeDash} function", () => {
-          const closeDashclickable = setElem(wrapper, "close-dash-clickable");
+          const closeDashclickable = setElem(wrapper, "close-dash-btn");
           expect(closeDashclickable.props().onClick).toBeDefined();
           expect(typeof closeDashclickable.props().onClick).toEqual("function");
         });
@@ -82,7 +82,6 @@ describe("DashComponents test", () => {
           for (let item of userDashItems) {
             expect(item.props.onClick).toBeDefined();
             expect(typeof item.props.onClick).toEqual("function");
-            expect(item.content).toBeDefined();
             expect(item["data-value"]).toBeDefined();
           }
         });
