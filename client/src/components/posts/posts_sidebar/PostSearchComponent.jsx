@@ -81,7 +81,7 @@ class PostSearchComponent extends Component {
 
   render() {
     return (
-      <Container className = {style.postSearchContainer} >
+      <Container className={style.postSearchContainer} data-test="post-search-component">
         <div className={style.postSearchContainerTitle}>Search Posts</div>
         <Search style={{textAlign: "center"}}
           fluid

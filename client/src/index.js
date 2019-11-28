@@ -8,7 +8,7 @@ import "./styles.scss";
 
 import {BrowserRouter as Router} from "react-router-dom";
 
-
+const testState = store.getState();
 
 ReactDOM.render(
   <Provider store={store}>

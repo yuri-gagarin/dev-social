@@ -1,6 +1,6 @@
-import React, {Component} from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import {Grid, Container, GridRow} from "semantic-ui-react";
+import {Grid} from "semantic-ui-react";
 import style from "../../assets/stylesheets/posts/post.scss";
 //React components
 import PostsNavbar from "./post_navbar/PostsNavbar.jsx";
@@ -11,34 +11,36 @@ import TrendingPostsComponent from "./posts_sidebar/TrendingPostsComponent.jsx";
 import {connect} from "react-redux";
 import {fetchPosts, fetchTrendingPosts} from "../../redux/actions/postActions.js";
 
-class PostsIndexComponent extends Component {
-  constructor(props) {
-    super(props);
-  }
-  
-  
-  render () {
-    const trendingPosts = this.props.postsState.trendingPosts;
-    const {fetchPosts, fetchTrendingPosts} = this.props;
-    return (
-      <div className={style.postIndexComponent}>
-        <Grid>
-          <Grid.Row>
-            <PostsNavbar fetchPosts={fetchPosts}/>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width={12}>
-              <PostsContainerComponent />
-            </Grid.Column>
-            <Grid.Column width={4}>
-              <PostSearchComponent />
-              <TrendingPostsComponent fetchTrendingPosts={fetchTrendingPosts} trendingPosts={trendingPosts}/>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </div>
-    );
-  }
+const PostsIndexComponent = (props) => {
+  const {authState, postsState} = props;
+  const {fetchPosts, fetchTrendingPosts} = props;
+  const trendingPosts = props.postsState.trendingPosts;
+    
+  return (
+    <div className={style.postIndexComponent} data-test="posts-index-component">
+      <Grid>
+        <Grid.Row>
+          <PostsNavbar fetchPosts={fetchPosts}/>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={12}>
+            <PostsContainerComponent 
+              authState={authState}
+              postsState={postsState}
+              fetchPosts={fetchPosts}
+            />
+          </Grid.Column>
+          <Grid.Column width={4}>
+            <PostSearchComponent />
+            <TrendingPostsComponent 
+              fetchTrendingPosts={fetchTrendingPosts} 
+              trendingPosts={trendingPosts}
+            />
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+    </div>
+  )
 };
 PostsIndexComponent.propTypes = {
   postsState: PropTypes.object.isRequired,
@@ -49,8 +51,8 @@ PostsIndexComponent.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    authState: state.auth,
-    postsState: state.posts,
+    authState: state.authState,
+    postsState: state.postsState,
   };
 };
 const mapDispatchToProps = (dispatch) => {

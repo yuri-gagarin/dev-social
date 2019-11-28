@@ -14,9 +14,9 @@ export const closeMain = (e={}) => {
   const {authState, navState} = store.getState();
   if(navState.innerMainVisible) {
     setTimeout(() => {
-      store.dispatch(navActions.closeInnerMain());
+      store.dispatch(navActions.closeMain());
     }, 500);
-    store.dispatch(navActions.closeMain());
+    store.dispatch(navActions.closeInnerMain());
   }
   else {
     store.dispatch(navActions.closeMain());

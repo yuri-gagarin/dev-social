@@ -47,13 +47,13 @@ class App extends Component {
   render() {
     return (
       <Fragment>
-          <MainNav>
-            <ErrorComponent />
-            <Route exact path="/" component={WelcomeComponent} />
-            <Route path="/(login|register)/" component={AuthorizationComponent} />
-            <Route path="/posts" component={PostIndexComponent} />
-          </MainNav>
-          <Footer></Footer>
+        <MainNav>
+          <ErrorComponent />
+          <Route exact path="/" component={WelcomeComponent} />
+          <Route path="/(login|register)/" component={AuthorizationComponent} />
+          <Route path="/posts" component={PostIndexComponent} />
+        </MainNav>
+        <Footer />
       </Fragment>
     );
   }
@@ -65,7 +65,7 @@ App.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    authState: state.auth,
+    authState: state.authState,
     testState: state.test,
   };
 };

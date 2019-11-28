@@ -89,7 +89,7 @@ const closeInnerMain = () => {
 };
 //dashboard
 /**
- * 
+ * Opens the dashboard
  * @param {Object} authState - Authorization state of the whole app.
  * @param {Object} dashData - Dashboard data.
  */

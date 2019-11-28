@@ -68,6 +68,7 @@ describe("DashComponents test", () => {
         const userDash = setElem(wrapper, "user-dash");
         it("Return UserDashboard component", () => {
           expect(userDash.exists()).toBe(true);
+          console.log(wrapper.html());
         });
         it("Should be visible", () => {
           expect(userDash.props().visible).toBe(true);
@@ -82,11 +83,10 @@ describe("DashComponents test", () => {
           for (let item of userDashItems) {
             expect(item.props.onClick).toBeDefined();
             expect(typeof item.props.onClick).toEqual("function");
-            expect(item["data-value"]).toBeDefined();
+            expect(item.props["data-value"]).toBeDefined();
           }
         });
       });
     });
-    
   });
 });

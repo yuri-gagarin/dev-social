@@ -41,9 +41,10 @@ class TrendingPostsComponent extends Component {
     //set element and its position
     window.addEventListener("scroll", this.listenToScroll);
     this.mainNavHeight = document.getElementById("navbarDesktop");
-    console.log(this.mainNavHeight);
-    this.element = document.getElementById("trendingPostsComponent");
-    this.position = this.element.getBoundingClientRect();
+    if(this.element) {
+      this.element = document.getElementById("trendingPostsComponent");
+      this.position = this.element.getBoundingClientRect();
+    }
   }
   componentWillUnmount() {
     window.removeEventListener("scroll", this.listenToScroll);
@@ -74,7 +75,7 @@ class TrendingPostsComponent extends Component {
   }
   render() {
     return (
-      <div className={style.trendingPostsComponent} id="trendingPostsComponent">
+      <div className={style.trendingPostsComponent} id="trendingPostsComponent" data-test="trending-posts-component">
         <div className={style.headerDiv}>Trending Now</div>
         <Item.Group>
           {
