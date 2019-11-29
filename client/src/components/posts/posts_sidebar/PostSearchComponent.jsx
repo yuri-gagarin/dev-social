@@ -36,7 +36,12 @@ class PostSearchComponent extends Component {
     };
   }
 
+  componentDidMount = () => {
+    //console.log(this.state);
+  }
+
   handleSearchChange = (e, {value}) => {
+    console.log("called");
     if (this.state.typingTimeOut) {clearTimeout(this.state.typingTimeOut)};
     const searchTimeout = setTimeout(() => {
       const searchPattern = this.state.value;
@@ -66,7 +71,7 @@ class PostSearchComponent extends Component {
         });
       })
     }, 2000);
-    
+    console.log(74)
     this.setState({
       value: value,
       typingTimeOut: searchTimeout,
@@ -83,12 +88,14 @@ class PostSearchComponent extends Component {
     return (
       <Container className={style.postSearchContainer} data-test="post-search-component">
         <div className={style.postSearchContainerTitle}>Search Posts</div>
-        <Search style={{textAlign: "center"}}
+        <Search 
+          style={{textAlign: "center"} }
           fluid
           onSearchChange={this.handleSearchChange}
           loading={this.state.loading}
           results={this.state.results}
           resultRenderer={ResultRenderer}
+          data-test="post-search-input"
         />
       </Container>
     );

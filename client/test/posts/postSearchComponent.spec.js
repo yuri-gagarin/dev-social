@@ -1,5 +1,5 @@
 import React from "react";
-import { shallow } from "enzyme";
+import { shallow, mount } from "enzyme";
 
 import PostSearchComponent from "../../src/components/posts/posts_sidebar/PostSearchComponent";
 import { setElem } from "../helpers/helperFunctions";
@@ -29,6 +29,36 @@ describe("{PostSearchComponent} unit tests", () => {
     });
     it("Should NOT have a typing timeout set", () => {
       expect(componentInstance.state.typingTimeOut).toEqual(null);
+    });
+
+    describe("{PostSearchComponent} search input", () => {
+      let  mountedSearch, searchInput;
+      beforeAll(() => {
+        mountedSearch = mount(<PostSearchComponent />);
+        searchInput = setElem(mountedSearch, "post-search-input");
+
+      })
+      it("Should have an {onSearchChange} function defined in props", () => {
+        expect(searchInput.at(0).props().onSearchChange).toBeDefined();
+        expect(typeof searchInput.at(0).props().onSearchChange).toEqual("function");
+      });
+      describe("{PostSearchComponent} {handleSearchChange} function", () => {
+        it("Handle searchChange call should change the component state", () =>{
+          //searchInput.props().onSearchChange();
+          const searchComponent = mountedSearch.find("Search");
+          const postSearchComponent = mountedSearch.find("PostSearchComponent");
+          postSearchComponent.instance().setState({value: "Search me"});
+          searchComponent.instance().setState({value: "Search me"});
+          wrapper.update();
+          jest.useFakeTimers();
+          const newSearchComponent = mountedSearch.find("Search");
+          newSearchComponent.invoke("onSearchChange")({}, {value: "Searching"});
+          jest.runAllTimers();
+  
+          //console.log(newSearchComponent.instance());
+        });
+      
+      })
     })
   })
 })
