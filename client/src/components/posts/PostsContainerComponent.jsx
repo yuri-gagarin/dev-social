@@ -19,7 +19,7 @@ class PostsContainerComponent extends Component {
     return this.props.postsState !== nextProps.postsState;
   }
   handlePostLike = (id) => {
-    //console.log(id)
+    //console.log(typeof id)
     const currentPosts = this.props.postsState.posts;
     this.props.toggleLike(id, currentPosts);
   };

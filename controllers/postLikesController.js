@@ -62,8 +62,8 @@ export default {
       .then((post) => {
         return res.status(200).json({
           message: "Liked Post",
-          post: {
-            id: post._id,
+          updatedPost: {
+            _id: post._id,
             likeCount: post.likeCount,
             dislikeCount: post.dislikeCount,
           }
@@ -117,8 +117,8 @@ export default {
       .then((post) => {
         return res.status(200).json({
           message: "Unliked the Post",
-          post: {
-            id: post._id,
+          updatedPost: {
+            _id: post._id,
             likeCount: post.likeCount,
             dislikeCount: post.dislikeCount
           }
