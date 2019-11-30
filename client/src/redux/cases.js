@@ -32,5 +32,5 @@ export const POSTS_ERROR = "POSTS_ERROR";
 export const FETCH_TRENDING_POSTS = "FETCH_TRENDING_POSTS";
 export const CREATE_POST = "CREATE_POST";
 export const DELETE_POST = "DELETE_POST";
-export const LIKE_POST = "LIKE_POST";
-export const UNLIKE_POST = "UNLIKE_POST";
+export const HANDLE_POST_LIKE = "HANDLE_POST_LIKE";
+export const HANDLE_POST_DISLIKE = "HANDLE_POST_DISLIKE";

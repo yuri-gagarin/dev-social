@@ -9,11 +9,11 @@ import PostSearchComponent from "./posts_sidebar/PostSearchComponent.jsx";
 import TrendingPostsComponent from "./posts_sidebar/TrendingPostsComponent.jsx";
 //redux imports 
 import {connect} from "react-redux";
-import {fetchPosts, fetchTrendingPosts} from "../../redux/actions/postActions.js";
+import {fetchPosts, fetchTrendingPosts, handlePostLike, handlePostDislike} from "../../redux/actions/postActions.js";
 
 const PostsIndexComponent = (props) => {
   const {authState, postsState} = props;
-  const {fetchPosts, fetchTrendingPosts} = props;
+  const {fetchPosts, fetchTrendingPosts, toggleLike, toggleDislike} = props;
   const trendingPosts = props.postsState.trendingPosts;
     
   return (
@@ -28,6 +28,8 @@ const PostsIndexComponent = (props) => {
               authState={authState}
               postsState={postsState}
               fetchPosts={fetchPosts}
+              toggleLike={toggleLike}
+              toggleDislike={toggleDislike}
             />
           </Grid.Column>
           <Grid.Column width={4}>
@@ -45,8 +47,10 @@ const PostsIndexComponent = (props) => {
 PostsIndexComponent.propTypes = {
   postsState: PropTypes.object.isRequired,
   authState: PropTypes.object.isRequired,
-  fetchTrendingPosts:  PropTypes.func.isRequired,
+  fetchTrendingPosts: PropTypes.func.isRequired,
   fetchPosts: PropTypes.func.isRequired,
+  toggleLike: PropTypes.func.isRequired,
+  toggleDislike: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => {
@@ -59,6 +63,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     fetchTrendingPosts: () => dispatch(fetchTrendingPosts()),
     fetchPosts: (options) => dispatch(fetchPosts(options)),
+    toggleLike: (postId, currentPostState) => dispatch(handlePostLike(postId, currentPostState)),
+    toggleDislike: (postId, currentPostState) => dispatch(handlePostDislike(postId, currentPostState))
   };
 };
 

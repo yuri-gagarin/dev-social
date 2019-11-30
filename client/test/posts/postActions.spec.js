@@ -10,7 +10,12 @@ import {generatePost} from "../helpers/mockData";
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
+import {generatePost} from "../helpers/"
 
+const posts = [];
+for (let i = 0; i < 10; i++) {
+  posts.push(generatePost());
+}
 //throw in some post navbar tests here
 describe("Post Navbar Tests", () => {
   beforeEach(() => {
@@ -82,3 +87,26 @@ describe("Post Navbar Tests", () => {
       })
   });
 });
+
+describe("Post {Like} {Dislike} toggles tests", () => {
+  it(`Should successfully dispatch a ${types.HANDLE_POST_LIKE} action`, () => {
+
+    moxios.wait(() => {
+      let request = moxios.requests.mostRecent();
+      request.respondWith({
+        status: 200,
+        response: {
+          message: "liked",
+          posts: [...posts]
+        }
+      })
+    })
+    const expectedActions = [
+      {type: types.HANDLE_POST_LIKE, payload: postData}
+    ];
+    
+  })
+  it(`Should successfully dispatch a ${types.HANDLE_POST_DISLIKE} action`, () => {
+
+  })
+})

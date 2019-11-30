@@ -1,7 +1,7 @@
-import {FETCH_TRENDING_POSTS, LIKE_POST, UNLIKE_POST, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR} from "../cases.js";
-import {trimString} from "../../helpers/rendering/displayHelpers.js";
+import {FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR, HANDLE_POST_LIKE, HANDLE_POST_DISLIKE} from "../cases";
+import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
-import {postSearchOptions} from "../searchOptions.js";
+import {postSearchOptions} from "../searchOptions";
 
 
 export const postsRequest = () => {
@@ -99,26 +99,100 @@ export const fetchTrendingPosts = () => {
   }
 };
 
-export const likePost = (postId, userId) => {
-  return function(dispatch) {
-    
-    ///api actions
-
-    dispatch({
-      type: LIKE_POST,
-      payload: 0,
-    })
-  };
+export const handlePostLike = (postId, currentPostState) => {
+  const token = localStorage.getItem("jwtToken");
+  if(!token) {
+    ///we should return an error if user is not logged in
+    console.log("AAAAAAHHHHH")
+    return {
+      type: POSTS_ERROR,
+      payload: "error"
+    }
+  }
+  else {
+    return function(dispatch) {
+      const options = {
+        method: "post",
+        url: "/api/posts/like_post/" + postId,
+        headers: {"Authorization": `Bearer ${token}`}
+      };
+      ///api actions
+      axios(options)
+        .then((response) => {
+          let {updatedPost, message} = response.data;
+          let newPostState = currentPostState.map((post) => {
+            if(post._id === updatedPost._id) {
+              return {
+                ...post, likeCount: updatedPost.likeCount
+              }
+            }
+            else {
+              return post;
+            }
+          });
+          dispatch({
+            type: HANDLE_POST_LIKE,
+            payload: {
+              message: message,
+              posts: newPostState,
+            }
+          })
+        })
+        .catch((error) => {
+          dispatch({
+            type: POSTS_ERROR,
+            payload: error,
+          });
+        });
+    };
+  }
 };
 
-export const unlikePost = (postId, userId) => {
-  return function(dispatch) {
-    //api actions
-    dispatch({
-      type: UNLIKE_POST,
-      payload: 0,
-    });
-  };
+export const handlePostDislike = (postId, currentPostState) => {
+  const token = localStorage.getItem("jwtToken");
+  if(!token) {
+    return {
+      type: POSTS_ERROR,
+      payload: "error"
+    }
+  }
+  else {
+    return function(dispatch) {
+      const options = {
+        method: "post",
+        url: "/api/posts/like_post/" + postId,
+        headers: {"Authorization": `Bearer ${token}`}
+      };
+      axios(options)
+        .then((response) => {
+          let {updatedPost, message} = response.data;
+          let newPostState = currentPostState.map((post) => {
+            if(post._id === updatedPost._id) {
+              return {
+                ...post,
+                dislikeCount: updatedPost.dislikeCount
+              };
+            }
+            else {
+              return post;
+            }
+          });
+          dispatch({
+            type: HANDLE_POST_DISLIKE,
+            payload: {
+              message: message,
+              posts: newPostState,
+            }
+          });
+        })
+        .catch((error) => {
+          dispatch({
+            type: POSTS_ERROR,
+            payload: error,
+          });
+        });
+    }
+  }
 };
 
 

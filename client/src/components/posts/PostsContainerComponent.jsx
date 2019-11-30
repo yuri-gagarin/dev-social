@@ -18,6 +18,15 @@ class PostsContainerComponent extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.postsState !== nextProps.postsState;
   }
+  handlePostLike = (id) => {
+    //console.log(id)
+    const currentPosts = this.props.postsState.posts;
+    this.props.toggleLike(id, currentPosts);
+  };
+  handlePostDislike = (id) => {
+    const currentPosts = this.props.postsState.posts;
+    this.props.toggleDislike(id, currentPosts);
+  }
   render () {
     const posts = this.props.postsState.posts;
     const {authState, errorState} = this.props;
@@ -26,12 +35,15 @@ class PostsContainerComponent extends Component {
         <Item.Group>
           {
             posts.map((post) => {
+              const postId = post._id;
               return (
                 <PostComponent
                   key={post._id}
                   post={post}
                   authState={authState}
-                  errorState={errorState}
+                  //errorState={errorState}
+                  toggleLike={() => this.handlePostLike(postId)}
+                  toggleDislike={() => this.handlePostDislike(postId)}
                 />
               );
             })

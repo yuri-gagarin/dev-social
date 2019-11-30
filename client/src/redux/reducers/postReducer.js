@@ -1,4 +1,5 @@
-import {FETCH_POSTS, FETCH_TRENDING_POSTS, LIKE_POST, UNLIKE_POST, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR} from "../cases.js";
+import {FETCH_POSTS, FETCH_TRENDING_POSTS, HANDLE_POST_LIKE, HANDLE_POST_DISLIKE, 
+        POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR} from "../cases.js";
 
 const initialState = {
   loading: false,
@@ -39,11 +40,11 @@ const postReducer = (state=initialState, action) => {
         loading: action.payload.loading,
         postsError: action.payload.error,
       };
-    case LIKE_POST:
+    case HANDLE_POST_LIKE:
       return {
         ...state,
       };
-    case UNLIKE_POST:
+    case HANDLE_POST_DISLIKE:
       return {
         ...state,
       };
