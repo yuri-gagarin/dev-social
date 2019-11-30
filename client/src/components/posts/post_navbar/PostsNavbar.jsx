@@ -97,20 +97,28 @@ class PostsNavbar extends Component {
             <Dropdown.Header icon='filter' content='Filter by type' />
             <Dropdown.Divider />
             <Dropdown.Item onClick={this.handleSortClick} data-value={options.filter.new}>
-              <Icon name="bullhorn" className="right floated" />
-              {options.filter.new}
+              <div className={styles.filterOption}>
+                <i aria-hidden="true" className="icon feed"></i>
+                <span>{options.filter.new}</span>
+              </div>
             </Dropdown.Item>
             <Dropdown.Item onClick={this.handleSortClick} data-value={options.filter.trending}>
-              <Icon name='heartbeat' className='right floated' />
-              {options.filter.trending}
+              <div className={styles.filterOption}>
+                <i aria-hidden="true" className="icon bullhorn"></i>
+                <span>{options.filter.trending}</span>
+              </div>
             </Dropdown.Item>
             <Dropdown.Item onClick={this.handleSortClick} data-value={options.filter.controversial}>
-              <Icon name='fire' className='right floated' />
-              {options.filter.heated}
+              <div className={styles.filterOption}>
+                <i aria-hidden="true" className="icon fire"></i>
+                <span>{options.filter.controversial}</span>
+              </div>
             </Dropdown.Item>
             <Dropdown.Item onClick={this.handleSortClick} data-value={options.filter.discussed}>
-              <Icon name='conversation' className='right floated' />
-              {options.filter.discussed}
+              <div className={styles.filterOption}>
+                <i aria-hidden="true" className="icon comments"></i>
+                <span>{options.filter.discussed}</span>
+              </div>
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
@@ -143,7 +151,7 @@ class PostsNavbar extends Component {
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
-        <div className={styles.sortValue}>{this.state.time}</div>
+        <div className={styles.sortValue}>{this.state.from}</div>
       </Menu>
     );
   }

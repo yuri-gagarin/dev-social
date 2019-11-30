@@ -22,7 +22,7 @@ class PostsContainerComponent extends Component {
     const posts = this.props.postsState.posts;
     const {authState, errorState} = this.props;
     return (
-      <Container style={{border: "3px solid green"}} data-test="posts-container">
+      <Container data-test="posts-container">
         <Item.Group>
           {
             posts.map((post) => {

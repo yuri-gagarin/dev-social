@@ -57,6 +57,7 @@ export default {
     let {from, toDate, filter, limit} = req.query
     //check for null required values
     //maybe remove to a separate function
+    //console.info(req.query);
     let fromDate = convertTimeQuery(from, POST_QUERY_OPTIONS);
     if (filter && typeof filter === 'string') {
       filter = filter.toLowerCase();

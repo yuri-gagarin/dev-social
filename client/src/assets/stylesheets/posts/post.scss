@@ -40,6 +40,8 @@
 .menuDropdown {
   background-color: red;
 }
+//end style for post navbar
+
 //styles for a post thumbnail
 .postImage {
   height: 100%;
@@ -50,9 +52,13 @@
 }
 .postItem {
   position: relative;
-  border: 3px solid red !important;
+  border: 1px solid rgb(180, 177, 177) !important;
+  background-color: rgba(255, 255, 255, 0.904) !important;
   min-height: 200px;
   padding: 25px !important;
+  -webkit-box-shadow: -1px 0px 4px 1px rgba(122,117,122,1) !important;
+  -moz-box-shadow: -1px 0px 4px 1px rgba(122,117,122,1) !important;
+  box-shadow: -1px 0px 4px 1px rgba(122,117,122,1) !important;
 }
 .postTimeStamps {
   position: relative;
@@ -63,14 +69,74 @@
 }
 .postCreated {
   position: absolute;
-  left: 2%;
+  right: 2%;
   top: 2%;
+  :first-child {
+    color: rgb(15, 13, 13);
+    margin-right: 2px;
+  }
+  :nth-child(2) {
+    color: rgb(26, 26, 230)
+  }
 }
 .postEdited {
   position: absolute;
   right: 2%;
-  top: 2%;
+  top: 12%;
+  :first-child {
+    color: rgb(15, 13, 13);
+    margin-right: 2px;
+  }
+  :nth-child(2) {
+    color: rgb(26, 26, 230)
+  }
 }
+
+.postLikeCount {
+  .postLikeButton {
+    display: inline-block;
+  }
+  display: inline-block;
+  //border: 1px solid red;
+  padding: 2px;
+  margin-right: 2px;
+  i {
+    &:hover {
+      color: rgb(5, 5, 175) !important;
+      cursor: pointer;
+    }
+  }
+  span {
+    color: blue;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.postDislikeCount {
+  .postDislikeButton {
+    display: inline-block;
+  }
+  display: inline-block;
+  //border: 1px solid red;
+  padding: 2px;
+  margin-left: 2px;
+  i {
+    &:hover {
+      color: rgb(247, 151, 8) !important;
+      cursor: pointer;
+    }
+  }
+  span {
+    color: blue;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+//end styles for post thumbnail
 
 .postSearchContainer {
   height: 200px;

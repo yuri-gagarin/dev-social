@@ -66,7 +66,11 @@ export const fetchTrendingPosts = () => {
   return function(dispatch) {
     axios({
       method: "get",
-      url: `/api/posts?q=trending&l=5`,
+      url: `/api/posts`,
+      params: {
+        filter: "trending", 
+        limit: 5,
+      }
     })
     .then((response) => {
       const trendingPosts = response.data.posts.map((post) => {

@@ -1,15 +1,25 @@
 import React, {Component} from "react";
-import PropTypes from "prop-types";
 import {Search, Container, Item} from "semantic-ui-react";
 import style from "../../../assets/stylesheets/posts/post.scss";
 
 import {setPostImage} from "../../../helpers/rendering/displayHelpers.js";
 import axios from "axios";
 
-
+const searchPosts = (value) => {
+  if (typeof value !== "string" || !value) return Promise.reject("No value");
+  const searchParams = {
+    method: "get",
+    url: "/api/posts/search",
+    timeout: 3000,
+    params: {
+      pattern : value,
+    }
+  };
+  return axios(searchParams);
+}
 const ResultRenderer = (props) => {
   return (
-    <Item>
+    <Item data-test="post-search-result">
       <Item.Image size="tiny" url={setPostImage(props.image)}></Item.Image>
       <Item.Content>
         <Item.Header>{props.title}</Item.Header>
@@ -18,11 +28,11 @@ const ResultRenderer = (props) => {
     </Item>
   )
 };
-ResultRenderer.propTypes = {
-  title: PropTypes.string.isRequired,
-  author: PropTypes.string.isRequired,
-  image: PropTypes.string,
-};
+//ResultRenderer.propTypes = {
+//  title: PropTypes.string.isRequired,
+//  author: PropTypes.string.isRequired,
+//  image: PropTypes.string,
+//};
 
 class PostSearchComponent extends Component {
   constructor(props) {
@@ -40,48 +50,44 @@ class PostSearchComponent extends Component {
     //console.log(this.state);
   }
 
+  
   handleSearchChange = (e, {value}) => {
-    console.log("called");
     if (this.state.typingTimeOut) {clearTimeout(this.state.typingTimeOut)};
-    const searchTimeout = setTimeout(() => {
-      const searchPattern = this.state.value;
-      if (this.state.value.length < 3) return;
-      this.setState({loading: true}, () => {
-        axios({
-          method: "get",
-          url: "/api/posts/search",
-          params: {
-            pattern: searchPattern,
-          }
-        })
-        .then((response) => {
-          this.setState({
-            loading: false,
-            message: response.data.message,
-            results: [...response.data.searchResults]
-          })
-        })
-        .catch((error) => {
-          console.error(error);
-          this.setState({
-            loading: false,
-            message: "Something went wrong",
-            results: [],
-          })
-        });
-      })
-    }, 2000);
-    console.log(74)
     this.setState({
       value: value,
-      typingTimeOut: searchTimeout,
-      loading: true,
-    }, () => {
-      if(this.state.value.length < 3) {
-        this.setState({loading: false});
-      }
+      loading: false,
+      typingTimeOut: this.typingTimeOut(),
     });
-  }
+  };
+
+  typingTimeOut = () => {
+    console.log("setting timout")
+    return setTimeout(() => {
+      console.log("firing timout")
+      this.setState({loading: true}, () => {
+        this.setSearchResults();        
+      });
+    }, 2000);
+  };
+
+  setSearchResults = () => {
+    return searchPosts(this.state.value)
+      .then((response) => {
+        this.setState({
+          message: response.data.message || "Search results",
+          results: [...response.data.posts],
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        console.log(84)
+        this.setState({
+          message: error.message,
+          results: [],
+          loading: false,
+        });
+      });
+  };
 
 
   render() {
