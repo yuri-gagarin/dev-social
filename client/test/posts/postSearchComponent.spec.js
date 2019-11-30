@@ -68,7 +68,8 @@ describe("{PostSearchComponent} unit tests", () => {
             request.respondWith({
               status: 200,
               response: {
-                posts: expectedResults,
+                message: "success",
+                searchResults: expectedResults,
               }
             });
           });
@@ -96,7 +97,8 @@ describe("{PostSearchComponent} unit tests", () => {
             request.respondWith({
               status: 200,
               response: {
-                posts: expectedResults,
+                message: "Posts",
+                searchResults: expectedResults,
               }
             });
           });

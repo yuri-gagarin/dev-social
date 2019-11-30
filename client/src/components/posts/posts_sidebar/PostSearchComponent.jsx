@@ -75,12 +75,13 @@ class PostSearchComponent extends Component {
       .then((response) => {
         this.setState({
           message: response.data.message || "Search results",
-          results: [...response.data.posts],
+          results: [...response.data.searchResults],
           loading: false,
         });
       })
       .catch((error) => {
         console.log(84)
+        console.log(error);
         this.setState({
           message: error.message,
           results: [],
