@@ -1,15 +1,17 @@
 import postReducer from "../../src/redux/reducers/postReducer";
 import * as postActions from "../../src/redux/actions/postActions";
 
+import * as cases from "../../src/redux/cases";
+import store from "../../src/redux/store";
+import { generatePost } from "../helpers/mockData";
+
+const testState = store.getState();
+const postsState = testState.postsState;
+
 describe("postReducer", () => {
-  const initialState = {
-    loading: false,
-    posts: [],
-    trendingPosts: [],
-  };
 
   it("Should return the initial state", () => {
-    expect(postReducer(undefined, {})).toEqual(initialState);
+    expect(postReducer(undefined, {})).toEqual(postState);
   });
 
   it("Should handle a POSTS_REQUEST case", () => {
@@ -33,6 +35,47 @@ describe("postReducer", () => {
       posts: [...data.posts]
     }
     const newState = postReducer(initialState, action);
+    expect(newState).toEqual(expectedState);
+  });
+
+  it(`Should handle a ${cases.LIKE_POST} case`, () => {
+    const payload = {message: "Successs", posts: [1,2,3,4,5]};
+    const expectedState = {
+      ...postsState,
+      postsError: null,
+      posts: [...payload.posts],
+    };
+    const newState = postReducer(postsState, {type: cases.LIKE_POST, payload: payload});
+    expect(newState).toEqual(expectedState);
+  });
+  it(`Should handle a ${cases.REMOVE_POST_LIKE} case`, () => {
+    const payload = {message: "Successs", posts: [1,2,3,4,5]};
+    const expectedState = {
+      ...postsState,
+      postsError: null,
+      posts: [...payload.posts],
+    };
+    const newState = postReducer(postsState, {type: cases.LIKE_POST, payload: payload});
+    expect(newState).toEqual(expectedState);
+  });
+  it(`Should handle a ${cases.DISLIKE_POST} case`, () => {
+    const payload = {message: "Successs", posts: [1,2,3,4,5]};
+    const expectedState = {
+      ...postsState,
+      postsError: null,
+      posts: [...payload.posts],
+    };
+    const newState = postReducer(postsState, {type: cases.LIKE_POST, payload: payload});
+    expect(newState).toEqual(expectedState);
+  });
+  it(`Should handle a ${cases.REMOVE_POST_DISLIKE} case`, () => {
+    const payload = {message: "Successs", posts: [1,2,3,4,5]};
+    const expectedState = {
+      ...postsState,
+      postsError: null,
+      posts: [...payload.posts],
+    };
+    const newState = postReducer(postsState, {type: cases.LIKE_POST, payload: payload});
     expect(newState).toEqual(expectedState);
   });
 
