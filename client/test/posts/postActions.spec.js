@@ -2,7 +2,7 @@ import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
 
 import * as actions from "../../src/redux/actions/postActions";
-import * as postLikeDisActions from "../../src/redux/actions/postLikeDislikeActions";
+import * as likeDislikeActions from "../../src/redux/actions/postLikeDislikeActions";
 import * as types from "../../src/redux/cases";
 import store from "../../src/redux/store";
 
@@ -78,9 +78,18 @@ describe("Post Actions Tests", () => {
   
   // 
   describe("Post {Like} {Dislike} toggles tests", () => {
+    beforeAll(() => {
+      //localStorage mock token
+      localStorage.setItem("jwtToken",  "a_fake_token")
+    })
     it(`Should successfully dispatch a ${types.LIKE_POST} action`, () => {
-
-      const updatedPost = posts[0];
+      // a liked post for mock API call return
+      const updatedPost = {...posts[0]};
+      updatedPost.likeCount +=1;
+      updatedPost.markLiked = true;
+      // the shape of new postState with the first post liked.
+      const newPostsState = [...posts];
+      newPostsState[0] = {...updatedPost};
 
       moxios.wait(() => {
         let request = moxios.requests.mostRecent();
@@ -92,18 +101,46 @@ describe("Post Actions Tests", () => {
           }
         })
       })
+      
       const expectedActions = [
-        {type: types.HANDLE_POST_LIKE, payload: {message: "liked", updatedPost: updatedPost}}
+        { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState} }
       ];
       const postId = posts[0]._id;
-      return testStore.dispatch(postLikeDisActions.likePost({postId: postId, currentPostState: posts}))
+      return testStore.dispatch(likeDislikeActions.likePost(postId, posts))
         .then(() => {
+          //console.log(testStore.getActions())
+          //console.log(expectedActions)
           expect(testStore.getActions()).toEqual(expectedActions);
         });
      
     });
-    it(`Should successfully dispatch a ${types.REMOVE_POST_LIKE} action`, () => {
-  
+    it(`Should successfully dispatch a ${types.DISLIKE_POST} action`, () => {
+      const updatedPost = {...posts[1]};
+      updatedPost.dislikeCount +=1;
+      updatedPost.markDisliked = true;
+      //
+      const newPostsState = [...posts];
+      newPostsState[1] = {...updatedPost};
+      //console.log(newPostsState)
+      moxios.wait(() => {
+        let request = moxios.requests.mostRecent();
+        request.respondWith({
+          status: 200,
+          response: {
+            message: "disliked",
+            updatedPost: updatedPost,
+          }
+        })
+      });
+
+      const expectedActions = [
+        { type: types.DISLIKE_POST, payload: {message: "disliked", posts: newPostsState} }
+      ];
+      const postId = posts[1]._id;
+      return testStore.dispatch(likeDislikeActions.dislikePost(postId, posts))
+        .then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
     });
   })
 });
