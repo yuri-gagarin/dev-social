@@ -1,4 +1,5 @@
 import {LIKE_POST, REMOVE_POST_LIKE, DISLIKE_POST, REMOVE_POST_DISLIKE, POSTS_ERROR} from "../cases";
+import {JWT_TOKEN} from "../../helpers/constants/appConstants";
 import axios from "axios";
 
 
@@ -11,8 +12,7 @@ const loginError = new Error("Must be logged in");
  * @return {Promise} A Promise which resolves to an action.
  */
 export const likePost = (postId, currentPostState=[]) => {
-  const token = localStorage.getItem("jwtToken");
-  let error;
+  const token = localStorage.getItem(JWT_TOKEN);
   //we should return an error if user is not logged in
   const options = {
     method: "post",
@@ -58,7 +58,7 @@ export const likePost = (postId, currentPostState=[]) => {
         })
       })
       .catch((error) => {
-        console.log("error")
+        console.log("called an error")
         console.log(error)
         return dispatch({
           type: POSTS_ERROR,
@@ -70,7 +70,7 @@ export const likePost = (postId, currentPostState=[]) => {
 
 
 export const removePostLike = (postId, currentPostState) => {
-  const token = localStorage.getItem("jwtToken");
+  const token = localStorage.getItem(JWT_TOKEN);
   const options = {
     method: "delete",
     url: "/api/posts/unlike_post/" + postId,
@@ -95,7 +95,8 @@ export const removePostLike = (postId, currentPostState) => {
             return {
               ...post,
               likeCount: updatedPost.likeCount,
-              dislikeCount: updatedPost.dislikeCount
+              dislikeCount: updatedPost.dislikeCount,
+              markLiked: false,
             };
           }
           else {
@@ -173,48 +174,50 @@ export const dislikePost = (postId, currentPostState) => {
 
 export const removePostDislike = (postId, currentPostState) => {
   const token = localStorage.getItem("jwtToken");
-  if(!token) {
-    return {
-      type: POSTS_ERROR,
-      payload: loginError
-    };
-  }
-  else {
-    return function(dispatch) {
-      const options = {
-        method: "delete",
-        url: "/api/posts/remove_dislike/" + postId,
-        headers: {"Authorization": `Bearer ${token}`}
-      };
-      axios(options) 
-        .then((response) => {
-          const {message, updatedPost} = response.data;
-          let newPostState = currentPostState.map((post) => {
-            if(post._id === updatedPost._id) {
-              return {
-                ...post,
-                likeCount: updatedPost.likeCount,
-                dislikeCount: updatedPost.dislikeCount,
-              };
-            }
-            else {
-              return post;
-            }
-          });
-          dispatch({
-            type: REMOVE_POST_DISLIKE,
-            payload: {
-              message: message,
-              posts: newPostState,
-            }
-          });
-        })
-        .catch((error) => {
-          dispatch({
-            type: POSTS_ERROR,
-            payload: error,
-          });
+  
+  const options = {
+    method: "delete",
+    url: "/api/posts/remove_dislike/" + postId,
+    headers: {"Authorization": `Bearer ${token}`}
+  };
+
+  return function(dispatch) {
+    if(!token) {
+      return Promise.resolve((dispatch) => {
+        return dispatch({
+          type: POSTS_ERROR,
+          payload: loginError
         });
+      });
     }
+    return axios(options) 
+      .then((response) => {
+        const {message, updatedPost} = response.data;
+        let newPostState = currentPostState.map((post) => {
+          if(post._id === updatedPost._id) {
+            return {
+              ...post,
+              likeCount: updatedPost.likeCount,
+              dislikeCount: updatedPost.dislikeCount,
+            };
+          }
+          else {
+            return post;
+          }
+        });
+        dispatch({
+          type: REMOVE_POST_DISLIKE,
+          payload: {
+            message: message,
+            posts: newPostState,
+          }
+        });
+      })
+      .catch((error) => {
+        dispatch({
+          type: POSTS_ERROR,
+          payload: error,
+        });
+      });
   }
 };

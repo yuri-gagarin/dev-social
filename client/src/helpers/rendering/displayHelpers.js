@@ -1,4 +1,4 @@
-import monthsArr from "./constants/months";
+import monthsArr from "../constants/months";
 
 // helpers //
 function addZero(number) {
@@ -12,7 +12,7 @@ function formatAMPM(options) {
   let hour = options.hour;
   if(hour < 12) {
     if(hour === 0) {
-      return `{12}:${minutes} AM`;
+      return `12:${minutes} AM`;
     }
     else {
       return `${hour}:${minutes} AM`;
@@ -20,7 +20,7 @@ function formatAMPM(options) {
   }
   else {
     if(hour === 12) {
-      return `{12}:${minutes} PM`;
+      return `12:${minutes} PM`;
     }
     else {
       hour = hour - 12;

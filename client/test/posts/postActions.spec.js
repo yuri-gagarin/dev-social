@@ -6,6 +6,7 @@ import * as likeDislikeActions from "../../src/redux/actions/postLikeDislikeActi
 import * as types from "../../src/redux/cases";
 import store from "../../src/redux/store";
 
+import {JWT_TOKEN} from "../../src/helpers/constants/appConstants";
 
 import moxios from "moxios";
 import {generatePost} from "../helpers/mockData";
@@ -80,7 +81,7 @@ describe("Post Actions Tests", () => {
   describe("Post {Like} {Dislike} toggles tests", () => {
     beforeAll(() => {
       //localStorage mock token
-      localStorage.setItem("jwtToken",  "a_fake_token")
+      localStorage.setItem(JWT_TOKEN,  "a_fake_token")
     })
     it(`Should successfully dispatch a ${types.LIKE_POST} action`, () => {
       // a liked post for mock API call return
@@ -100,7 +101,7 @@ describe("Post Actions Tests", () => {
             updatedPost: updatedPost,
           }
         })
-      })
+      });
       
       const expectedActions = [
         { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState} }
@@ -114,6 +115,41 @@ describe("Post Actions Tests", () => {
         });
      
     });
+    it(`Should successfully dispatch a ${types.REMOVE_POST_LIKE} action`, () => {
+      //in the mock state the post is liked
+      const likedPost = {...posts[0]};
+      likedPost.likeCount = 1;
+      likedPost.markLiked = true;
+      const currentPostState = posts.slice(1)
+      currentPostState.unshift(likedPost);
+      //expected that all posts will have no user like
+      const updatedPost = {...posts[0]}
+      updatedPost.likeCount -= 1;
+      updatedPost.markLiked = false;
+      const expectedPostState = posts.slice(1);
+      expectedPostState.unshift(updatedPost);
+
+      moxios.wait(() => {
+        let request = moxios.requests.mostRecent();
+        request.respondWith({
+          status: 200,
+          response: {
+            message: "unlike post",
+            updatedPost: updatedPost,
+          }
+        });
+      });
+
+      const expectedActions = [
+        { type: types.REMOVE_POST_LIKE, payload: {message: "unlike post", posts: expectedPostState} }
+      ];
+      const postId = updatedPost._id;
+      return testStore.dispatch(likeDislikeActions.removePostLike(postId, currentPostState))
+        .then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+    });
+
     it(`Should successfully dispatch a ${types.DISLIKE_POST} action`, () => {
       const updatedPost = {...posts[1]};
       updatedPost.dislikeCount +=1;
@@ -127,21 +163,41 @@ describe("Post Actions Tests", () => {
         request.respondWith({
           status: 200,
           response: {
-            message: "disliked",
+            message: "disliked post",
             updatedPost: updatedPost,
           }
         })
       });
-
+      const postId = updatedPost._id;
       const expectedActions = [
-        { type: types.DISLIKE_POST, payload: {message: "disliked", posts: newPostsState} }
+        { type: types.DISLIKE_POST, payload: {message: "disliked post", posts: newPostsState} }
       ];
-      const postId = posts[1]._id;
       return testStore.dispatch(likeDislikeActions.dislikePost(postId, posts))
         .then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
     });
+    it(`Should successfully handle an error`, () => {
+      const error = new Error("Operation not allowed")
+      moxios.wait(() => {
+        let request = moxios.requests.mostRecent();
+        request.reject({
+          status: 400,
+          response: {
+            error: error
+          }
+        });
+      });
+      const expectedActions = [
+        { type: types.POSTS_ERROR, payload: { message: error.message, error: error, loading: false}}
+      ]
+
+      return testStore.dispatch(likeDislikeActions.likePost(undefined, posts))
+        .then(() => {
+          console.log(testStore.getActions());
+          //expect(testStore.getActions()).toEqual(expectedActions);
+        })
+    })
   })
 });
 

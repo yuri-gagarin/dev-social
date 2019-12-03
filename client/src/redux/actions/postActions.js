@@ -23,6 +23,8 @@ export const postsSuccess = (data) => {
   };
 };
 export const postsError = (error) => {
+  //console.log(26)
+  //console.log(error)
   return {
     type: POSTS_ERROR,
     payload: {
