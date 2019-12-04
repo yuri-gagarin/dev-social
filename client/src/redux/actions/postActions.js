@@ -2,6 +2,7 @@ import {FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_E
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
 import {postSearchOptions} from "../searchOptions";
+import { isError } from "util";
 
 
 export const postsRequest = () => {
@@ -22,9 +23,14 @@ export const postsSuccess = (data) => {
     }
   };
 };
-export const postsError = (error) => {
-  //console.log(26)
-  //console.log(error)
+export const postsError = (err) => {
+  let error;
+  //some checking of the err object to make sure we are working with right data
+  if(isError(err)) error = err;
+  if(isError(err.response)) error = err.response;
+  if(isError(err.request)) error = err.request;
+  if(!error) error = new Error("Something went wrong");
+
   return {
     type: POSTS_ERROR,
     payload: {

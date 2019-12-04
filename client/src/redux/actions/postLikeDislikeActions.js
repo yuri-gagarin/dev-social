@@ -1,10 +1,11 @@
 import {LIKE_POST, REMOVE_POST_LIKE, DISLIKE_POST, REMOVE_POST_DISLIKE, POSTS_ERROR} from "../cases";
 import {JWT_TOKEN} from "../../helpers/constants/appConstants";
+import { postsError } from "./postActions";
+import { loginError } from "../../helpers/commonErrors";
 import axios from "axios";
 
 
 // Actions for PostLike
-const loginError = new Error("Must be logged in");
 /**
  * Likes a Post and returns an action to reducer;
  * @param {string} postId - _id of the Post to alter.
@@ -22,19 +23,13 @@ export const likePost = (postId, currentPostState=[]) => {
   return function(dispatch) {
     ///api actions
     if(!token) {
-      const error = new Error("User not Logged in");
-      return Promise.resolve(error)
-        .then((error) => {
-          return dispatch({
-            type: POSTS_ERROR,
-            payload: error
-          });
+      return Promise.resolve()
+        .then(() => {
+          return dispatch(postsError(loginError));
         });
     }
     return axios(options)
       .then((response) => {
-        console.log("here")
-        //console.log(response);
         let {message, updatedPost} = response.data;
         let newPostState = currentPostState.map((post) => {
           if(post._id === updatedPost._id) {
@@ -58,12 +53,7 @@ export const likePost = (postId, currentPostState=[]) => {
         })
       })
       .catch((error) => {
-        console.log("called an error")
-        console.log(error)
-        return dispatch({
-          type: POSTS_ERROR,
-          payload: error,
-        });
+        return dispatch(postsError(error));
       });
   };
 };
@@ -78,13 +68,9 @@ export const removePostLike = (postId, currentPostState) => {
   };
   return function(dispatch) {
     if(!token) {
-      const error = new Error("User not Logged in");
-      return Promise.resolve(error)
-        .then((errror) => {
-          return {
-            type: POSTS_ERROR,
-            payload: error,
-          };
+      return Promise.resolve()
+        .then(() => {
+          return dispatch(postsError(loginError));
         });
     }
     return axios(options)
@@ -103,7 +89,7 @@ export const removePostLike = (postId, currentPostState) => {
             return post;
           }
         });
-        dispatch({
+        return dispatch({
           type: REMOVE_POST_LIKE, 
           payload: {
             message: message,
@@ -112,11 +98,8 @@ export const removePostLike = (postId, currentPostState) => {
         });
       })
       .catch((error) => {
-        dispatch({
-          type: POSTS_ERROR,
-          payload: error
-        })
-      })
+        return dispatch(postsError(error));
+      });
   }
 }
 
@@ -131,13 +114,9 @@ export const dislikePost = (postId, currentPostState) => {
   
   return function(dispatch) {
     if(!token) {
-      const error = new Error("User not Logged in");
-      return Promise.resolve(error)
-        .then((error) => {
-          return dispatch({
-            type: POSTS_ERROR,
-            payload: error
-          });
+      return Promise.resolve()
+        .then(() => {
+          return dispatch(postsError(loginError));
         });
     }
     return axios(options)
@@ -164,10 +143,7 @@ export const dislikePost = (postId, currentPostState) => {
         });
       })
       .catch((error) => {
-        return dispatch({
-          type: POSTS_ERROR,
-          payload: error,
-        });
+        return dispatch(postsError(error));
       });
   }
 };
@@ -183,12 +159,10 @@ export const removePostDislike = (postId, currentPostState) => {
 
   return function(dispatch) {
     if(!token) {
-      return Promise.resolve((dispatch) => {
-        return dispatch({
-          type: POSTS_ERROR,
-          payload: loginError
+      return Promise.resolve()
+        .then(() => {
+          return dispatch(postsError(loginError));
         });
-      });
     }
     return axios(options) 
       .then((response) => {
@@ -199,13 +173,14 @@ export const removePostDislike = (postId, currentPostState) => {
               ...post,
               likeCount: updatedPost.likeCount,
               dislikeCount: updatedPost.dislikeCount,
+              markDisliked: false,
             };
           }
           else {
             return post;
           }
         });
-        dispatch({
+        return dispatch({
           type: REMOVE_POST_DISLIKE,
           payload: {
             message: message,
@@ -214,10 +189,7 @@ export const removePostDislike = (postId, currentPostState) => {
         });
       })
       .catch((error) => {
-        dispatch({
-          type: POSTS_ERROR,
-          payload: error,
-        });
+        return dispatch(postsError(error));
       });
   }
 };
