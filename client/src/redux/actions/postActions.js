@@ -8,9 +8,7 @@ import { isError } from "util";
 export const postsRequest = () => {
   return {
     type: POSTS_REQUEST,
-    payload: {
-      loading: true,
-    }
+    payload: null,
   };
 };
 export const postsSuccess = (data) => {
@@ -19,7 +17,6 @@ export const postsSuccess = (data) => {
     payload: {
       message: data.message,
       posts: data.posts,
-      loading: false,
     }
   };
 };
@@ -35,7 +32,6 @@ export const postsError = (err) => {
     type: POSTS_ERROR,
     payload: {
       message: error.message,
-      loading: false,
       error: error,
     }
   };
@@ -93,13 +89,13 @@ export const fetchTrendingPosts = () => {
         message: response.data.message,
         trendingPosts: trendingPosts,
       };
-      dispatch({
+      return dispatch({
         type: FETCH_TRENDING_POSTS,
         payload: trendingPostsState,
       });
     })
     .catch((error) => {
-      dispatch({
+      return dispatch({
         type: LIST_ERRORS,
         payload: error
       });

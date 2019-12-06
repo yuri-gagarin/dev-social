@@ -6,6 +6,7 @@ const initialState = {
   loading: false,
   posts: [],
   trendingPosts: [],
+  postsError: null,
 };
 const postReducer = (state=initialState, action) => {
   switch(action.type) {
@@ -25,13 +26,13 @@ const postReducer = (state=initialState, action) => {
     case POSTS_REQUEST:
       return {
         ...state,
-        loading: action.payload.loading,
+        loading: true,
         postsError: null,
       };
     case POSTS_SUCCESS:
       return {
         ...state,
-        loading: action.payload.loading,
+        loading: false,
         postsError: null,
         posts: [...action.payload.posts]
       };
@@ -39,29 +40,38 @@ const postReducer = (state=initialState, action) => {
       return {
         ...state,
         loading: false,
+        message: action.payload.message,
         postsError: action.payload.error,
       };
     case LIKE_POST:
       return {
         ...state,
+        loading: false,
+        postsError: null,
         message: action.payload.message,
         posts: [...action.payload.posts]
       };
     case REMOVE_POST_LIKE:
       return {
         ...state,
+        loading: false,
+        postsError: null,
         message: action.payload.message,
         posts: [...action.payload.posts]
       };
     case DISLIKE_POST:
       return {
         ...state,
+        loading: false,
+        postsError: null,
         message: action.payload.message,
         posts: [...action.payload.posts]
       };
     case REMOVE_POST_DISLIKE:
       return {
         ...state,
+        loading: false,
+        postsError: null,
         message: action.payload.message,
         posts: [...action.payload.posts]
       };
