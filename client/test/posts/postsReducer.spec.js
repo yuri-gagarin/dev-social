@@ -94,7 +94,7 @@ describe("postReducer tests", () => {
     const payload = {
       message: error.message,
       error: error,
-    }
+    };
     const expectedState = {
       ...postsState,
       loading: false,
@@ -104,4 +104,4 @@ describe("postReducer tests", () => {
     const newState = postReducer(postsState, { type: POSTS_ERROR, payload: payload });
     expect(newState).toEqual(expectedState);
   });
-})
+});
