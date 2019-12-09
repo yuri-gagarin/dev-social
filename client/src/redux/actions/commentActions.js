@@ -1,5 +1,4 @@
-import { COMMENTS_SUCCESS, COMMENTS_REQUEST, LIKE_COMMENT, REMOVE_COMMENT_LIKE,
-        DISLIKE_COMMENT, REMOVE_COMMENT_DISLIKE, COMMENTS_ERROR } from "../cases";
+import { COMMENTS_SUCCESS, COMMENTS_REQUEST, COMMENTS_ERROR } from "../cases";
 
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
@@ -66,3 +65,16 @@ export const fetchComments = (options={}) => {
     });
   }
 };
+
+// to do later //
+export const createComment = (commentData) => {
+
+};
+
+export const deleteCOmment = (commentData) => {
+
+};
+
+export const editComment = (commentData) => {
+
+}
