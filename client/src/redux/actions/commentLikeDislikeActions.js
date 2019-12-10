@@ -5,7 +5,7 @@ import { commentsError } from "./commentActions";
 import { loginError, generalError } from "../../helpers/commonErrors";
 import axios from "axios";
 
-export const likeComment = ({commentId, postId}, currentCommentsState = []) => {
+export const likeComment = (commentId, currentCommentsState = []) => {
   const token = localStorage.getItem(JWT_TOKEN);
   //we should return an error if user is not logged in
   const options = {
@@ -53,7 +53,7 @@ export const likeComment = ({commentId, postId}, currentCommentsState = []) => {
 };
 
 
-export const removeCommentLike = ({commentId, postId}, currentCommentsState = []) => {
+export const removeCommentLike = (commentId, currentCommentsState = []) => {
   const token = localStorage.getItem(JWT_TOKEN);
   const options = {
     method: "delete",
@@ -100,15 +100,12 @@ export const removeCommentLike = ({commentId, postId}, currentCommentsState = []
 
 // CommentDislike actions //
 
-export const dislikeComment = ({postId = null, commentId = null} = {}, currentCommentsState = []) => {
+export const dislikeComment = (commentId, currentCommentsState = []) => {
   const token = localStorage.getItem("jwtToken");
   const options = {
     method: "post",
     url: "/api/comments/dislike_comment/" + commentId,
     headers: {"Authorization": `Bearer ${token}`},
-    data: {
-      postId: postId
-    }
   };
   
   return function(dispatch) {
