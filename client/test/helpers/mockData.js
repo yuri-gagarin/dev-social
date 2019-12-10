@@ -1,7 +1,7 @@
 import faker from "faker";
 
 
-export const generatePost = ({userId, postId})=> {
+export const generatePost = ({userId, postId}) => {
   if(!postId) {postId = Math.floor(Math.random() * 1000)}
   if(!userId) {userId = Math.floor(Math.random() * 1000)}
   const post = {
@@ -14,4 +14,19 @@ export const generatePost = ({userId, postId})=> {
     dislikeCount: 0,
   };
   return post;
+};
+
+export const generateComment = ({userId, commentId, postId}) => {
+  if(!userId) {userId = Math.floor(Math.random() * 1000)};
+  if(!commentId) (commentId = Math.floor(Math.random() * 1000));
+  if(!postId) {postId = Math.floor(Math.random() * 1000)};
+  const comment = {
+    _id: commentId,
+    user: userId,
+    post: postId,
+    text: faker.lorem.paragraph(1),
+    likeCount: 0,
+    dislikeCount: 0,
+  };
+  return comment;
 };
