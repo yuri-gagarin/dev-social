@@ -1,5 +1,5 @@
 import { FETCH_COMMENTS, COMMENTS_REQUEST, COMMENTS_SUCCESS, COMMENTS_ERROR, 
-         LIKE_COMMENT, REMOVE_COMMMENT_LIKE, DISLIKE_COMMENT, REMOVE_COMMENT_DISLIKE, COMMENTS_ERROR } from "../cases";
+         LIKE_COMMENT, REMOVE_COMMMENT_LIKE, DISLIKE_COMMENT, REMOVE_COMMENT_DISLIKE } from "../cases";
 
 const initialState = {
   message: "",
@@ -14,6 +14,7 @@ const commentsReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: true,
+        message: action.payload.message,
         commentsError: null,
       };
     case COMMENTS_SUCCESS: 

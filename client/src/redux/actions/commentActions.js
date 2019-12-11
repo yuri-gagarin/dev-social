@@ -7,7 +7,9 @@ import { isError } from "util";
 export const commentsRequest = () => {
   return  {
     type: COMMENTS_REQUEST,
-    payload: null,
+    payload: {
+      message: "Loading"
+    },
   }
 }
 export const commentsSuccess = (data) => {
