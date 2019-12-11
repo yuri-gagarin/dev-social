@@ -14,12 +14,12 @@ export const commentsRequest = () => {
     },
   }
 }
-export const commentsSuccess = (data) => {
+export const commentsSuccess = ({message, comments} = {}) => {
   return {
     type: COMMENTS_SUCCESS,
     payload: {
-      message: data.message,
-      posts: data.posts,
+      message: message,
+      comments: comments,
     }
   };
 };
@@ -42,7 +42,7 @@ export const commentsError = (err) => {
   };
 };
 
-export const fetchComments = (options={}) => {
+export const fetchComments = (options = {}) => {
   const params = {
     postId: options.postId,
     from: options.from,
@@ -73,26 +73,70 @@ export const fetchComments = (options={}) => {
 };
 
 // to do later //
-export const createComment = (commentData) => {
-  //first check if a user is logged in - save an extra API call //
+export const createComment = ({text, author}, currentComments = []) => {
+  const token = localStorage.getItem(JWT_TOKEN);
+  const options = {
+    url: "/api/comments",
+    method: "post",
+    data: {
+      text: text,
+      author: author,
+    }
+  };
   return function(dispatch) {
-    const token = localStorage.getItem(JWT_TOKEN);
+    // first check if a user is logged in - save an extra API call //
     if(!token) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(loginError));
       })
     }
+    
+    dispatch(commentsRequest());
+    return axios(options)
+      .then((response) => {
+        const newComment = resonse.data.comment;
+        const updatedComments = [...currentComments, newComment];
+        return dispatch(commentsSuccess({message: response.data.message, comments: updatedComments}));
+      })
+      .catch((error) => {
+        return dispatch(commentsError);
+      })
   }
 };
 
-export const saveEditedComment = (commentData) => {
+export const saveEditedComment = ({text, author}, currentComments = []) => {
+  const token = localStorage.getItem(JWT_TOKEN);
+  const options = {
+    url: "/api/comments",
+    method: "patch",
+    data: {
+      text: text,
+      author: author,
+    }
+  };
   return function(dispatch) {
-    const token = localStorage.getItem(JWT_TOKEN);
+    // first check if a user is logged in - save an extra API call //
     if(!token) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(loginError));
       })
     }
+    return axios(options)
+      .then((response) => {
+        const { updatedComment, message } = response.data;
+        const updatedComments = currentComments.map((comment) => {
+          if(comment._id === updatedComment._id) {
+            return updatedComment;
+          }
+          else {
+            return comment;
+          }
+        });
+        return dispatch(commentsSuccess({message: message, comments: updatedComments}))
+      })
+      .catch((error) => {
+        return dispatch((commentsError(error)));
+      });
   }
 };
 
