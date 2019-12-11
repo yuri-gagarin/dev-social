@@ -8,6 +8,8 @@ import * as types from "../../src/redux/cases";
 import { loginError } from "../../src/helpers/commonErrors";
 import { generateComment } from "../helpers/mockData";
 
+import moxios from "moxios";
+
 
 const initialState = {};
 const comments = [];
@@ -92,31 +94,157 @@ describe("Comments Like - Dislike Action tests", () => {
     beforeEach(() => {
       //localStorage mock token
       localStorage.setItem(JWT_TOKEN,  "a_fake_token");
+      moxios.install();
     });
     afterEach(() => {
       testStore.clearActions();
+      moxios.uninstall();
     })
     describe("Action: {likeComment}", () => {
-      const currentCommentsState = comments.slice();
-      const updatedComment = {
-        ...currentCommentsState[0],
-        likeCount: currentCommentsState[0].likeCount += 1,
-        markLiked = true,
-      };
-      const commentId = updatedComment._id;
-      const expectedState = currentCommentsState.slice(1);
-      expectedState.unshift(updatedComment);
+      it(`Should successfully dispatch a ${types.LIKE_COMMENT} action`, () => {
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment) );
+        // expected state //
+        const newCommentsState = currentCommentsState.slice(1);
+        const updatedComment = {
+          ...currentCommentsState[0],
+          likeCount: currentCommentsState[0].likeCount + 1,
+          markLiked: true,
+          markDisliked: false,
+        };
+        const commentId = updatedComment._id;
+        newCommentsState.unshift(updatedComment);
 
-      const expectedActions = [
-        { type: types.LIKE_COMMENT, payload: updatedComment }
-      ];
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Success",
+              updatedComment: updatedComment,
+            }
+          });
+        });
 
-      return testStore.dispatch(actions.likeComment(commentId, currentCommentsState)).then(() => {
-        expect(store.getActions().toEqual(expectedActions));
-      })
+        const expectedActions = [
+          { type: types.LIKE_COMMENT, payload: {message: "Success", comments: newCommentsState} }
+        ];
+
+        return testStore.dispatch(actions.likeComment(commentId, currentCommentsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+
+      it(`Should successfully dispatch a ${types.LIKE_COMMENT} on a comment which was disliked`, () => {
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment) );
+        currentCommentsState[0].dislikeCount += 1;
+        currentCommentsState[0].markDisliked = true;
+        //expected state
+        const newCommentsState = currentCommentsState.slice(1);
+        const updatedComment = {
+          ...currentCommentsState[0],
+          dislikeCount: currentCommentsState[0].dislikeCount - 1,
+          markDisliked: false,
+          likeCount: currentCommentsState[0].likeCount + 1,
+          markLiked: true
+        };
+        const commentId = updatedComment._id;
+        newCommentsState.unshift(updatedComment);
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Success",
+              updatedComment: updatedComment,
+            }
+          });
+        });
+
+        const expectedActions = [
+          { type: types.LIKE_COMMENT, payload: {message: "Success", comments: newCommentsState} }
+        ];
+
+        return testStore.dispatch(actions.likeComment(commentId, currentCommentsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+      it("Should successfully handle an API error", () => {
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
+        const commentId = "randomid";
+        const error =  new Error("Ooops....");
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.reject({
+            status: 400,
+            response: error
+          });
+        });
+        const expectedActions = [
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} }
+        ];
+
+        return testStore.dispatch(actions.removeCommentLike(commentId, currentCommentsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
     });
-    describe("Action: {removeCommmentLike", () => {
+    describe("Action: {removeCommmentLike}", () => {
+      it(`Should successfully dispatch a ${types.REMOVE_COMMMENT_LIKE} action`, () => {
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
+        currentCommentsState[0].dislikeCount += 1;
+        currentCommentsState[0].markDisliked = true;
+        // expected state //
+        const newCommentsState = comments.slice(1);
+        const updatedComment = {
+          ...currentCommentsState[0],
+          likeCount: currentCommentsState[0].likeCount - 1,
+          markLiked: false,
+        };
+        const commentId = updatedComment._id;
+        newCommentsState.unshift(updatedComment);
 
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Success",
+              updatedComment: updatedComment
+            }
+          });
+        });
+      
+        const expectedActions = [
+          { type: types.REMOVE_COMMMENT_LIKE, payload: {message: "Success", comments: newCommentsState} }
+        ];
+
+        return testStore.dispatch(actions.removeCommentLike(commentId, currentCommentsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+
+      it("Should successfully handle an API error", () => {
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
+        const commentId = "randomid";
+        const error =  new Error("Ooops....");
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.reject({
+            status: 400,
+            response: error
+          });
+        });
+        const expectedActions = [
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} }
+        ];
+
+        return testStore.dispatch(actions.removeCommentLike(commentId, currentCommentsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
     });
     describe("Action: {dislikeComment}", () =>{
 
