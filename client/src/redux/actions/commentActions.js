@@ -3,6 +3,8 @@ import { COMMENTS_SUCCESS, COMMENTS_REQUEST, COMMENTS_ERROR } from "../cases";
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
 import { isError } from "util";
+import { JWT_TOKEN } from "../../helpers/constants/appConstants";
+import { loginError } from "../../helpers/commonErrors";
 
 export const commentsRequest = () => {
   return  {
@@ -72,13 +74,35 @@ export const fetchComments = (options={}) => {
 
 // to do later //
 export const createComment = (commentData) => {
-
+  //first check if a user is logged in - save an extra API call //
+  return function(dispatch) {
+    const token = localStorage.getItem(JWT_TOKEN);
+    if(!token) {
+      return Promise.resolve().then(() => {
+        return dispatch(commentsError(loginError));
+      })
+    }
+  }
 };
 
-export const deleteComment = (commentData) => {
-
+export const saveEditedComment = (commentData) => {
+  return function(dispatch) {
+    const token = localStorage.getItem(JWT_TOKEN);
+    if(!token) {
+      return Promise.resolve().then(() => {
+        return dispatch(commentsError(loginError));
+      })
+    }
+  }
 };
 
-export const editComment = (commentData) => {
-
-}
+export const deleteComment = (commentId) => {
+  return function(dispatch) {
+    const token = localStorage.getItem(JWT_TOKEN);
+    if(!token) {
+      return Promise.resolve().then(() => {
+        return dispatch(commentsError(loginError));
+      })
+    }
+  }
+};

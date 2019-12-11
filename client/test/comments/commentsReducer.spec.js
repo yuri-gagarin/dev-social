@@ -134,4 +134,4 @@ describe("{commentsReducer} tests", () => {
     };
     expect(commentsReducer(initialCommentsState, action)).toEqual(expectedCommentsState);
   });
-})
+});
