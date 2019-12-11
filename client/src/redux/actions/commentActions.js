@@ -73,7 +73,7 @@ export const createComment = (commentData) => {
 
 };
 
-export const deleteCOmment = (commentData) => {
+export const deleteComment = (commentData) => {
 
 };
 

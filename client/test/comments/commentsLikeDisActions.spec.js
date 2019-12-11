@@ -35,7 +35,7 @@ describe("Comments Like - Dislike Action tests", () => {
     describe("Action: {likeComment}", () => {
       it("Should throw an error and not allow an API call", () => {
         const commentId = "1234id";
-        const currentCommentsState = comments.slice();
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
 
         const expectedActions = [
           { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
@@ -49,7 +49,7 @@ describe("Comments Like - Dislike Action tests", () => {
     describe("Action: {removeCommmentLike", () => {
       it("Should throw an error and not allow an API call", () => {
         const commentId = "1234id";
-        const currentCommentsState = comments.slice();
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
 
         const expectedActions = [
           { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
@@ -63,7 +63,7 @@ describe("Comments Like - Dislike Action tests", () => {
     describe("Action: {dislikeComment}", () => {
       it("Should throw an error and not allow an API call", () => {
         const commentId = "1234id";
-        const currentCommentsState = comments.slice();
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
 
         const expectedActions = [
           { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
@@ -77,7 +77,7 @@ describe("Comments Like - Dislike Action tests", () => {
     describe("Action {removeCommentDislike}", () => {
       it("Should throw an error and not allow an API call", () => {
         const commentId = "1234id";
-        const currentCommentsState = comments.slice();
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
 
         const expectedActions = [
           { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
@@ -100,6 +100,7 @@ describe("Comments Like - Dislike Action tests", () => {
       testStore.clearActions();
       moxios.uninstall();
     })
+    // likeComment tests //
     describe("Action: {likeComment}", () => {
       it(`Should successfully dispatch a ${types.LIKE_COMMENT} action`, () => {
         const currentCommentsState = comments.map((comment) => Object.assign({}, comment) );
@@ -138,6 +139,7 @@ describe("Comments Like - Dislike Action tests", () => {
         const currentCommentsState = comments.map((comment) => Object.assign({}, comment) );
         currentCommentsState[0].dislikeCount += 1;
         currentCommentsState[0].markDisliked = true;
+        currentCommentsState[0].markLiked = false;
         //expected state
         const newCommentsState = currentCommentsState.slice(1);
         const updatedComment = {
@@ -162,7 +164,7 @@ describe("Comments Like - Dislike Action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.LIKE_COMMENT, payload: {message: "Success", comments: newCommentsState} }
+          { type: types.LIKE_COMMENT, payload: {message: "Success", comments: newCommentsState } }
         ];
 
         return testStore.dispatch(actions.likeComment(commentId, currentCommentsState)).then(() => {
@@ -190,6 +192,8 @@ describe("Comments Like - Dislike Action tests", () => {
         });
       });
     });
+    // END likeComment tests //
+    // removeCommentLike tests //
     describe("Action: {removeCommmentLike}", () => {
       it(`Should successfully dispatch a ${types.REMOVE_COMMMENT_LIKE} action`, () => {
         const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
@@ -246,12 +250,104 @@ describe("Comments Like - Dislike Action tests", () => {
         });
       });
     });
-    describe("Action: {dislikeComment}", () =>{
+    // END removeCommentLike tests //
+    // dislikeComment tests //
+    describe("Action: {dislikeComment}", () => {
+      it(`Should successfully dispatch a ${types.DISLIKE_COMMENT} action`, () => {
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment) );
+        // expected state //
+        const newCommentsState = currentCommentsState.slice(1);
+        const updatedComment = {
+          ...currentCommentsState[0],
+          dislikeCount: currentCommentsState[0].dislikeCount + 1,
+          markDisliked: true,
+          markLiked: false,
+        };
+        const commentId = updatedComment._id;
+        newCommentsState.unshift(updatedComment);
 
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Success",
+              updatedComment: updatedComment,
+            }
+          });
+        });
+
+        const expectedActions = [
+          { type: types.DISLIKE_COMMENT, payload: {message: "Success", comments: newCommentsState} }
+        ];
+
+        return testStore.dispatch(actions.dislikeComment(commentId, currentCommentsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+      it(`Should successfully dispatch a ${types.DISLIKE_COMMENT} on a comment which was liked`, () => {
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment) );
+        currentCommentsState[0].likeCount += 1;
+        currentCommentsState[0].markLiked = true;
+        currentCommentsState[0].markDisliked = false;
+        //expected state
+        const newCommentsState = currentCommentsState.slice(1);
+        const updatedComment = {
+          ...currentCommentsState[0],
+          likeCount: currentCommentsState[0].likeCount - 1,
+          dislikeCount: currentCommentsState[0].dislikeCount + 1,
+          markLiked: false,
+          markDisliked: true 
+        };
+        const commentId = updatedComment._id;
+        newCommentsState.unshift(updatedComment);
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Success",
+              updatedComment: updatedComment,
+            }
+          });
+        });
+
+        const expectedActions = [
+          { type: types.DISLIKE_COMMENT, payload: {message: "Success", comments: newCommentsState} }
+        ];
+
+        return testStore.dispatch(actions.dislikeComment(commentId, currentCommentsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+      it("Should successfully handle an API error", () => {
+        const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
+        const commentId = "randomid";
+        const error =  new Error("Ooops....");
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.reject({
+            status: 400,
+            response: error
+          });
+        });
+        const expectedActions = [
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} }
+        ];
+
+        return testStore.dispatch(actions.dislikeComment(commentId, currentCommentsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
     });
+    // END dislikeComment tests //
+    // removeCommentDislike tests //
     describe("Action {removeCommentDislike}", () => {
 
     });
+    // END removeCommentDislike tests //
   });
 
 })

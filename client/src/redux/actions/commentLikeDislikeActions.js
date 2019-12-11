@@ -115,7 +115,7 @@ export const dislikeComment = (commentId, currentCommentsState = []) => {
         return dispatch(commentsError(loginError));
       });
     }
-    if(!postId || !commentId) {
+    if(!commentId) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(generalError));
       });
@@ -128,6 +128,7 @@ export const dislikeComment = (commentId, currentCommentsState = []) => {
             return {
               ...comment,
               dislikeCount: updatedComment.dislikeCount,
+              likeCount: updatedComment.likeCount,
               markDisliked: true,
               markLiked: false,
             };
