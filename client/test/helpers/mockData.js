@@ -24,6 +24,7 @@ export const generateComment = ({userId, commentId, postId}) => {
     _id: commentId,
     user: userId,
     post: postId,
+    author: faker.name.findName(),
     text: faker.lorem.paragraph(1),
     likeCount: 0,
     dislikeCount: 0,

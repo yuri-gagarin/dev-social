@@ -1,4 +1,4 @@
-import { COMMENTS_SUCCESS, COMMENTS_REQUEST, COMMENTS_ERROR } from "../cases";
+import { COMMENTS_SUCCESS, COMMENTS_REQUEST, CREATE_COMMENT, COMMENTS_ERROR } from "../cases";
 
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
@@ -90,16 +90,21 @@ export const createComment = ({text, author}, currentComments = []) => {
         return dispatch(commentsError(loginError));
       })
     }
-    
     dispatch(commentsRequest());
     return axios(options)
       .then((response) => {
-        const newComment = resonse.data.comment;
+        const { message, newComment } = response.data;
         const updatedComments = [...currentComments, newComment];
-        return dispatch(commentsSuccess({message: response.data.message, comments: updatedComments}));
+        return dispatch({
+          type: CREATE_COMMENT,
+          payload: {
+            message: message,
+            comments: updatedComments,
+          }
+        });
       })
       .catch((error) => {
-        return dispatch(commentsError);
+        return dispatch(commentsError(error));
       })
   }
 };
@@ -121,6 +126,7 @@ export const saveEditedComment = ({text, author}, currentComments = []) => {
         return dispatch(commentsError(loginError));
       })
     }
+    dispatch(commentsRequest());
     return axios(options)
       .then((response) => {
         const { updatedComment, message } = response.data;
@@ -135,7 +141,7 @@ export const saveEditedComment = ({text, author}, currentComments = []) => {
         return dispatch(commentsSuccess({message: message, comments: updatedComments}))
       })
       .catch((error) => {
-        return dispatch((commentsError(error)));
+        return dispatch(commentsError(error));
       });
   }
 };
@@ -143,10 +149,25 @@ export const saveEditedComment = ({text, author}, currentComments = []) => {
 export const deleteComment = (commentId) => {
   return function(dispatch) {
     const token = localStorage.getItem(JWT_TOKEN);
+    const options = {
+      url: "/api/comments/" + commentId,
+      method: "delete",
+    }
     if(!token) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(loginError));
-      })
+      });
     }
+    return axios(options)
+      .then((response) => {
+        const { deletedComment, message } = response.data;
+        const updatedComments = currentComments.filter((comment) => {
+          return comment._id !== deletedComment._id;
+        });
+        return dispatch(commentsSuccess({message: message, comments: updatedComments}))
+      })
+      .catch((error) => {
+        return dispatch(commentsError(error));
+      });
   }
 };
