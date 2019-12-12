@@ -1,5 +1,6 @@
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
+import store from "../../src/redux/store";
 
 import { JWT_TOKEN } from "../../src/helpers/constants/appConstants";
 import { loginError, generalError } from "../../src/helpers/commonErrors";
@@ -10,16 +11,16 @@ import moxios from "moxios";
 import { generateComment } from "../helpers/mockData";
 
 const middleWares = [thunk];
-const initialState = {};
-const comments = [];
-
-for (let i = 0; i < 5; i++) {
-  comments.push(generateComment({userId: 1, postId: 1, commentId: i+1}));
-}
-const testStore = configureMockStore(middleWares)(initialState);
+const testStore = configureMockStore(middleWares)(store.getState());
 
 
 describe("Comments API actions tests", () => {
+  const comments = [];
+  beforeAll(() => {
+    for (let i = 0; i < 5; i++) {
+      comments.push(generateComment({userId: 1, postId: 1, commentId: i+1}));
+    }
+  });
   describe("User is NOT logged in / no JWT token presend in {localStorage}", () => {
     beforeEach(() => {
       localStorage.removeItem(JWT_TOKEN);
