@@ -1,19 +1,40 @@
+import configureMockStore from "redux-mock-store";
+import thunk from "redux-thunk";
+import * as actions from "../../src/redux/actions/postLikeDislikeActions";
+import * as types from "../../src/redux/cases";
+import store from "../../src/redux/store";
+
+import {JWT_TOKEN} from "../../src/helpers/constants/appConstants";
+import { loginError, generalError } from "../../src/helpers/commonErrors";
+
+import moxios from "moxios";
+import {generatePost} from "../helpers/mockData";
+
+const middlewares = [thunk];
+const testStore = configureMockStore(middlewares)(store.getState().postsState);
+
 describe("Post {Like} {Dislike} action tests", () => {
   // Context no user logged in or no jwt token //
-  beforeEach(() => {
-    localStorage.removeItem(JWT_TOKEN);
+  const posts = [];
+  beforeAll(() => {
+    for (let i = 0; i < 10; i++) {
+      posts.push(generatePost({postId: i, userId: i}));
+    }
   });
-  afterEach(() => {
-    testStore.clearActions();
-  })
   describe("User is NOT logged in / no JWT token presend in {localStorage}", () => {
+    beforeEach(() => {
+      localStorage.removeItem(JWT_TOKEN);
+    });
+    afterEach(() => {
+      testStore.clearActions();
+    })
     describe(`Action: {likePost}`, () => {
       it("Should throw an error and not allow an API call", () => {
         localStorage.removeItem(JWT_TOKEN);
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, loading: false} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
         ];
-        return testStore.dispatch(likePost(123, posts)).then(() => {
+        return testStore.dispatch(actions.likePost(123, posts)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -22,9 +43,9 @@ describe("Post {Like} {Dislike} action tests", () => {
       it("Should throw an error and not allow an API call", () => {
         localStorage.removeItem(JWT_TOKEN);
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, loading: false} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
         ];
-        return testStore.dispatch(likePost(123, posts)).then(() => {
+        return testStore.dispatch(actions.removePostLike(123, posts)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -33,9 +54,9 @@ describe("Post {Like} {Dislike} action tests", () => {
       it("Should throw an error and not allow an API call", () => {
         localStorage.removeItem(JWT_TOKEN);
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, loading: false} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
         ];
-        return testStore.dispatch(likePost(123, posts)).then(() => {
+        return testStore.dispatch(actions.dislikePost(123, posts)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -44,9 +65,9 @@ describe("Post {Like} {Dislike} action tests", () => {
       it("Should throw an error and not allow an API call", () => {
         localStorage.removeItem(JWT_TOKEN);
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, loading: false} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
         ];
-        return testStore.dispatch(likePost(123, posts)).then(() => {
+        return testStore.dispatch(actions.removePostDislike(123, posts)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -62,23 +83,26 @@ describe("Post {Like} {Dislike} action tests", () => {
     });
     afterEach(() => {
       localStorage.removeItem(JWT_TOKEN);
-      testStore.clearActions();
       moxios.uninstall();
+      testStore.clearActions();
     })
     // {likePost} actions tests //
     describe(`Action: {likePost}`, () => {
       it(`Should dispatch a ${types.LIKE_POST} action`, () => {
-        // a liked post for mock API call return
-        const currentPostsState = posts.slice();
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
         //expected updated post //
         const updatedPost = {
           ...currentPostsState[0],
-          markLiked: true,
           likeCount: currentPostsState[0].likeCount += 1,
         };
         //expected postsState to be passed to reducer//
+        const expectedPost = {
+          ...updatedPost,
+          markLiked: true,
+          markDisliked: false,
+        }
         const newPostsState = currentPostsState.slice(1);
-        newPostsState.unshift(updatedPost);
+        newPostsState.unshift(expectedPost);
   
         moxios.wait(() => {
           let request = moxios.requests.mostRecent();
@@ -94,23 +118,63 @@ describe("Post {Like} {Dislike} action tests", () => {
           { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState} }
         ];
         const postId = posts[0]._id;
-        return testStore.dispatch(likePost(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
+      it(`Should successfully dispatch a ${types.LIKE_POST} on a post which was previously disliked`, () => {
+        // posts setup
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
+        currentPostsState[0].dislikeCount += 1;
+        currentPostsState[0].markDisliked = true;
+        // this is our mock API post response //
+        const updatedPost = {
+          ...currentPostsState[0],
+          dislikeCount: currentPostsState[0].dislikeCount - 1,
+          likeCount: currentPostsState[0].likeCount + 1,
+        };
+        const postId = updatedPost._id;
+        moxios.wait(() => {
+          let request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "liked",
+              updatedPost: updatedPost,
+            }
+          });
+        });
+        // this is the expected post and posts after redux action //
+        const expectedPost = {
+          ...updatedPost,
+          markLiked: true,
+          markDisliked: false
+        };
+        const newPostsState = currentPostsState.slice(1)
+        newPostsState.unshift(expectedPost);
+
+        const expectedActions = [
+          { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState} }
+        ];
+        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+
+      });
       it(`Should successfully handle an API error`, () => {
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
         const error = new Error("Oops");
         moxios.wait(() => {
           let request = moxios.requests.mostRecent();
           request.reject({
-            status: 400,
+            status: 500,
             response: error
           });
         });
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, loading: false} }
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} }
         ];
-        return testStore.dispatch(likePost(123, posts)).then(() => {
+        return testStore.dispatch(actions.likePost(123, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -120,20 +184,22 @@ describe("Post {Like} {Dislike} action tests", () => {
     describe("Action: {removePostLike}", () => {
       it(`Should successfully dispatch a ${types.REMOVE_POST_LIKE} action`, () => {
         //in the mock state the post is liked
-        const currentPostsState = posts.slice()
-        //expected updated post //
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
         currentPostsState[0].likeCount = 1;
         currentPostsState[0].markLiked = true;
         const postId = currentPostsState[0]._id;
         //expected updated post //
         const updatedPost = {
           ...currentPostsState[0], 
-          markLiked: false,
           likeCount: currentPostsState[0].likeCount - 1,
         };
         //expected postsState to be passed to reducer//
+        const expectedPost = {
+          ...updatedPost,
+          markLiked: false,
+        }
         const newPostsState = posts.slice(1)
-        newPostsState.unshift(updatedPost);
+        newPostsState.unshift(expectedPost);
   
         moxios.wait(() => {
           let request = moxios.requests.mostRecent();
@@ -145,27 +211,27 @@ describe("Post {Like} {Dislike} action tests", () => {
             }
           });
         });
-  
         const expectedActions = [
           { type: types.REMOVE_POST_LIKE, payload: {message: "unlike post", posts: newPostsState} }
         ];
-        return testStore.dispatch(removePostLike(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.removePostLike(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
       it(`Should successfully handle an API error`, () => {
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
         const error = new Error("Oops");
         moxios.wait(() => {
           let request = moxios.requests.mostRecent();
           request.reject({
-            status: 400,
+            status: 500,
             response: error
           });
         });
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, loading: false} }
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} }
         ];
-        return testStore.dispatch(removePostLike(123, posts)).then(() => {
+        return testStore.dispatch(actions.removePostLike(123, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -175,19 +241,21 @@ describe("Post {Like} {Dislike} action tests", () => {
     describe("Action: {dislikePost}", () => {
       it(`Should successfully dispatch a ${types.DISLIKE_POST} action`, () => {
         //current postsState //
-        const currentPostsState = posts.slice();
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
         //expected updated post
         const updatedPost = {
           ...currentPostsState[0],
-          markDisliked: true,
-          dislikeCount: currentPostsState[0].dislikeCount += 1,
+          dislikeCount: currentPostsState[0].dislikeCount + 1,
         };
-        updatedPost.dislikeCount +=1;
-        updatedPost.markDisliked = true;
-        const postId = currentPostsState[0]._id;
+        const postId = updatedPost._id;
         //expected postsState //
+        const expectedPost = {
+          ...updatedPost,
+          markDisliked: true,
+          markLiked: false,
+        };
         const newPostsState = currentPostsState.slice(1);
-        newPostsState.unshift(updatedPost);
+        newPostsState.unshift(expectedPost);
 
         moxios.wait(() => {
           let request = moxios.requests.mostRecent();
@@ -202,11 +270,52 @@ describe("Post {Like} {Dislike} action tests", () => {
         const expectedActions = [
           { type: types.DISLIKE_POST, payload: {message: "disliked post", posts: newPostsState} }
         ];
-        return testStore.dispatch(dislikePost(postId, posts)).then(() => {
+        return testStore.dispatch(actions.dislikePost(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
+      it(`Should successfully dispatch a ${types.DISLIKE_POST} on a post which was previously liked`, () => {
+        // posts setup
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
+        currentPostsState[0].likeCount += 1;
+        currentPostsState[0].markLiked = true;
+        currentPostsState[0].markDisliked = false;
+        // this is our mock API post response //
+        const updatedPost = {
+          ...currentPostsState[0],
+          dislikeCount: currentPostsState[0].dislikeCount + 1,
+          likeCount: currentPostsState[0].likeCount - 1,
+        };
+        const postId = updatedPost._id;
+        moxios.wait(() => {
+          let request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "disliked",
+              updatedPost: updatedPost,
+            }
+          });
+        });
+        // these are the expected post and posts after redux action //
+        const expectedPost = {
+          ...updatedPost,
+          markDisliked: true,
+          markLiked: false
+        };
+        const newPostsState = currentPostsState.slice(1)
+        newPostsState.unshift(expectedPost);
+
+        const expectedActions = [
+          { type: types.DISLIKE_POST, payload: {message: "disliked", posts: newPostsState} }
+        ];
+        return testStore.dispatch(actions.dislikePost(postId, currentPostsState)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+
+      });
       it(`Should successfully handle an error`, () => {
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
         const error = new Error("Oops");
         moxios.wait(() => {
           let request = moxios.requests.mostRecent();
@@ -216,9 +325,9 @@ describe("Post {Like} {Dislike} action tests", () => {
           });
         });
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, loading: false} }
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} }
         ];
-        return testStore.dispatch(dislikePost(123, posts)).then(() => {
+        return testStore.dispatch(actions.dislikePost(123, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -228,19 +337,22 @@ describe("Post {Like} {Dislike} action tests", () => {
     describe("Action: {removePostDislike}", () => {
       it(`Should successfully dispatch a ${types.REMOVE_POST_DISLIKE} action`, () => {
         //current posts state
-        const currentPostsState = posts.slice();
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
         currentPostsState[0].markDisliked = true;
         currentPostsState[0].dislikeCount = 1;
-        const postId = currentPostsState[0]._id
         //updated post
         const updatedPost = {
           ...currentPostsState[0],
-          markDisliked: false,
           dislikeCount: currentPostsState[0].dislikeCount - 1,
         };
+        const postId = updatedPost._id;
         //expected post state
+        const expectedPost = {
+          ...updatedPost,
+          markDisliked: false,
+        }
         const expectedPostState = posts.slice(1);
-        expectedPostState.unshift(updatedPost);
+        expectedPostState.unshift(expectedPost);
 
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
@@ -256,11 +368,12 @@ describe("Post {Like} {Dislike} action tests", () => {
         const expectedActions = [
           { type: types.REMOVE_POST_DISLIKE, payload: {message: "disliked", posts: expectedPostState} }
         ];
-        return testStore.dispatch(removePostDislike(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.removePostDislike(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
       it(`Should successfully handle an API error`, () => {
+        const currentPostsState = posts.map((post) => Object.assign({}, post));
         const error = new Error("Oops");
         moxios.wait(() => {
           let request = moxios.requests.mostRecent();
@@ -270,14 +383,15 @@ describe("Post {Like} {Dislike} action tests", () => {
           });
         });
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, loading: false} }
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} }
         ];
-        return testStore.dispatch(removePostDislike(123, posts)).then(() => {
+        return testStore.dispatch(actions.removePostDislike(123, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
     });
-    // END {removePostLike} action tests //
+    // END {removePostDislike} action tests //
   });
   // END Context with a logged in user //
 });
+// END Post {Like} {Dislike} action tests  //

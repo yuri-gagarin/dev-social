@@ -38,6 +38,7 @@ export const likePost = (postId, currentPostState=[]) => {
               likeCount: updatedPost.likeCount,
               dislikeCount: updatedPost.dislikeCount,
               markLiked: true,
+              markDisliked: false,
             }
           }
           else {
@@ -127,7 +128,9 @@ export const dislikePost = (postId, currentPostState) => {
             return {
               ...post,
               dislikeCount: updatedPost.dislikeCount,
+              likeCount: updatedPost.likeCount,
               markDisliked: true,
+              markLiked: false,
             };
           }
           else {

@@ -2,7 +2,6 @@ import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
 
 import * as actions from "../../src/redux/actions/postActions";
-import {likePost, dislikePost, removePostLike, removePostDislike} from "../../src/redux/actions/postLikeDislikeActions";
 import * as types from "../../src/redux/cases";
 import store from "../../src/redux/store";
 

@@ -68,7 +68,6 @@ describe("DashComponents test", () => {
         const userDash = setElem(wrapper, "user-dash");
         it("Return UserDashboard component", () => {
           expect(userDash.exists()).toBe(true);
-          console.log(wrapper.html());
         });
         it("Should be visible", () => {
           expect(userDash.props().visible).toBe(true);
