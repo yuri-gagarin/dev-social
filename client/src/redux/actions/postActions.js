@@ -8,15 +8,17 @@ import { isError } from "util";
 export const postsRequest = () => {
   return {
     type: POSTS_REQUEST,
-    payload: null,
+    payload: {
+      message: "Loading"
+    }
   };
 };
-export const postsSuccess = (data) => {
+export const postsSuccess = ({message, posts}) => {
   return {
     type: POSTS_SUCCESS,
     payload: {
-      message: data.message,
-      posts: data.posts,
+      message: message,
+      posts: posts,
     }
   };
 };
