@@ -186,5 +186,55 @@ describe("Comments API actions tests", () => {
       
     })
     // END {savedEditedComment} action tests //
+    // {deleteComment} action tests //
+    describe("Action: {deleteComment}", () => {
+      it(`Should successfully dispatch a ${types.DELETE_COMMENT} action`, () => {
+        const currentComments = comments.map((comment) => Object.assign({}, comment));
+        const mockDeletedComment = Object.assign({}, currentComments[0])
+        const _id = mockDeletedComment._id;
+        // expected comments after delete //
+        const newComments = currentComments.slice(1);
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Deleted",
+              deletedComment: mockDeletedComment,
+            }
+          });
+        });
+        const expectedActions = [
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.DELETE_COMMENT, payload: {message: "Deleted", comments: newComments} }
+        ];
+        return testStore.dispatch(actions.deleteComment(_id, currentComments)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+          //console.log(testStore.getActions());
+        })
+      });
+      it(`Should successfulle handle an API error and dispatch a ${types.COMMENTS_ERROR} action`, () => {
+        const currentComments = comments.map((comment) => Object.assign({}, comment));
+        //error to be thrown // comments array should not be touched //
+        const _id = currentComments[0];
+        const error = generalError("Server error");
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.reject({
+            status: 500,
+            response: error
+          });
+        });
+        const expectedActions = [
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} },
+        ];
+        return testStore.dispatch(actions.deleteComment(_id, currentComments)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+
+      });
+    });
+    // END {deleteComment} action tests //
   });
 })
