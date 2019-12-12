@@ -129,5 +129,62 @@ describe("Comments API actions tests", () => {
       });
     });
     // END {createComment} action tests //
+    // {saveEditedComment} action tests //
+    describe("Action {saveEditedComment}", () => {
+      it(`Should successfully dispatch a ${types.EDIT_COMMENT} action`, () => {
+        const currentComments = comments.map((comment) => Object.assign({}, comment));
+        const editedComment = {
+          ...currentComments[0],
+          text: "I've edited something",
+        };
+        const { text, _id } = editedComment;
+        // expected comments //
+        const newComments = currentComments.slice(1);
+        newComments.unshift(editedComment);
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Success",
+              updatedComment: editedComment,
+            }
+          });
+        });
+
+        const expectedActions = [
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.EDIT_COMMENT, payload: {message: "Success", comments: [...newComments]}}
+        ];
+
+        return testStore.dispatch(actions.saveEditedComment({text: text, _id: _id}, currentComments)).then(() => {  
+          //console.log(testStore.getActions());
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+      it(`Should successfulle handle an API error and dispatch a ${types.COMMENTS_ERROR} action`, () => {
+        const currentComments = comments.map((comment) => Object.assign({}, comment));
+        //error to be thrown // comments array should not be touched //
+        const { _id, text } = currentComments[0];
+        const error = generalError("Server error");
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.reject({
+            status: 500,
+            response: error
+          });
+        });
+        const expectedActions = [
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} },
+        ];
+        return testStore.dispatch(actions.saveEditedComment({_id: _id, text: text}, currentComments)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+      
+    })
+    // END {savedEditedComment} action tests //
   });
 })

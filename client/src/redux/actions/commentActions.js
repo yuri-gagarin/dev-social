@@ -1,4 +1,4 @@
-import { COMMENTS_SUCCESS, COMMENTS_REQUEST, CREATE_COMMENT, COMMENTS_ERROR } from "../cases";
+import { COMMENTS_SUCCESS, COMMENTS_REQUEST, CREATE_COMMENT, COMMENTS_ERROR, EDIT_COMMENT } from "../cases";
 
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
@@ -109,14 +109,13 @@ export const createComment = ({text, author}, currentComments = []) => {
   }
 };
 
-export const saveEditedComment = ({text, author}, currentComments = []) => {
+export const saveEditedComment = ({_id, text}, currentComments = []) => {
   const token = localStorage.getItem(JWT_TOKEN);
   const options = {
-    url: "/api/comments",
+    url: "/api/comments/" + _id,
     method: "patch",
     data: {
       text: text,
-      author: author,
     }
   };
   return function(dispatch) {
@@ -138,7 +137,13 @@ export const saveEditedComment = ({text, author}, currentComments = []) => {
             return comment;
           }
         });
-        return dispatch(commentsSuccess({message: message, comments: updatedComments}))
+        return dispatch({
+          type: EDIT_COMMENT,
+          payload: {
+            message: message,
+            comments: updatedComments
+          }
+        });
       })
       .catch((error) => {
         return dispatch(commentsError(error));
