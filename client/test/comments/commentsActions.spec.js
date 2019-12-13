@@ -14,7 +14,7 @@ const middleWares = [thunk];
 const testStore = configureMockStore(middleWares)(store.getState());
 
 
-describe("Comments API actions tests", () => {
+describe("Comments API / Redux Actions Tests", () => {
   const comments = [];
   beforeAll(() => {
     for (let i = 0; i < 5; i++) {

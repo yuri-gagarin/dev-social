@@ -1,5 +1,5 @@
-import {REGISTER, LOGIN, LOGOUT, LOGIN_SUCCESS, SET_USER} from "../cases.js";
-import isEmpty from "../../helpers/validators/isEmpty.js";
+import { REGISTER, LOGIN, LOGOUT, LOGIN_SUCCESS, SET_USER } from "../cases";
+import { isEmpty } from "../../helpers/validators/dataValidators";
 
 const initialState = {
   userLoggedIn: false,

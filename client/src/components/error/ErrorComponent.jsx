@@ -1,11 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {Message, Icon} from "semantic-ui-react";
-import style from "../../assets/stylesheets/errors/errors.scss";
-import isEmpty from "../../helpers/validators/isEmpty.js";
+import { Message, Icon } from "semantic-ui-react";
 
-import {connect} from "react-redux";
-import {clearErrors} from "../../redux/actions/errorActions.js";
+import { connect } from "react-redux";
+import { clearErrors } from "../../redux/actions/errorActions";
+
+import { isEmpty } from "../../helpers/validators/dataValidators";
+
+import style from "../../assets/stylesheets/errors/errors.scss";
 
 const ErrorComponent = (props) => {
 

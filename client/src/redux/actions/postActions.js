@@ -1,8 +1,8 @@
 import {FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR} from "../cases";
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
-import {postSearchOptions} from "../searchOptions";
-import { isError } from "util";
+import { postSearchOptions } from "../searchOptions";
+import { isError } from "../../helpers/validators/dataValidators";
 
 
 export const postsRequest = () => {
@@ -39,7 +39,7 @@ export const postsError = (err) => {
   };
 };
 
-export const fetchPosts = (options={}) => {
+export const fetchPosts = (options={}, currentPosts = []) => {
   const params = {
     from: options.from || null,
     toDate: options.toDate || null,
@@ -48,6 +48,12 @@ export const fetchPosts = (options={}) => {
   };
 
   return function(dispatch) {
+    // error checking for wrong input //
+    if(typeof options !== "object") {
+      return Promise.resolve().then(() => {
+        return dispatch(postsError)
+      })
+    }
     dispatch(postsRequest());
     return axios({
       method: "get",

@@ -2,7 +2,7 @@ import { COMMENTS_SUCCESS, COMMENTS_REQUEST, CREATE_COMMENT, COMMENTS_ERROR, EDI
 
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
-import { isError } from "util";
+import { isError } from "../../helpers/validators/dataValidators";
 import { JWT_TOKEN } from "../../helpers/constants/appConstants";
 import { loginError } from "../../helpers/commonErrors";
 
