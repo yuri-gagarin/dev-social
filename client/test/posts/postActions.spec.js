@@ -44,7 +44,7 @@ describe("Post API / Redux Actions Tests", () => {
             status: 200,
             response: {
               message: "success",
-              posts: posts,
+              posts: mockPostResponse,
             }
           });
         });
@@ -54,13 +54,12 @@ describe("Post API / Redux Actions Tests", () => {
           { type: types.POSTS_SUCCESS, payload: {message: "success", posts: expectedPosts} },
         ];  
 
-        return testStore.dispatch(actions.fetchPosts(currentPosts))
-          .then(() => {
-            expect(testStore.getActions()).toEqual(expectedActions);
-          });
+        return testStore.dispatch(actions.fetchPosts({}, currentPosts)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
       });
   
-      it("throws an error when the request fails", () => {
+      it("Correctly handles an API error", () => {
         const currentPosts = [];
         const error = generalError("Ooops...");
 
@@ -68,19 +67,19 @@ describe("Post API / Redux Actions Tests", () => {
           let request = moxios.requests.mostRecent();
           request.reject({
             status: 500,
-            error: error,
+            response: error,
           })
         });  
 
         const expectedActions = [
-          {type: types.POSTS_REQUEST, payload: {message: "Loading"}},
-          {type: types.POSTS_ERROR, payload: {message: error.message, error: error}},
+          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} },
         ];
 
-        return testStore.dispatch(actions.fetchPosts(currentPosts))
-          .then(() => {
-            expect(testStore.getActions()).toEqual(expectedActions);
-          });
+        return testStore.dispatch(actions.fetchPosts({}, currentPosts)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+          //console.log(testStore.getActions());
+        });
       });
   });
   // END logged user NOT logged in context //

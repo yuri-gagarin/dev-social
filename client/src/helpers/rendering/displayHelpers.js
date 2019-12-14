@@ -101,3 +101,42 @@ export const formatDate = (date, options) => {
     return  `${month} ${day} ${year}, ${timeOfDay}`;
   }
 };
+
+/**
+ * Merges two different arrays of objects by {_id} property preserving order.
+ * @param {Object[]} oldItems - Old items already present in state.
+ * @param {Object[]} newItems  - New items to become the new state.
+ * @returns {Object[]} - A new array of objects to become the new state.
+ */
+export const mergeItems = (oldItems = [], newItems = []) => {
+  let updatedItems = [];
+  let onlyNewItems = true;
+  
+  const oldIds = new Set(oldItems.map((item) => item._id));
+  const newIds = new Set(newItems.map((item) => item._id));
+
+  newIds.forEach((newId) => {
+    if (oldIds.has(newId)) {
+      onlyNewItems = false;
+    }
+  });
+
+  if (onlyNewItems) {
+    // the response only sent back new posts //
+    return [...oldItems, ...newItems];
+  }
+  
+  for (let i = 0; i < oldItems.length; i++) {
+    for (let j = 0; j < newItems.length; j++) {
+      if (newItems[j]._id === oldItems[i]._id) {
+        updatedItems.push(newItems[j]);
+        break;
+      }
+      if ((j === newItems.length - 1) && (newItems[j]._id !== oldItems[i]._id)) {
+        updatedItems.push(oldItems[i]);
+      }
+    }
+  }
+  const remainder = newItems.filter((item) => !oldIds.has(item._id));
+  return [...updatedItems, ...remainder];
+};

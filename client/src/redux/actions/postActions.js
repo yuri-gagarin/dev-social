@@ -1,8 +1,9 @@
-import {FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR} from "../cases";
+import { FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR } from "../cases";
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
 import { postSearchOptions } from "../searchOptions";
 import { isError } from "../../helpers/validators/dataValidators";
+import { inputError } from "../../helpers/commonErrors";
 
 
 export const postsRequest = () => {
@@ -25,10 +26,10 @@ export const postsSuccess = ({message, posts}) => {
 export const postsError = (err) => {
   let error;
   //some checking of the err object to make sure we are working with right data
-  if(isError(err)) error = err;
-  if(isError(err.response)) error = err.response;
-  if(isError(err.request)) error = err.request;
-  if(!error) error = new Error("Something went wrong");
+  if (isError(err)) error = err;
+  if (isError(err.response)) error = err.response;
+  if (isError(err.request)) error = err.request;
+  if (!error) error = new Error("Something went wrong");
 
   return {
     type: POSTS_ERROR,
@@ -39,20 +40,24 @@ export const postsError = (err) => {
   };
 };
 
-export const fetchPosts = (options={}, currentPosts = []) => {
+export const fetchPosts = (options = {}, currentPosts = []) => {
   const params = {
     from: options.from || null,
     toDate: options.toDate || null,
     filter: options.filter || postSearchOptions.filter.new,
     limit: options.limit || 10,
   };
-
-  return function(dispatch) {
-    // error checking for wrong input //
-    if(typeof options !== "object") {
+  // type checking to avoid strange errors //
+  // first argument should be an object //
+  const firstArgValid = typeof options === "object";
+  // sceond argument should be an array //
+  const secondArgValid = Array.isArray(currentPosts);
+  // 
+  return function (dispatch) {
+    if (!firstArgValid || !secondArgValid) {
       return Promise.resolve().then(() => {
-        return dispatch(postsError)
-      })
+        return dispatch(postsError(inputError("Invalid arguments passed to fetch...")));
+      });
     }
     dispatch(postsRequest());
     return axios({
@@ -61,11 +66,28 @@ export const fetchPosts = (options={}, currentPosts = []) => {
       params: {...params},
     })
     .then((response) => {
-      const postState = {
-        message: response.data.message,
-        posts: response.data.posts,
-      };
-      return dispatch(postsSuccess(postState));
+      const { message, posts } = response.data;
+      if(currentPosts.length === 0) {
+        const newPostsState = {
+          message: message,
+          posts: [...posts]
+        };
+        return dispatch(postsSuccess(newPostsState));
+      } else {
+        const newPosts = [];
+        for(let newPost of posts) {
+          for(let oldPost of currentPosts) {
+            if(newPost._id === oldPost._id) {
+              newPosts.push(newPost);
+            }
+          }
+        }
+        const newPostsState = {
+          message: message,
+          posts: [...currentPosts, ...posts],
+        }
+        return dispatch(postsSuccess(newPostsState));
+      }
     })
     .catch((error) => {
       return dispatch(postsError(error));
