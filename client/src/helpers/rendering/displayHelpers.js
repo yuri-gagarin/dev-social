@@ -109,6 +109,12 @@ export const formatDate = (date, options) => {
  * @returns {Object[]} - A new array of objects to become the new state.
  */
 export const mergeItems = (oldItems = [], newItems = []) => {
+  if(oldItems && ! newItems) {
+    return [...oldItems];
+  }
+  if (!oldItems && !newItems) {
+    return [];
+  }
   let updatedItems = [];
   let onlyNewItems = true;
   
