@@ -24,6 +24,7 @@ describe("Post API / Redux Actions Tests", () => {
   });
   // Context a user is NOT logged in / JWT token NOT present //
   describe("User is NOT logged in / no JWT token present in {localStorage}", () => {
+    // setup moxios, clear actions etc //
     beforeEach(() => {
       moxios.install();
       localStorage.removeItem(JWT_TOKEN);
@@ -34,6 +35,7 @@ describe("Post API / Redux Actions Tests", () => {
     });
     // {fetchPost} action tests //
     describe("Action: {fetchPosts}", () => {
+
       it("Successfully resolves a mock fetch request", () => {
         const currentPosts = [];
         const mockPostResponse = posts.map((post) => Object.assign({}, post));
@@ -85,6 +87,7 @@ describe("Post API / Redux Actions Tests", () => {
     // END {fetchPosts} action tests //
     // {createPost} action tests //
     describe("Action: {createPost}", () => {
+
       it("Should throw an error and not allow an API call", () => {
 
         const expectedActions = [
@@ -99,6 +102,7 @@ describe("Post API / Redux Actions Tests", () => {
     // END {createPost} action tests //
     // {saveEditedPost} action tests //
     describe("Action: {savedEditedPost}", () => {
+
       it("Should throw an error and not allow an API call", () => {
 
         const expectedActions = [
@@ -113,6 +117,7 @@ describe("Post API / Redux Actions Tests", () => {
     // END {saveEditedPost} action tests //
     // {deletePost} action tests //
     describe("Action: {deletePost}", () => {
+
       it("Should throw an error and not allow an API call", () => {
 
         const postId = "afakeid";
@@ -130,6 +135,7 @@ describe("Post API / Redux Actions Tests", () => {
   // END logged user NOT logged in / NO JWT token context //
   // Context a user is logged in / JWT token present //
   describe("User is logged in / JWT token is present in {localStorage}", () => {
+    // setup moxios, localStorage etc //
     beforeEach(()=> {
       moxios.install();
       localStorage.setItem(JWT_TOKEN, "afaketoken");
@@ -139,6 +145,127 @@ describe("Post API / Redux Actions Tests", () => {
       localStorage.removeItem(JWT_TOKEN);
       testStore.clearActions();
     });
+    // {createPost} action tests //
+    describe("Action {createPost}", () => {
+
+      it(`Should successfully dispatch a ${types.CREATE_POST} action`, () => {
+        // mock created Post and current state of Post(s) array //
+        const currentPosts = posts.map((post) => Object.assign({}, post));
+        const mockPost = generatePost({userId: 1, postId: 1})
+        const { title, text, author } = post;
+        // expected Post(s) array with a new created Post //
+        const newPosts = [...currentPosts, mockPost];
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Post Created",
+              newPost: mockPost
+            }
+          });
+        });
+
+        const expectedActions = [
+          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.CREATE_POST, payload: {message: "Post Created", posts: [...newPosts]} }
+        ];
+
+        return testStore.dispatch(actions.createPost({title: title, text: text, author: author},currentPosts)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+      
+      it(`Should successfulle handle an API error and dispatch a ${types.POSTS_REQUEST} action`, () => {
+        // mock created Post and current state of Post(s) array //
+        const currentPosts = posts.map((post) => Object.assign({}, post));
+        const mockPost = generatePost({userId: 1, postId: 1});
+        const { title, text, author } = mockPost;
+        //error to be thrown // currentPosts array should not be touched //
+        const error = generalError("Server error");
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.reject({
+            status: 500,
+            response: error
+          });
+        });
+
+        const expectedActions = [
+          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} },
+        ];
+
+        return testStore.dispatch(actions.createPost({title: title, text: text, author: author},currentPosts)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+    });
+    // END {createPost} action tests //
+    // {saveEditedPost} action tests //
+    describe("Action {saveEditedPost}", () => {
+      
+      it(`Should successfully dispatch a ${types.EDIT_POST} action`, () => {
+        // mock created Post and current state of Post(s) array //
+        const currentPosts = post.map((post) => Object.assign({}, post));
+        const updatedPost = {
+          ...currentPosts[0],
+          text: "I've edited something",
+          title: "I've edited title"
+        };
+        const { title, text, _id } = editedPost;
+        // expected Posts(s) //
+        const newPosts = currentPosts.slice(1);
+        newPosts.unshift(editedPost);
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Success",
+              updatedPost: updatedPost
+            }
+          });
+        });
+
+        const expectedActions = [
+          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.EDIT_POST, payload: {message: "Success", posts: [...newPosts]} }
+        ];
+
+        return testStore.dispatch(actions.saveEditedPost({title: title, text: text, _id: _id}, currentPosts)).then(() => {  
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+
+      it(`Should successfulle handle an API error and dispatch a ${types.COMMENTS_ERROR} action`, () => {
+        // current state of Post(s) array //
+        const currentPosts = posts.map((post) => Object.assign({}, post));
+        // error to be thrown // Post(s) array should not be touched //
+        const { _id, title, text } = currentPosts[0]
+        const error = generalError("Server error");
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.reject({
+            status: 500,
+            response: error
+          });
+        });
+
+        const expectedActions = [
+          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} },
+        ];
+        return testStore.dispatch(actions.saveEditedPost({_id: _id, title: title, text: text},currentPosts)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+    });
+    // END {savedEditedComment} action tests //
   });
   // END logged in user context //
 });
