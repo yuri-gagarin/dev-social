@@ -3,7 +3,8 @@ import { FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_
 import axios from "axios";
 import { postSearchOptions } from "../searchOptions";
 import { isError } from "../../helpers/validators/dataValidators";
-import { inputError } from "../../helpers/commonErrors";
+import { inputError, loginError } from "../../helpers/commonErrors";
+import { JWT_TOKEN } from "../../helpers/constants/appConstants";
 
 
 export const postsRequest = () => {
@@ -132,3 +133,55 @@ export const fetchTrendingPosts = () => {
     });
   }
 };
+
+/**
+ * Dispatches an API request to create a new Post.
+ * @param {Object} postData - New Post data.
+ * @param {Object[]} currentPosts - The current Post(s) displayed.
+ * @return {Promise<Object>} A Promise which resolved to a Redux action.
+ */
+export const createPost = (postData, currentPosts = {}) => {
+  const token = localStorage.getItem(JWT_TOKEN);
+  return function(dispatch) {
+    if (!token) {
+      return Promise.resolve().then(() => {
+        return dispatch(postsError(loginError));
+      });
+    }
+  }
+};
+
+/**
+ * Dispatches an API request to save an existing Post.
+ * @param {Object} postData - Edited Post data.
+ * @param {Object[]} currentPosts - The current Post(s) displayed.
+ * @return {Promise<Object>} A Promise which resolved to a Redux action.
+ */
+export const saveEditedPost = () => {
+  const token = localStorage.getItem(JWT_TOKEN);
+  return function(dispatch) {
+    if (!token) {
+      return Promise.resolve().then(() => {
+        return dispatch(postsError(loginError));
+      });
+    }
+  }
+};
+
+/**
+ * Dispatches an API request to delete an existing Post.
+ * @param {string} postId - A MongoDB ObjecID of the Post to be deleted.
+ * @param {Object[]} currentPosts - The current Post(s) displayed.
+ * @return {Promise<Object>} A Promise which resolved to a redux action.
+ */
+export const deletePost = () => {
+  const token = localStorage.getItem(JWT_TOKEN);
+  return function(dispatch) {
+    if (!token) {
+      return Promise.resolve().then(() => {
+        return dispatch(postsError(loginError));
+      });
+    }
+  }
+};
+

@@ -32,6 +32,7 @@ describe("Post API / Redux Actions Tests", () => {
       moxios.uninstall();
       testStore.clearActions();
     });
+    // {fetchPost} action tests //
     describe("Action: {fetchPosts}", () => {
       it("Successfully resolves a mock fetch request", () => {
         const currentPosts = [];
@@ -78,11 +79,55 @@ describe("Post API / Redux Actions Tests", () => {
 
         return testStore.dispatch(actions.fetchPosts({}, currentPosts)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
-          //console.log(testStore.getActions());
         });
       });
+    });
+    // END {fetchPosts} action tests //
+    // {createPost} action tests //
+    describe("Action: {createPost}", () => {
+      it("Should throw an error and not allow an API call", () => {
+
+        const expectedActions = [
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+        ];
+
+        return testStore.dispatch(actions.createPost({}, [])).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+    });
+    // END {createPost} action tests //
+    // {saveEditedPost} action tests //
+    describe("Action: {savedEditedPost}", () => {
+      it("Should throw an error and not allow an API call", () => {
+
+        const expectedActions = [
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+        ];
+
+        return testStore.dispatch(actions.saveEditedPost({}, [])).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+    });
+    // END {saveEditedPost} action tests //
+    // {deletePost} action tests //
+    describe("Action: {deletePost}", () => {
+      it("Should throw an error and not allow an API call", () => {
+
+        const postId = "afakeid";
+        const expectedActions = [
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+        ];
+
+        return testStore.dispatch(actions.deletePost(postId)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+    });
+    // END {deletePost} action tests //
   });
-  // END logged user NOT logged in context //
+  // END logged user NOT logged in / NO JWT token context //
   // Context a user is logged in / JWT token present //
   describe("User is logged in / JWT token is present in {localStorage}", () => {
     beforeEach(()=> {
@@ -96,9 +141,4 @@ describe("Post API / Redux Actions Tests", () => {
     });
   });
   // END logged in user context //
-  // Context user is not logged in or no JWT TOKEn
-  
-  });
-
-  
 });
