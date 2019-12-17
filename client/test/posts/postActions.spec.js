@@ -273,7 +273,7 @@ describe("Post API / Redux Actions Tests", () => {
         // mock Post state array //
         const currentPosts = posts.map((post) => Object.assign({}, post));
         const mockDeletedPost = {
-          ...currentPosts[0];
+          ...currentPosts[0]
         }
         const postId = mockDeletedPost._id;
         // expected posts after successful delete API request //

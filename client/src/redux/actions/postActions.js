@@ -1,10 +1,11 @@
-import { FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR } from "../cases";
+import { FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR, CREATE_POST, EDIT_POST } from "../cases";
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
 import { postSearchOptions } from "../searchOptions";
 import { isError } from "../../helpers/validators/dataValidators";
-import { inputError, loginError } from "../../helpers/commonErrors";
+import { inputError, loginError, generalError } from "../../helpers/commonErrors";
 import { JWT_TOKEN } from "../../helpers/constants/appConstants";
+import isEmpty from "../../../../helpers/validators/isEmpty";
 
 
 export const postsRequest = () => {
@@ -98,7 +99,7 @@ export const fetchPosts = (options = {}, currentPosts = []) => {
 
 
 export const fetchTrendingPosts = () => {
-  return function(dispatch) {
+  return function (dispatch) {
     axios({
       method: "get",
       url: `/api/posts`,
@@ -140,14 +141,46 @@ export const fetchTrendingPosts = () => {
  * @param {Object[]} currentPosts - The current Post(s) displayed.
  * @return {Promise<Object>} A Promise which resolved to a Redux action.
  */
-export const createPost = (postData, currentPosts = {}) => {
+export const createPost = (postData, currentPosts = []) => {
+
+  const { author, title, text } = postData;
+  const options = {
+    url: "/api/posts",
+    method: "post",
+    data: {
+      author: author,
+      title: title,
+      text: text
+    }
+  };
   const token = localStorage.getItem(JWT_TOKEN);
-  return function(dispatch) {
+
+  return function (dispatch) {
     if (!token) {
       return Promise.resolve().then(() => {
         return dispatch(postsError(loginError));
       });
     }
+    if(isEmpty(postData)) {
+      return Promise.resolve().then(() => {
+        return dispatch(postsError(generalError("Post data is empty")));
+      })
+    }
+    return axios(options)
+      .then((response) => {
+        const { message, newPost } = response.data;
+        const newPostsArray = [...currentPosts, newPost];
+        return dispatch({
+          type: CREATE_POST,
+          payload: {
+            message: message,
+            posts: newPostsArray
+          }
+        });
+      })
+      .catch((error) => {
+        return dispatch(postsError(error));
+      })
   }
 };
 
@@ -157,14 +190,53 @@ export const createPost = (postData, currentPosts = {}) => {
  * @param {Object[]} currentPosts - The current Post(s) displayed.
  * @return {Promise<Object>} A Promise which resolved to a Redux action.
  */
-export const saveEditedPost = () => {
+export const saveEditedPost = (postData = {}, currentPosts = []) => {
+
+  const { _id, title, text } = postData;
   const token = localStorage.getItem(JWT_TOKEN);
-  return function(dispatch) {
+  const options = {
+    url: "/api/posts/" + _id,
+    method: "patch",
+    data: {
+      title: title,
+      text: text
+    }
+  };
+
+  return function (dispatch) {
     if (!token) {
       return Promise.resolve().then(() => {
         return dispatch(postsError(loginError));
       });
     }
+    if(isEmpty(postData)) {
+      return Promise.resolve().then(() => {
+        return dispatch(postsError("Post data is empty"));
+      })
+    }
+    return axios(options)
+      .then((response) => {
+        const { message, updatedPost } = response.data;
+        const updatedPosts = currentPosts.map((post) => {
+          if (post._id === updatedPost._id) {
+            return {
+              ...updatedPost
+            };
+          } else {
+            return post;
+          }
+        });
+        return dispatch({
+          type: EDIT_POST,
+          payload: {
+            message: message,
+            posts: updatedPosts
+          }
+        });
+      })
+      .catch((error) => {
+        return dispatch(postsError(error));
+      });
   }
 };
 
