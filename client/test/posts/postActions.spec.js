@@ -241,7 +241,7 @@ describe("Post API / Redux Actions Tests", () => {
         });
       });
 
-      it(`Should successfulle handle an API error and dispatch a ${types.COMMENTS_ERROR} action`, () => {
+      it(`Should successfulle handle an API error and dispatch a ${types.POSTS_ERROR} action`, () => {
         // current state of Post(s) array //
         const currentPosts = posts.map((post) => Object.assign({}, post));
         // error to be thrown // Post(s) array should not be touched //
@@ -260,12 +260,71 @@ describe("Post API / Redux Actions Tests", () => {
           { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
           { type: types.POSTS_ERROR, payload: {message: error.message, error: error} },
         ];
-        return testStore.dispatch(actions.saveEditedPost({_id: _id, title: title, text: text},currentPosts)).then(() => {
+        return testStore.dispatch(actions.saveEditedPost({_id: _id, title: title, text: text}, currentPosts)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
     });
-    // END {savedEditedComment} action tests //
+    // END {savedEditedPost} action tests //
+    // {deletePost} action tests //
+    describe("Action: {deletePost}", () => {
+
+      it(`Should successfully dispatch a ${types.DELETE_POST} action`, () => {
+        // mock Post state array //
+        const currentPosts = posts.map((post) => Object.assign({}, post));
+        const mockDeletedPost = {
+          ...currentPosts[0];
+        }
+        const postId = mockDeletedPost._id;
+        // expected posts after successful delete API request //
+        const newPosts = currentPosts.slice(1);
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.respondWith({
+            status: 200,
+            response: {
+              message: "Deleted",
+              deletedPost: mockDeletedPost,
+            }
+          });
+        });
+
+        const expectedActions = [
+          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.DELETE_POST, payload: {message: "Deleted", posts: [...newPosts]} }
+        ];
+
+        return testStore.dispatch(actions.deletePost(postId, currentPosts)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+
+      it(`Should successfulle handle an API error and dispatch a ${types.POSTS_ERROR} action`, () => {
+        const currentPosts = posts.map((post) => Object.assign({}, post));
+        //error to be thrown // posts array should not be touched //
+        const postId = currentPosts[0];
+        const error = generalError("Server error");
+
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent();
+          request.reject({
+            status: 500,
+            response: error
+          });
+        });
+
+        const expectedActions = [
+          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} },
+        ];
+
+        return testStore.dispatch(actions.deletePost(postId, currentPosts)).then(() => {
+          expect(testStore.getActions()).toEqual(expectedActions);
+        });
+      });
+    });
+  // END {deletePost} action tests //
   });
   // END logged in user context //
 });
