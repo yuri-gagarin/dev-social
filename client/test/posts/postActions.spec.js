@@ -152,12 +152,15 @@ describe("Post API / Redux Actions Tests", () => {
         // mock created Post and current state of Post(s) array //
         const currentPosts = posts.map((post) => Object.assign({}, post));
         const mockPost = generatePost({userId: 1, postId: 1})
-        const { title, text, author } = post;
+        const { title, text, author } = mockPost;
         // expected Post(s) array with a new created Post //
         const newPosts = [...currentPosts, mockPost];
+        // test for present authorization headers //
+        let headers = {};
 
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
+          headers = request.headers;
           request.respondWith({
             status: 200,
             response: {
@@ -172,8 +175,10 @@ describe("Post API / Redux Actions Tests", () => {
           { type: types.CREATE_POST, payload: {message: "Post Created", posts: [...newPosts]} }
         ];
 
-        return testStore.dispatch(actions.createPost({title: title, text: text, author: author},currentPosts)).then(() => {
+        return testStore.dispatch(actions.createPost({title: title, text: text, author: author}, currentPosts)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
+          // should set appropriate authorization header for request //
+          expect(headers.Authorization).toBeDefined();
         });
       });
       
@@ -182,7 +187,7 @@ describe("Post API / Redux Actions Tests", () => {
         const currentPosts = posts.map((post) => Object.assign({}, post));
         const mockPost = generatePost({userId: 1, postId: 1});
         const { title, text, author } = mockPost;
-        //error to be thrown // currentPosts array should not be touched //
+        // error to be thrown // currentPosts array should not be touched //
         const error = generalError("Server error");
 
         moxios.wait(() => {
@@ -209,19 +214,22 @@ describe("Post API / Redux Actions Tests", () => {
       
       it(`Should successfully dispatch a ${types.EDIT_POST} action`, () => {
         // mock created Post and current state of Post(s) array //
-        const currentPosts = post.map((post) => Object.assign({}, post));
+        const currentPosts = posts.map((post) => Object.assign({}, post));
         const updatedPost = {
           ...currentPosts[0],
           text: "I've edited something",
           title: "I've edited title"
         };
-        const { title, text, _id } = editedPost;
+        const { title, text, _id } = updatedPost;
         // expected Posts(s) //
         const newPosts = currentPosts.slice(1);
-        newPosts.unshift(editedPost);
+        newPosts.unshift(updatedPost);
+        // test for present authorization headers //
+        let headers = {};
 
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
+          headers = request.headers;
           request.respondWith({
             status: 200,
             response: {
@@ -238,6 +246,8 @@ describe("Post API / Redux Actions Tests", () => {
 
         return testStore.dispatch(actions.saveEditedPost({title: title, text: text, _id: _id}, currentPosts)).then(() => {  
           expect(testStore.getActions()).toEqual(expectedActions);
+          // should set appropriate authorization header for request //
+          expect(headers.Authorization).toBeDefined();
         });
       });
 
@@ -278,9 +288,12 @@ describe("Post API / Redux Actions Tests", () => {
         const postId = mockDeletedPost._id;
         // expected posts after successful delete API request //
         const newPosts = currentPosts.slice(1);
+        // test for present authorization headers //
+        let headers = {};
 
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
+          headers = request.headers;
           request.respondWith({
             status: 200,
             response: {
@@ -297,6 +310,8 @@ describe("Post API / Redux Actions Tests", () => {
 
         return testStore.dispatch(actions.deletePost(postId, currentPosts)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
+          // should set appropriate authorization header for request //
+          expect(headers.Authorization).toBeDefined();
         });
       });
 

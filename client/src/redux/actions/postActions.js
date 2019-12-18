@@ -1,11 +1,12 @@
-import { FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR, CREATE_POST, EDIT_POST } from "../cases";
+import { FETCH_TRENDING_POSTS, LIST_ERRORS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR, 
+        CREATE_POST, EDIT_POST, DELETE_POST } from "../cases";
 //import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
 import { postSearchOptions } from "../searchOptions";
 import { isError } from "../../helpers/validators/dataValidators";
 import { inputError, loginError, generalError } from "../../helpers/commonErrors";
 import { JWT_TOKEN } from "../../helpers/constants/appConstants";
-import isEmpty from "../../../../helpers/validators/isEmpty";
+import { isEmpty } from "../../helpers/validators/dataValidators";
 
 
 export const postsRequest = () => {
@@ -143,17 +144,20 @@ export const fetchTrendingPosts = () => {
  */
 export const createPost = (postData, currentPosts = []) => {
 
+  const token = localStorage.getItem(JWT_TOKEN);
   const { author, title, text } = postData;
   const options = {
     url: "/api/posts",
     method: "post",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    },
     data: {
       author: author,
       title: title,
       text: text
     }
   };
-  const token = localStorage.getItem(JWT_TOKEN);
 
   return function (dispatch) {
     if (!token) {
@@ -166,6 +170,7 @@ export const createPost = (postData, currentPosts = []) => {
         return dispatch(postsError(generalError("Post data is empty")));
       })
     }
+    dispatch(postsRequest());
     return axios(options)
       .then((response) => {
         const { message, newPost } = response.data;
@@ -191,12 +196,15 @@ export const createPost = (postData, currentPosts = []) => {
  * @return {Promise<Object>} A Promise which resolved to a Redux action.
  */
 export const saveEditedPost = (postData = {}, currentPosts = []) => {
-
-  const { _id, title, text } = postData;
+  
   const token = localStorage.getItem(JWT_TOKEN);
+  const { _id, title, text } = postData;
   const options = {
     url: "/api/posts/" + _id,
     method: "patch",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    },
     data: {
       title: title,
       text: text
@@ -214,6 +222,7 @@ export const saveEditedPost = (postData = {}, currentPosts = []) => {
         return dispatch(postsError("Post data is empty"));
       })
     }
+    dispatch(postsRequest());
     return axios(options)
       .then((response) => {
         const { message, updatedPost } = response.data;
@@ -246,14 +255,43 @@ export const saveEditedPost = (postData = {}, currentPosts = []) => {
  * @param {Object[]} currentPosts - The current Post(s) displayed.
  * @return {Promise<Object>} A Promise which resolved to a redux action.
  */
-export const deletePost = () => {
+export const deletePost = (postId, currentPosts = []) => {
+  
   const token = localStorage.getItem(JWT_TOKEN);
+  const options = {
+    url: "/api/posts/" + postId,
+    method: "delete",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  }
   return function(dispatch) {
     if (!token) {
       return Promise.resolve().then(() => {
         return dispatch(postsError(loginError));
       });
     }
+    if (!postId) {
+      return Promise.resolve().then(() => {
+        return dispatch(postsError(generalError("Can't resolve Post id")));
+      });
+    }
+    dispatch(postsRequest());
+    return axios(options)
+      .then((response) => {
+        const { message, deletedPost } = response.data;
+        const newPosts = currentPosts.filter((post) => post._id !== deletedPost._id);
+        return dispatch({
+          type: DELETE_POST,
+          payload: {
+            message: message,
+            posts: newPosts
+          }
+        });
+      })
+      .catch((error) => {
+        return dispatch(postsError(error));
+      });
   }
 };
 
