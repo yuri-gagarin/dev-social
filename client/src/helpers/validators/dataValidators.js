@@ -16,7 +16,12 @@ export const isEmpty = (value) => {
 /**
  * Checks if a passed object is an error.
  * @param {object} objToCheck - A javascript object.
+ * @return {boolean} = {true} if IS an Error proto, {false} if NOT.
  */
 export const isError = (objToCheck) => {
-  return objToCheck && objToCheck.message && objToCheck.stack
+  if (objToCheck && objToCheck.message && objToCheck.stack) {
+    return true;
+  } else {
+    return false;
+  }
 };

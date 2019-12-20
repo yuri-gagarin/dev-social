@@ -29,39 +29,58 @@ describe("postActions integration tests", () => {
         });
       });     
     });
+
     describe("Action {createPost}", () => {
       it("Should reject with an error and set appropriate {postsState}", () => {
-        return store.dispatch(actions.createPost()).then(() => {
+        const post = { title: "title", text: "text" }
+        const currentPosts = store.getState().postsState.posts;
+
+        return store.dispatch(actions.createPost(post, currentPosts)).then(() => {
           const { loading, message, posts, postsError} = store.getState().postsState;
           expect(loading).toBe(false);
           expect(typeof message).toEqual("string");
           expect(Array.isArray(posts)).toBe(true);
           expect(isError(postsError)).toBe(true);
-        })
-      })
+        });
+      });
     });
+
     describe("Action {saveEditedPost}", () => {
       it("Should reject with an error and set appropriate {postsState}", () => {
-        return store.dispatch(actions.fetchPosts()).then(() => {
+        const currentPosts = store.getState().postsState.posts;
+        const editedPost = {
+          ...currentPosts[0],
+          title: "I changed it"
+        };
+
+        return store.dispatch(actions.saveEditedPost(editedPost, currentPosts)).then(() => {
           const { loading, message, posts, postsError} = store.getState().postsState;
           expect(loading).toBe(false);
           expect(typeof message).toEqual("string");
           expect(Array.isArray(posts)).toBe(true);
           expect(isError(postsError)).toBe(true);
-        })
-      })
+        });
+      });
     });
+
     describe("Action {deletePost}", () => {
+      const currentPosts = store.getState().postsState.posts;
+      const postToDelete = {
+        ...currentPosts[0]
+      };
+      const postId = postToDelete._id;
+
       it("Should reject with an error and set appropriate {postsState}", () => {
-        return store.dispatch(actions.fetchPosts()).then(() => {
+        return store.dispatch(actions.deletePost(postId)).then(() => {
           const { loading, message, posts, postsError} = store.getState().postsState;
           expect(loading).toBe(false);
           expect(typeof message).toEqual("string");
           expect(Array.isArray(posts)).toBe(true);
           expect(isError(postsError)).toBe(true);
-        })
-      })
-    })
+          console.log(store.getState().postsState.posts.length);
+        });
+      });
+    });
 
   });
   // END User is NOT Logged IN //
