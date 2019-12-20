@@ -3,9 +3,68 @@ import axios from "axios";
 import store from "../../../src/redux/store";
 import * as actions from "../../../src/redux/actions/postActions";
 import { JWT_TOKEN } from "../../../src/helpers/constants/appConstants";
+import { isError } from "../../../src/helpers/validators/dataValidators";
 
 
 describe("postActions integration tests", () => {
+
+  beforeAll(() => {
+    axios.defaults.baseURL = "http://localhost:3000";
+  });
+  
+
+  // User is NOT Logged IN //
+  describe("User is NOT logged in", () => {
+
+   
+
+    describe("Action {fetchPosts}", () => {
+      it("Should fetch posts and correctly set the {postsState}", () => {
+        return store.dispatch(actions.fetchPosts()).then(() => {
+          const { loading, message, posts, postsError } = store.getState().postsState;
+          expect(loading).toBe(false);
+          expect(typeof message).toEqual("string");
+          expect(Array.isArray(posts)).toBe(true);
+          expect(postsError).toBe(null);
+        });
+      });     
+    });
+    describe("Action {createPost}", () => {
+      it("Should reject with an error and set appropriate {postsState}", () => {
+        return store.dispatch(actions.createPost()).then(() => {
+          const { loading, message, posts, postsError} = store.getState().postsState;
+          expect(loading).toBe(false);
+          expect(typeof message).toEqual("string");
+          expect(Array.isArray(posts)).toBe(true);
+          expect(isError(postsError)).toBe(true);
+        })
+      })
+    });
+    describe("Action {saveEditedPost}", () => {
+      it("Should reject with an error and set appropriate {postsState}", () => {
+        return store.dispatch(actions.fetchPosts()).then(() => {
+          const { loading, message, posts, postsError} = store.getState().postsState;
+          expect(loading).toBe(false);
+          expect(typeof message).toEqual("string");
+          expect(Array.isArray(posts)).toBe(true);
+          expect(isError(postsError)).toBe(true);
+        })
+      })
+    });
+    describe("Action {deletePost}", () => {
+      it("Should reject with an error and set appropriate {postsState}", () => {
+        return store.dispatch(actions.fetchPosts()).then(() => {
+          const { loading, message, posts, postsError} = store.getState().postsState;
+          expect(loading).toBe(false);
+          expect(typeof message).toEqual("string");
+          expect(Array.isArray(posts)).toBe(true);
+          expect(isError(postsError)).toBe(true);
+        })
+      })
+    })
+
+  });
+  // END User is NOT Logged IN //
   // User is Logged IN //
   describe("User IS logged in", () => {
     let posts = [], token;
@@ -37,7 +96,7 @@ describe("postActions integration tests", () => {
       it("Should create a Post, save to database and updated state", () => {
         //console.log(localStorage.getItem(JWT_TOKEN))
         return store.dispatch(actions.fetchPosts()).then(() => {
-          console.log(store.getState().postsState);
+          //console.log(store.getState().postsState);
         })
       });
     });
