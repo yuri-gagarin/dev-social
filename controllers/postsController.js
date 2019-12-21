@@ -197,10 +197,13 @@ export default {
     const userId = req.user._id;
     const postId = req.params.id;
 
+    let deletedPost;
+
 
     Post.findOneAndDelete({_id: postId})
       .then((post) => {
         if (post) {
+          deletedPost = post;
           return Comment.deleteMany({post: postId});
         }
         else {
@@ -209,7 +212,8 @@ export default {
       })
       .then((result) => {
         return res.json({
-          message: `deleted post and ${result.deletedCount} post comments`
+          message: `deleted Post and ${result.deletedCount} Post comments`,
+          deletedPost: deletedPost
         });
       })
       .catch((error) => {

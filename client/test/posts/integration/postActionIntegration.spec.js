@@ -27,11 +27,13 @@ describe("postActions integration tests", () => {
       return axios(options)
         .then((response) => {
           token = response.data.token;
-          //console.log(localStorage.getItem(JWT_TOKEN));
         })
         .catch((error) => {
           console.log(error);
-        })
+        });
+  });
+  afterAll(() => {
+
   });
   
 
@@ -39,12 +41,12 @@ describe("postActions integration tests", () => {
   describe("User is NOT logged in", () => {
 
     beforeEach(() => {
-      // set a wrong token
+      // set a wrong token //
       localStorage.setItem(JWT_TOKEN, "thisisnotavalidtoken");
-    })
+    });
     afterEach(() => {
       localStorage.removeItem(JWT_TOKEN);
-    })
+    });
    
 
     describe("Action {fetchPosts}", () => {
@@ -93,13 +95,13 @@ describe("postActions integration tests", () => {
     });
 
     describe("Action {deletePost}", () => {
-      const currentPosts = store.getState().postsState.posts;
-      const postToDelete = {
-        ...currentPosts[0]
-      };
-      const postId = postToDelete._id;
-
       it("Should reject with an error and set appropriate {postsState}", () => {
+        const currentPosts = store.getState().postsState.posts;
+        const postToDelete = {
+          ...currentPosts[0]
+        };
+        const postId = postToDelete._id;  
+
         return store.dispatch(actions.deletePost(postId)).then(() => {
           const { loading, message, posts, postsError} = store.getState().postsState;
           expect(loading).toBe(false);
@@ -115,16 +117,36 @@ describe("postActions integration tests", () => {
   // User is Logged IN //
   describe("User IS logged in", () => {
     // login user - get JWT token //
-    beforeAll(() => {
+    beforeEach(() => {
       localStorage.setItem(JWT_TOKEN, token);
     }); 
-    // {createPost} Redux and API action //
+    afterEach(() => {
+      localStorage.removeItem(JWT_TOKEN);
+    })
+    // {fetchPosts} Redux and API actions //
+    describe("Action {fetchPosts}", () => {
+      it("Should fetch Post(s) and set the appropriate {postsState}", () => {
+
+        return store.dispatch(actions.fetchPosts()).then(() => {
+          const { loading, message, posts, postsError } = store.getState().postsState;
+
+          expect(loading).toBe(false);
+          expect(typeof message).toEqual("string");
+          expect(Array.isArray(posts)).toBe(true);
+          expect(postsError).toBe(null);
+        });
+      });
+    });
+    // END {fetchPosts} Redux and API actions //
+    // {createPost} Redux and API actions //
     describe("Action {createPost}",  () => {
       it("Should create a Post, save to database and updated state", () => {
         const currentPosts = store.getState().postsState.posts; 
         const postData = { title: "A new post", text: faker.lorem.paragraph(2) };
+
         return store.dispatch(actions.createPost(postData, currentPosts)).then(() => {
           const { loading, message, posts, postsError } = store.getState().postsState;
+
           expect(loading).toBe(false);
           expect(typeof message).toEqual("string");
           expect(posts.length).toEqual(currentPosts.length + 1);
@@ -132,8 +154,8 @@ describe("postActions integration tests", () => {
         });
       });
     });
-    // END {createPost} Redux and API action //
-    // {saveEditedPost} Redux and API action //
+    // END {createPost} Redux and API actions //
+    // {saveEditedPost} Redux and API actions //
     describe("Action {savedEditedPost}", () => {
       it("Should save an edited Post and update state", () => {
         const currentPosts = store.getState().postsState.posts;
@@ -142,26 +164,39 @@ describe("postActions integration tests", () => {
           title: "I am updated"
         };
 
-       return store.dispatch(actions.saveEditedPost(updatedPost, currentPosts)).then(() => {
-         const { loading, message, posts, postsError } = store.getState().postsState;
-         const updatedPostTitle = posts[posts.length - 1].title;
-         expect(loading).toBe(false);
-         expect(typeof message).toEqual("string");
-         expect(posts.length).toEqual(currentPosts.length);
-         expect(updatedPostTitle).toEqual(updatedPost.title);
-         expect(postsError).toBe(null);
-       });
+        return store.dispatch(actions.saveEditedPost(updatedPost, currentPosts)).then(() => {
+          const { loading, message, posts, postsError } = store.getState().postsState;
+          const updatedPostTitle = posts[posts.length - 1].title;
 
+          expect(loading).toBe(false);
+          expect(typeof message).toEqual("string");
+          expect(posts.length).toEqual(currentPosts.length);
+          expect(updatedPostTitle).toEqual(updatedPost.title);
+          expect(postsError).toBe(null);
+        });
       });
     });
-    // END {saveEditedPost} Redux and API action //
-    // {deletePost} Redux and API action //
+    // END {saveEditedPost} Redux and API actions //
+    // {deletePost} Redux and API actions //
     describe("Action {deletePost}", () => {
       it("Should delete a specific post and update state", () => {
+        const currentPosts = store.getState().postsState.posts;
+        const postToDelete = {
+          ...currentPosts[currentPosts.length - 1],
+        };
+        const postId = postToDelete._id;
 
+        return store.dispatch(actions.deletePost(postId, currentPosts)).then(() => {
+          const { loading, message, posts, postsError } = store.getState().postsState;
+
+          expect(loading).toBe(false);
+          expect(typeof message).toEqual("string");
+          expect(posts.length).toEqual(currentPosts.length - 1);
+          expect(postsError).toBe(null);
+        });
       });
     });
-    // END {deletePost} Redux and API action //
+    // END {deletePost} Redux and API actions //
   });
   // END user is logged in 
-})
+});

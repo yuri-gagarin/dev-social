@@ -290,6 +290,7 @@ export const deletePost = (postId, currentPosts = []) => {
         });
       })
       .catch((error) => {
+        console.log(error);
         return dispatch(postsError(error));
       });
   }
