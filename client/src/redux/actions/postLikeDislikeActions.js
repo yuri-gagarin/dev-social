@@ -15,15 +15,15 @@ import axios from "axios";
  */
 export const likePost = (postId, currentPostState = []) => {
   const token = localStorage.getItem(JWT_TOKEN);
-  //we should return an error if user is not logged in
+  // we should return an error if user is not logged in
   const options = {
     method: "post",
     url: "/api/posts/like_post/" + postId,
     headers: {"Authorization": `${token}`}
   };
   return function(dispatch) {
-    ///api actions
-    if(!token) {
+    // api actions
+    if (!token) {
       return Promise.resolve()
         .then(() => {
           return dispatch(postsError(loginError));
@@ -34,7 +34,7 @@ export const likePost = (postId, currentPostState = []) => {
         const { message, updatedPost } = response.data;
         const statusCode = response.status;
         let newPostState = currentPostState.map((post) => {
-          if(post._id === updatedPost._id) {
+          if (post._id === updatedPost._id) {
             return {
               ...post, 
               likeCount: updatedPost.likeCount,
@@ -70,7 +70,7 @@ export const removePostLike = (postId, currentPostState) => {
     headers: {"Authorization": `${token}`}
   };
   return function(dispatch) {
-    if(!token) {
+    if (!token) {
       return Promise.resolve()
         .then(() => {
           return dispatch(postsError(loginError));
@@ -78,9 +78,10 @@ export const removePostLike = (postId, currentPostState) => {
     }
     return axios(options)
       .then((response) => {
-        const {message, updatedPost} = response.data;
+        const { message, updatedPost } = response.data;
+        const statusCode = response.status;
         let newPostState = currentPostState.map((post) => {
-          if(post._id === updatedPost._id) {
+          if (post._id === updatedPost._id) {
             return {
               ...post,
               likeCount: updatedPost.likeCount,
@@ -96,7 +97,8 @@ export const removePostLike = (postId, currentPostState) => {
           type: REMOVE_POST_LIKE, 
           payload: {
             message: message,
-            posts: newPostState
+            posts: newPostState,
+            statusCode: statusCode
           }
         });
       })
@@ -106,7 +108,7 @@ export const removePostLike = (postId, currentPostState) => {
   }
 }
 
-//PostDislikeHandling
+// PostDislikeHandling
 export const dislikePost = (postId, currentPostState) => {
   const token = localStorage.getItem("jwtToken");
   const options = {
@@ -116,7 +118,7 @@ export const dislikePost = (postId, currentPostState) => {
   };
   
   return function(dispatch) {
-    if(!token) {
+    if (!token) {
       return Promise.resolve()
         .then(() => {
           return dispatch(postsError(loginError));
@@ -124,7 +126,8 @@ export const dislikePost = (postId, currentPostState) => {
     }
     return axios(options)
       .then((response) => {
-        let {updatedPost, message} = response.data;
+        const {updatedPost, message} = response.data;
+        const statusCode = response.status;
         let newPostState = currentPostState.map((post) => {
           if(post._id === updatedPost._id) {
             return {
@@ -144,6 +147,7 @@ export const dislikePost = (postId, currentPostState) => {
           payload: {
             message: message,
             posts: newPostState,
+            statusCode: statusCode
           }
         });
       })
@@ -172,6 +176,7 @@ export const removePostDislike = (postId, currentPostState) => {
     return axios(options) 
       .then((response) => {
         const {message, updatedPost} = response.data;
+        const statusCode = response.status;
         let newPostState = currentPostState.map((post) => {
           if(post._id === updatedPost._id) {
             return {
@@ -190,6 +195,7 @@ export const removePostDislike = (postId, currentPostState) => {
           payload: {
             message: message,
             posts: newPostState,
+            statusCode: statusCode
           }
         });
       })

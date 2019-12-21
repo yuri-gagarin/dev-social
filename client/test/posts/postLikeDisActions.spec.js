@@ -34,9 +34,9 @@ describe("Post {Like} {Dislike} action tests", () => {
         const currentPostsState = posts.map((post) => Object.assign({}, post));
 
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
-        return testStore.dispatch(actions.default(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -47,7 +47,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         const currentPostsState = posts.map((post) => Object.assign({}, post));
 
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
         return testStore.dispatch(actions.removePostLike(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
@@ -60,7 +60,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         const currentPostsState = posts.map((post) => Object.assign({}, post));
 
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
         return testStore.dispatch(actions.dislikePost(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
@@ -73,7 +73,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         const currentPostsState = posts.map((post) => Object.assign({}, post));        
         
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
         return testStore.dispatch(actions.removePostDislike(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
@@ -126,10 +126,10 @@ describe("Post {Like} {Dislike} action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState} }
+          { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState, statusCode: 200} }
         ];
 
-        return testStore.dispatch(actions.default(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -168,10 +168,10 @@ describe("Post {Like} {Dislike} action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState} }
+          { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState, statusCode: 200} }
         ];
 
-        return testStore.dispatch(actions.default(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -190,10 +190,10 @@ describe("Post {Like} {Dislike} action tests", () => {
         });
       
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} }
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} }
         ];
 
-        return testStore.dispatch(actions.default(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -232,7 +232,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.REMOVE_POST_LIKE, payload: {message: "unlike post", posts: newPostsState} }
+          { type: types.REMOVE_POST_LIKE, payload: {message: "unlike post", posts: newPostsState, statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.removePostLike(postId, currentPostsState)).then(() => {
@@ -254,7 +254,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} }
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} }
         ];
 
         return testStore.dispatch(actions.removePostLike(postId, currentPostsState)).then(() => {
@@ -295,7 +295,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.DISLIKE_POST, payload: {message: "disliked post", posts: newPostsState} }
+          { type: types.DISLIKE_POST, payload: {message: "disliked post", posts: newPostsState, statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.dislikePost(postId, currentPostsState)).then(() => {
@@ -336,7 +336,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         newPostsState.unshift(expectedPost);
 
         const expectedActions = [
-          { type: types.DISLIKE_POST, payload: {message: "disliked", posts: newPostsState} }
+          { type: types.DISLIKE_POST, payload: {message: "disliked", posts: newPostsState, statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.dislikePost(postId, currentPostsState)).then(() => {
@@ -344,7 +344,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         });
       });
 
-      it(`Should successfully handle an error`, () => {
+      it(`Should successfully handle an API error`, () => {
         const currentPostsState = posts.map((post) => Object.assign({}, post));
         const postId = "randomid";
         const error = new Error("Oops");
@@ -352,13 +352,13 @@ describe("Post {Like} {Dislike} action tests", () => {
         moxios.wait(() => {
           let request = moxios.requests.mostRecent();
           request.reject({
-            status: 400,
+            status: 500,
             response: error
           });
         });
 
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} }
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} }
         ];
 
         return testStore.dispatch(actions.dislikePost(postId, currentPostsState)).then(() => {
@@ -400,7 +400,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.REMOVE_POST_DISLIKE, payload: {message: "disliked", posts: newPostsState} }
+          { type: types.REMOVE_POST_DISLIKE, payload: {message: "disliked", posts: newPostsState, statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.removePostDislike(postId, currentPostsState)).then(() => {
@@ -416,13 +416,13 @@ describe("Post {Like} {Dislike} action tests", () => {
         moxios.wait(() => {
           let request = moxios.requests.mostRecent();
           request.reject({
-            status: 400,
+            status: 500,
             response: error
           });
         });
 
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} }
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} }
         ];
         
         return testStore.dispatch(actions.removePostDislike(postId, currentPostsState)).then(() => {
