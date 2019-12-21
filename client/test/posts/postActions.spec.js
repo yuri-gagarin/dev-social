@@ -53,8 +53,8 @@ describe("Post API / Redux Actions Tests", () => {
         });
     
         const expectedActions = [
-          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.POSTS_SUCCESS, payload: {message: "success", posts: expectedPosts} },
+          { type: types.POSTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.POSTS_SUCCESS, payload: {message: "success", posts: expectedPosts, statusCode: 200} },
         ];  
 
         return testStore.dispatch(actions.fetchPosts({}, currentPosts)).then(() => {
@@ -75,8 +75,8 @@ describe("Post API / Redux Actions Tests", () => {
         });  
 
         const expectedActions = [
-          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} },
+          { type: types.POSTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} },
         ];
 
         return testStore.dispatch(actions.fetchPosts({}, currentPosts)).then(() => {
@@ -91,7 +91,7 @@ describe("Post API / Redux Actions Tests", () => {
       it("Should throw an error and not allow an API call", () => {
 
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
 
         return testStore.dispatch(actions.createPost({}, [])).then(() => {
@@ -106,7 +106,7 @@ describe("Post API / Redux Actions Tests", () => {
       it("Should throw an error and not allow an API call", () => {
 
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
 
         return testStore.dispatch(actions.saveEditedPost({}, [])).then(() => {
@@ -122,7 +122,7 @@ describe("Post API / Redux Actions Tests", () => {
 
         const postId = "afakeid";
         const expectedActions = [
-          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
 
         return testStore.dispatch(actions.deletePost(postId)).then(() => {
@@ -171,8 +171,8 @@ describe("Post API / Redux Actions Tests", () => {
         });
 
         const expectedActions = [
-          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.CREATE_POST, payload: {message: "Post Created", posts: [...newPosts]} }
+          { type: types.POSTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.CREATE_POST, payload: {message: "Post Created", posts: [...newPosts], statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.createPost({title: title, text: text, author: author}, currentPosts)).then(() => {
@@ -199,8 +199,8 @@ describe("Post API / Redux Actions Tests", () => {
         });
 
         const expectedActions = [
-          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} },
+          { type: types.POSTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} },
         ];
 
         return testStore.dispatch(actions.createPost({title: title, text: text, author: author},currentPosts)).then(() => {
@@ -240,8 +240,8 @@ describe("Post API / Redux Actions Tests", () => {
         });
 
         const expectedActions = [
-          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.EDIT_POST, payload: {message: "Success", posts: [...newPosts]} }
+          { type: types.POSTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.EDIT_POST, payload: {message: "Success", posts: [...newPosts], statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.saveEditedPost({title: title, text: text, _id: _id}, currentPosts)).then(() => {  
@@ -267,8 +267,8 @@ describe("Post API / Redux Actions Tests", () => {
         });
 
         const expectedActions = [
-          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} },
+          { type: types.POSTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} }
         ];
         return testStore.dispatch(actions.saveEditedPost({_id: _id, title: title, text: text}, currentPosts)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
@@ -304,8 +304,8 @@ describe("Post API / Redux Actions Tests", () => {
         });
 
         const expectedActions = [
-          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.DELETE_POST, payload: {message: "Deleted", posts: [...newPosts]} }
+          { type: types.POSTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.DELETE_POST, payload: {message: "Deleted", posts: [...newPosts], statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.deletePost(postId, currentPosts)).then(() => {
@@ -330,8 +330,8 @@ describe("Post API / Redux Actions Tests", () => {
         });
 
         const expectedActions = [
-          { type: types.POSTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.POSTS_ERROR, payload: {message: error.message, error: error} },
+          { type: types.POSTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.POSTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} },
         ];
 
         return testStore.dispatch(actions.deletePost(postId, currentPosts)).then(() => {

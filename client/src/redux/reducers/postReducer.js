@@ -51,6 +51,7 @@ const postReducer = (state=initialState, action) => {
     case EDIT_POST: 
       return {
         ...state,
+        statusCode: action.payload.statusCode,
         loading: false,
         message: action.payload.message,
         posts: [...action.payload.posts],
@@ -59,6 +60,7 @@ const postReducer = (state=initialState, action) => {
     case DELETE_POST: 
       return {
         ...state,
+        statusCode: action.payload.statusCode,
         loading: false,
         message: action.payload.message,
         posts: [...action.payload.posts],

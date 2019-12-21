@@ -13,16 +13,18 @@ export const postsRequest = () => {
   return {
     type: POSTS_REQUEST,
     payload: {
-      message: "Loading"
+      message: "Loading",
+      statusCode: null
     }
   };
 };
-export const postsSuccess = ({message, posts}) => {
+export const postsSuccess = ({message, posts, statusCode}) => {
   return {
     type: POSTS_SUCCESS,
     payload: {
       message: message,
       posts: posts,
+      statusCode: statusCode
     }
   };
 };
@@ -34,7 +36,15 @@ export const postsError = (err) => {
   if (isError(err.request)) error = err.request;
   if (!error) error = new Error("Something went wrong");
 
-  statusCode = err.response.status ? err.response.status : 400;
+  // check for a status code in possible response, otherwise error is probably on user end
+  if (err.response && err.response.status) {
+    statusCode = err.response.status;
+  } 
+  else if (err.status) {
+    statusCode = err.status;
+  } else {
+    statusCode = 400;
+  }
 
   return {
     type: POSTS_ERROR,
@@ -73,10 +83,12 @@ export const fetchPosts = (options = {}, currentPosts = []) => {
     })
     .then((response) => {
       const { message, posts } = response.data;
+      const statusCode = response.status;
       if(currentPosts.length === 0) {
         const newPostsState = {
           message: message,
-          posts: [...posts]
+          posts: [...posts],
+          statusCode: statusCode
         };
         return dispatch(postsSuccess(newPostsState));
       } else {
@@ -91,6 +103,7 @@ export const fetchPosts = (options = {}, currentPosts = []) => {
         const newPostsState = {
           message: message,
           posts: [...currentPosts, ...posts],
+          statusCode: statusCode,
         }
         return dispatch(postsSuccess(newPostsState));
       }
@@ -177,12 +190,14 @@ export const createPost = (postData, currentPosts = []) => {
     return axios(options)
       .then((response) => {
         const { message, newPost } = response.data;
+        const statusCode = response.status;
         const newPostsArray = [...currentPosts, newPost];
         return dispatch({
           type: CREATE_POST,
           payload: {
             message: message,
-            posts: newPostsArray
+            posts: newPostsArray,
+            statusCode: statusCode
           }
         });
       })
@@ -229,6 +244,7 @@ export const saveEditedPost = (postData = {}, currentPosts = []) => {
     return axios(options)
       .then((response) => {
         const { message, updatedPost } = response.data;
+        const statusCode = response.status;
         const updatedPosts = currentPosts.map((post) => {
           if (post._id === updatedPost._id) {
             return {
@@ -242,7 +258,8 @@ export const saveEditedPost = (postData = {}, currentPosts = []) => {
           type: EDIT_POST,
           payload: {
             message: message,
-            posts: updatedPosts
+            posts: updatedPosts,
+            statusCode: statusCode
           }
         });
       })
@@ -283,12 +300,14 @@ export const deletePost = (postId, currentPosts = []) => {
     return axios(options)
       .then((response) => {
         const { message, deletedPost } = response.data;
+        const statusCode = response.status;
         const newPosts = currentPosts.filter((post) => post._id !== deletedPost._id);
         return dispatch({
           type: DELETE_POST,
           payload: {
             message: message,
-            posts: newPosts
+            posts: newPosts,
+            statusCode: statusCode
           }
         });
       })
