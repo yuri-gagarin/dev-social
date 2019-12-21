@@ -5,20 +5,21 @@ import { loginError } from "../../helpers/commonErrors";
 import axios from "axios";
 
 
-// Actions for PostLike
+// Actions for PostLike //
+
 /**
- * Likes a Post and returns an action to reducer;
- * @param {string} postId - _id of the Post to alter.
- * @param {Object[]} currentPostState - Current state of the Post(s).
- * @return {Promise} A Promise which resolves to an action.
+ * Likes a Post and returns an action to reducer
+ * @param {string} postId - _id of the Post to alter
+ * @param {Object[]} currentPostState - Current state of the Post(s)
+ * @return {Promise<Object>} A Promise which resolves to an {object} for Redux action
  */
-export const likePost = (postId, currentPostState=[]) => {
+export const likePost = (postId, currentPostState = []) => {
   const token = localStorage.getItem(JWT_TOKEN);
   //we should return an error if user is not logged in
   const options = {
     method: "post",
     url: "/api/posts/like_post/" + postId,
-    headers: {"Authorization": `Bearer ${token}`}
+    headers: {"Authorization": `${token}`}
   };
   return function(dispatch) {
     ///api actions
@@ -30,7 +31,8 @@ export const likePost = (postId, currentPostState=[]) => {
     }
     return axios(options)
       .then((response) => {
-        let {message, updatedPost} = response.data;
+        const { message, updatedPost } = response.data;
+        const statusCode = response.status;
         let newPostState = currentPostState.map((post) => {
           if(post._id === updatedPost._id) {
             return {
@@ -40,8 +42,7 @@ export const likePost = (postId, currentPostState=[]) => {
               markLiked: true,
               markDisliked: false,
             }
-          }
-          else {
+          } else {
             return post;
           }
         });
@@ -50,8 +51,9 @@ export const likePost = (postId, currentPostState=[]) => {
           payload: {
             message: message,
             posts: newPostState,
+            statusCode: statusCode
           }
-        })
+        });
       })
       .catch((error) => {
         return dispatch(postsError(error));
@@ -65,7 +67,7 @@ export const removePostLike = (postId, currentPostState) => {
   const options = {
     method: "delete",
     url: "/api/posts/unlike_post/" + postId,
-    headers: {"Authorization": `Bearer ${token}`}
+    headers: {"Authorization": `${token}`}
   };
   return function(dispatch) {
     if(!token) {

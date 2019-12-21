@@ -13,24 +13,22 @@ describe("postActions integration tests", () => {
   beforeAll(() => {
     axios.defaults.baseURL = "http://localhost:3000";
     const userCredentials = { email: "firstuser@mail.com", password: "Password1" };
-      //console.log(localhost);
-      axios.defaults.baseURL = "http://localhost:3000";
-      const options = {
-        url: "/api/users/login",
-        port: 3000,
-        method: "post",
-        data: {
-          email: userCredentials.email,
-          password: userCredentials.password
-        },
-      };
-      return axios(options)
-        .then((response) => {
-          token = response.data.token;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    const options = {
+      url: "/api/users/login",
+      port: 3000,
+      method: "post",
+      data: {
+        email: userCredentials.email,
+        password: userCredentials.password
+      },
+    };
+    return axios(options)
+      .then((response) => {
+        token = response.data.token;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   });
   afterAll(() => {
 
@@ -52,6 +50,7 @@ describe("postActions integration tests", () => {
     describe("Action {fetchPosts}", () => {
       it("Should fetch posts and correctly set the {postsState}", () => {
         return store.dispatch(actions.fetchPosts()).then(() => {
+          
           const { loading, message, posts, postsError } = store.getState().postsState;
           expect(loading).toBe(false);
           expect(typeof message).toEqual("string");

@@ -27,18 +27,21 @@ export const postsSuccess = ({message, posts}) => {
   };
 };
 export const postsError = (err) => {
-  let error;
+  let error, statusCode;
   //some checking of the err object to make sure we are working with right data
   if (isError(err)) error = err;
   if (isError(err.response)) error = err.response;
   if (isError(err.request)) error = err.request;
   if (!error) error = new Error("Something went wrong");
 
+  statusCode = err.response.status ? err.response.status : 400;
+
   return {
     type: POSTS_ERROR,
     payload: {
       message: error.message,
       error: error,
+      statusCode: statusCode
     }
   };
 };
@@ -290,7 +293,6 @@ export const deletePost = (postId, currentPosts = []) => {
         });
       })
       .catch((error) => {
-        console.log(error);
         return dispatch(postsError(error));
       });
   }

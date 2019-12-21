@@ -36,7 +36,7 @@ describe("Post {Like} {Dislike} action tests", () => {
         const expectedActions = [
           { type: types.POSTS_ERROR, payload: {message: loginError.message, error: loginError} }
         ];
-        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.default(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -129,7 +129,7 @@ describe("Post {Like} {Dislike} action tests", () => {
           { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState} }
         ];
 
-        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.default(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -171,7 +171,7 @@ describe("Post {Like} {Dislike} action tests", () => {
           { type: types.LIKE_POST, payload: {message: "liked", posts: newPostsState} }
         ];
 
-        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.default(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -193,7 +193,7 @@ describe("Post {Like} {Dislike} action tests", () => {
           { type: types.POSTS_ERROR, payload: {message: error.message, error: error} }
         ];
 
-        return testStore.dispatch(actions.likePost(postId, currentPostsState)).then(() => {
+        return testStore.dispatch(actions.default(postId, currentPostsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
