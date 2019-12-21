@@ -5,17 +5,46 @@ import * as actions from "../../../src/redux/actions/postActions";
 import { JWT_TOKEN } from "../../../src/helpers/constants/appConstants";
 import { isError } from "../../../src/helpers/validators/dataValidators";
 
+import faker from "faker";
+
 
 describe("postActions integration tests", () => {
-
+  let token; // this will be the JWT token value 
   beforeAll(() => {
     axios.defaults.baseURL = "http://localhost:3000";
+    const userCredentials = { email: "firstuser@mail.com", password: "Password1" };
+      //console.log(localhost);
+      axios.defaults.baseURL = "http://localhost:3000";
+      const options = {
+        url: "/api/users/login",
+        port: 3000,
+        method: "post",
+        data: {
+          email: userCredentials.email,
+          password: userCredentials.password
+        },
+      };
+      return axios(options)
+        .then((response) => {
+          token = response.data.token;
+          //console.log(localStorage.getItem(JWT_TOKEN));
+        })
+        .catch((error) => {
+          console.log(error);
+        })
   });
   
 
   // User is NOT Logged IN //
   describe("User is NOT logged in", () => {
 
+    beforeEach(() => {
+      // set a wrong token
+      localStorage.setItem(JWT_TOKEN, "thisisnotavalidtoken");
+    })
+    afterEach(() => {
+      localStorage.removeItem(JWT_TOKEN);
+    })
    
 
     describe("Action {fetchPosts}", () => {
@@ -77,7 +106,6 @@ describe("postActions integration tests", () => {
           expect(typeof message).toEqual("string");
           expect(Array.isArray(posts)).toBe(true);
           expect(isError(postsError)).toBe(true);
-          console.log(store.getState().postsState.posts.length);
         });
       });
     });
@@ -86,43 +114,43 @@ describe("postActions integration tests", () => {
   // END User is NOT Logged IN //
   // User is Logged IN //
   describe("User IS logged in", () => {
-    let posts = [], token;
     // login user - get JWT token //
     beforeAll(() => {
-      const userCredentials = { email: "firstuser@mail.com", password: "Password1" };
-      //console.log(localhost);
-      axios.defaults.baseURL = "http://localhost:3000";
-      const options = {
-        url: "/api/users/login",
-        port: 3000,
-        method: "post",
-        data: {
-          email: userCredentials.email,
-          password: userCredentials.password
-        },
-      };
-      return axios(options)
-        .then((response) => {
-          localStorage.setItem(JWT_TOKEN, response.data.token);
-          //console.log(localStorage.getItem(JWT_TOKEN));
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-    });
+      localStorage.setItem(JWT_TOKEN, token);
+    }); 
     // {createPost} Redux and API action //
     describe("Action {createPost}",  () => {
       it("Should create a Post, save to database and updated state", () => {
-        //console.log(localStorage.getItem(JWT_TOKEN))
-        return store.dispatch(actions.fetchPosts()).then(() => {
-          //console.log(store.getState().postsState);
-        })
+        const currentPosts = store.getState().postsState.posts; 
+        const postData = { title: "A new post", text: faker.lorem.paragraph(2) };
+        return store.dispatch(actions.createPost(postData, currentPosts)).then(() => {
+          const { loading, message, posts, postsError } = store.getState().postsState;
+          expect(loading).toBe(false);
+          expect(typeof message).toEqual("string");
+          expect(posts.length).toEqual(currentPosts.length + 1);
+          expect(postsError).toBe(null);
+        });
       });
     });
     // END {createPost} Redux and API action //
     // {saveEditedPost} Redux and API action //
     describe("Action {savedEditedPost}", () => {
       it("Should save an edited Post and update state", () => {
+        const currentPosts = store.getState().postsState.posts;
+        const updatedPost = { 
+          ...currentPosts[currentPosts.length - 1],
+          title: "I am updated"
+        };
+
+       return store.dispatch(actions.saveEditedPost(updatedPost, currentPosts)).then(() => {
+         const { loading, message, posts, postsError } = store.getState().postsState;
+         const updatedPostTitle = posts[posts.length - 1].title;
+         expect(loading).toBe(false);
+         expect(typeof message).toEqual("string");
+         expect(posts.length).toEqual(currentPosts.length);
+         expect(updatedPostTitle).toEqual(updatedPost.title);
+         expect(postsError).toBe(null);
+       });
 
       });
     });

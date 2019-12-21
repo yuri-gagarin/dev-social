@@ -1,4 +1,4 @@
-import { FETCH_POSTS, FETCH_TRENDING_POSTS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR,
+import { FETCH_POSTS, FETCH_TRENDING_POSTS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR, CREATE_POST, EDIT_POST, DELETE_POST,
          LIKE_POST, REMOVE_POST_LIKE, DISLIKE_POST, REMOVE_POST_DISLIKE } from "../cases";
 
 const initialState = {
@@ -11,7 +11,6 @@ const initialState = {
 const postReducer = (state=initialState, action) => {
   switch(action.type) {
     case FETCH_POSTS: 
-      //console.log(action.payload)
       return {
         ...state,
         posts: [...action.payload.posts],
@@ -35,6 +34,26 @@ const postReducer = (state=initialState, action) => {
         loading: false,
         postsError: null,
         posts: [...action.payload.posts]
+      };
+    case CREATE_POST: 
+      return {
+        ...state,
+        loading: false,
+        message: action.payload.message,
+        posts: [...action.payload.posts],
+        postsError: null
+      };
+    case EDIT_POST: 
+      return {
+        ...state,
+        loading: false,
+        message: action.payload.message,
+        posts: [...action.payload.posts],
+        postsError: null
+      };
+    case DELETE_POST: 
+      return {
+        ...state
       };
     case POSTS_ERROR:
       return {

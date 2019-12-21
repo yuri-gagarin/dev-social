@@ -6,11 +6,11 @@ export default function(data) {
   let errors = {};
 
   data.text = !isEmpty(data.text) ? data.text : "";
-  if(validator.isEmpty(data.title)) {
-    errors.text = "Title is required";
+  if (validator.isEmpty(data.title)) {
+    errors.title = "Title is required";
   }
   if (validator.isEmpty(data.text)) {
-    errors.text = "Please write something here... anything?"
+    errors.text = "Please write something here... anything?";
   }
 
   if (data.text.length < 2) {

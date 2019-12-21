@@ -1,11 +1,11 @@
-import Post from "../models/Post.js";
-import postValidator from "../helpers/validators/postValidator.js";
-import User from "../models/User.js";
-import Comment from "../models/Comment.js";
-import getDateWithTime from "../helpers/getDateWithTime.js";
-import makeRouteSlug from "./controller_helpers/makeRouteSlug.js";
-
-import {rewind, convertTimeQuery} from "../helpers/timeHelpers.js";
+import Post from "../models/Post";
+import postValidator from "../helpers/validators/postValidator";
+import User from "../models/User";
+import Comment from "../models/Comment";
+import getDateWithTime from "../helpers/getDateWithTime";
+import makeRouteSlug from "./controller_helpers/makeRouteSlug";
+import { createError } from "../helpers/APIhelpers/dataHelpers";
+import {rewind, convertTimeQuery} from "../helpers/timeHelpers";
 import {POST_QUERY_OPTIONS} from "./controller_helpers/controllerConstants";
 
 
@@ -119,7 +119,7 @@ export default {
   },
 
   createPost: (req, res) => {
-    const {errors, isValid} = postValidator(req.body);
+    const { errors, isValid } = postValidator(req.body);
     const author = `${req.user.name} ${req.user.lastName}`;
     if (isValid) {
       const newPost = new Post({
@@ -130,26 +130,28 @@ export default {
         user: req.user.id,
         slug: makeRouteSlug(req.body.title),
         likeCount: 0,
+        dislikeCount: 0
       });
 
       newPost.save()
         .then((post) => {
           return res.json({
             message: "New Post!",
-            post: post
+            newPost: post
           });
         })
         .catch((err) => {
           return res.status(400).json({
             message: "Error in saving a new Post",
-            errors: err
+            error: err
           });
         });
     }
     else {
+      const error = createError(errors);
       return res.status(400).json({
         message: "Error processing your request",
-        errors: errors
+        error: error
       });
     }
   },
@@ -157,7 +159,7 @@ export default {
   editPost: (req, res) => {
     const postId = req.params.id;
     const user = req.user;
-
+    // 
     Post.findOne({_id: postId})
       .then((post) => {
         const postText = req.body.text ? req.body.text : post.text;
@@ -178,13 +180,13 @@ export default {
       .then((post) => {
         return res.json({
           message: "Post successfully edited",
-          post: post
+          updatedPost: post
         });
       })
       .catch((error) => {
         return res.status(400).json({
           message: "Something went wrong",
-          error: error.message
+          error: error
         });
       });
   },

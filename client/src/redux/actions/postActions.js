@@ -150,7 +150,7 @@ export const createPost = (postData, currentPosts = []) => {
     url: "/api/posts",
     method: "post",
     headers: {
-      "Authorization": `Bearer ${token}`
+      "Authorization": `${token}`
     },
     data: {
       author: author,
@@ -203,7 +203,7 @@ export const saveEditedPost = (postData = {}, currentPosts = []) => {
     url: "/api/posts/" + _id,
     method: "patch",
     headers: {
-      "Authorization": `Bearer ${token}`
+      "Authorization": `${token}`
     },
     data: {
       title: title,
@@ -262,7 +262,7 @@ export const deletePost = (postId, currentPosts = []) => {
     url: "/api/posts/" + postId,
     method: "delete",
     headers: {
-      "Authorization": `Bearer ${token}`
+      "Authorization": `${token}`
     }
   }
   return function(dispatch) {
