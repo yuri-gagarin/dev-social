@@ -10,7 +10,7 @@ const initialState = {
   trendingPosts: [],
   postsError: null
 };
-const postReducer = (state=initialState, action) => {
+const postReducer = (state = initialState, action) => {
   switch(action.type) {
     case FETCH_POSTS: 
       return {
@@ -27,8 +27,10 @@ const postReducer = (state=initialState, action) => {
     case POSTS_REQUEST:
       return {
         ...state,
+        statusCode: action.payload.statusCode,
+        message: action.payload.message,
         loading: true,
-        postsError: null,
+        postsError: null
       };
     case POSTS_SUCCESS:
       return {
@@ -86,10 +88,11 @@ const postReducer = (state=initialState, action) => {
     case REMOVE_POST_LIKE:
       return {
         ...state,
+        statusCode: action.payload.statusCode,
         loading: false,
-        postsError: null,
         message: action.payload.message,
-        posts: [...action.payload.posts]
+        posts: [...action.payload.posts],
+        postsError: null
       };
     case DISLIKE_POST:
       return {
@@ -108,7 +111,9 @@ const postReducer = (state=initialState, action) => {
         posts: [...action.payload.posts]
       };
     default:
-      return state;
+      return {
+        ...state
+      };
   };
 };
 

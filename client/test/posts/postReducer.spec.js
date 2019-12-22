@@ -5,65 +5,91 @@ import { POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR, LIKE_POST,
 import store from "../../src/redux/store";
 import { generatePost } from "../helpers/mockData";
 
-const testState = store.getState();
-const postsState = testState.postsState;
-
+const initialPostsState = store.getState().postsState;
 
 describe("postReducer tests", () => {
+  const mockPosts = [];
+  beforeAll(() => {
+    for (let i = 0; i < 5; i++) {
+      mockPosts.push(generatePost({userId: 1, postId: i}));
+    }
+  });
 
   it("Should return the initial state", () => {
     const expectedState = {
+      statusCode: null,
       message: "",
       loading: false,
       postsError: null,
       posts: [],
-      trendingPosts: [],
+      trendingPosts: []
     };
+
     expect(postReducer(undefined, {})).toEqual(expectedState);
   });
 
   it(`Should handle a ${POSTS_REQUEST} case`, () => {
     const expectedState = {
-      ...postsState,
+      ...initialPostsState,
+      statusCode: null,
+      message: "Loading",
       loading: true,
-      postsError: null,
+      postsError: null
     }
-    const newState = postReducer(postsState, {type: POSTS_REQUEST, payload: null} );
+
+    const action = { type: POSTS_REQUEST, payload: { message: "Loading", statusCode: null} };
+    const newState = postReducer(initialPostsState, action);
+
     expect(newState).toEqual(expectedState);
   });
 
   it(`Should handle a ${POSTS_SUCCESS} case`, () => {
-    const payload = {message: "Great Success!", posts: [1,2,3]};
+    const payload = { message: "Great Success!", posts: mockPosts, statusCode: 200 };
     const expectedState = {
-      ...postsState,
+      ...initialPostsState,
+      statusCode: payload.statusCode,
+      message: payload.message,
       loading: false,
-      postsError: null,
-      posts: [...payload.posts]
-    }
-    const newState = postReducer(postsState, { type: POSTS_SUCCESS, payload: payload });
+      posts: [...payload.posts],
+      postsError: null
+    };
+
+    const action = { type: POSTS_SUCCESS, payload: payload };
+    const newState = postReducer(initialPostsState, action);
+
     expect(newState).toEqual(expectedState);
   });
 
   it(`Should handle a ${LIKE_POST} case`, () => {
-    const payload = {message: "Successs", posts: [1,2,3,4,5]};
+    const payload =  { message: "Successs",  posts: mockPosts, statusCode: 200 };
     const expectedState = {
-      ...postsState,
-      postsError: null,
+      ...initialPostsState,
+      statusCode: payload.statusCode,
       message: payload.message,
+      loading: false,
       posts: [...payload.posts],
+      postsError: null
     };
-    const newState = postReducer(postsState, { type: LIKE_POST, payload: payload });
+
+    const action = { type: LIKE_POST, payload: payload };
+    const newState = postReducer(initialPostsState, action);
+
     expect(newState).toEqual(expectedState);
   });
+
   it(`Should handle a ${REMOVE_POST_LIKE} case`, () => {
-    const payload = {message: "Successs", posts: [1,2,3,4,5]};
+    const payload = { message: "Successs", posts: mockPosts, statusCode: 200 };
     const expectedState = {
-      ...postsState,
-      postsError: null,
+      ...initialPostsState,
+      statusCode: payload.statusCode,
       message: payload.message,
+      loading: false,
       posts: [...payload.posts],
+      postsError: null
     };
-    const newState = postReducer(postsState, { type: REMOVE_POST_LIKE, payload: payload });
+    const action = { type: REMOVE_POST_LIKE, payload: payload };
+    const newState = postReducer(initialPostsState, action);
+    
     expect(newState).toEqual(expectedState);
   });
   it(`Should handle a ${DISLIKE_POST} case`, () => {
