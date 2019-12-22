@@ -1,6 +1,5 @@
 import { FETCH_POSTS, FETCH_TRENDING_POSTS, POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR, CREATE_POST, EDIT_POST, DELETE_POST,
          LIKE_POST, REMOVE_POST_LIKE, DISLIKE_POST, REMOVE_POST_DISLIKE } from "../cases";
-import { response } from "express";
 
 const initialState = {
   statusCode: null,
@@ -38,8 +37,8 @@ const postReducer = (state = initialState, action) => {
         statusCode: action.payload.statusCode,
         message: action.payload.message,
         loading: false,
-        postsError: null,
-        posts: [...action.payload.posts]
+        posts: [...action.payload.posts],
+        postsError: null
       };
     case CREATE_POST: 
       return {
@@ -81,9 +80,9 @@ const postReducer = (state = initialState, action) => {
         ...state,
         statusCode: action.payload.statusCode,
         loading: false,
-        postsError: null,
         message: action.payload.message,
-        posts: [...action.payload.posts]
+        posts: [...action.payload.posts],
+        postsError: null
       };
     case REMOVE_POST_LIKE:
       return {
@@ -97,18 +96,20 @@ const postReducer = (state = initialState, action) => {
     case DISLIKE_POST:
       return {
         ...state,
+        statusCode: action.payload.statusCode,
         loading: false,
-        postsError: null,
         message: action.payload.message,
-        posts: [...action.payload.posts]
+        posts: [...action.payload.posts],
+        postsError: null
       };
     case REMOVE_POST_DISLIKE:
       return {
         ...state,
+        statusCode: action.payload.statusCode,
         loading: false,
-        postsError: null,
         message: action.payload.message,
-        posts: [...action.payload.posts]
+        posts: [...action.payload.posts],
+        postsError: null
       };
     default:
       return {
