@@ -1,14 +1,14 @@
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
-import store from "../../src/redux/store";
+import store from "../../../src/redux/store";
 
-import {JWT_TOKEN} from "../../src/helpers/constants/appConstants";
-import { loginError, generalError } from "../../src/helpers/commonErrors";
-import * as actions from "../../src/redux/actions/postActions";
-import * as types from "../../src/redux/cases";
+import {JWT_TOKEN} from "../../../src/helpers/constants/appConstants";
+import { loginError, generalError } from "../../../src/helpers/commonErrors";
+import * as actions from "../../../src/redux/actions/postActions";
+import * as types from "../../../src/redux/cases";
 
 import moxios from "moxios";
-import { generatePost } from "../helpers/mockData";
+import { generatePost } from "../../helpers/mockData";
 
 const middlewares = [thunk];
 const testStore = configureMockStore(middlewares)(store.getState());

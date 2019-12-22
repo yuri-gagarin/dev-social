@@ -1,11 +1,11 @@
-import postReducer from "../../src/redux/reducers/postReducer";
+import postReducer from "../../../src/redux/reducers/postReducer";
 
 import { POSTS_REQUEST, POSTS_SUCCESS, POSTS_ERROR, LIKE_POST, 
          REMOVE_POST_LIKE, DISLIKE_POST, REMOVE_POST_DISLIKE,
-         CREATE_POST, EDIT_POST, DELETE_POST } from "../../src/redux/cases";
+         CREATE_POST, EDIT_POST, DELETE_POST } from "../../../src/redux/cases";
 
-import store from "../../src/redux/store";
-import { generatePost } from "../helpers/mockData";
+import store from "../../../src/redux/store";
+import { generatePost } from "../../helpers/mockData";
 
 const initialPostsState = store.getState().postsState;
 
@@ -19,7 +19,7 @@ describe("postReducer tests", () => {
   // general {postReducer} actions //
   describe("General {postReducer} actions", () => {
     // default no argument type //
-    describe(`type: ${null}`, () => {
+    describe(`type: ${undefined}`, () => {
       it("Should return the initial state", () => {
         const expectedState = {
           statusCode: null,

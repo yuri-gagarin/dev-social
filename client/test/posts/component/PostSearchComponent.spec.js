@@ -1,8 +1,8 @@
 import React from "react";
 import { shallow, mount } from "enzyme";
 
-import PostSearchComponent from "../../src/components/posts/posts_sidebar/PostSearchComponent";
-import { setElem } from "../helpers/helperFunctions";
+import PostSearchComponent from "../../../src/components/posts/posts_sidebar/PostSearchComponent";
+import { setElem } from "../../helpers/helperFunctions";
 
 import moxios from "moxios";
 

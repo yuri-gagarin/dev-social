@@ -7,52 +7,123 @@ import { generateComment } from "../helpers/mockData";
     
 const initialCommentsState = store.getState().commentsState;
 //const initialCommentsState = testState.commentsState;
-const fakeComments = [];
-for (let i = 0; i < 10; i++) {
-  fakeComments.push(generateComment({userId: 1, postId: 1, commentId: i}));
-};
+
 
 describe("{commentsReducer} tests", () => {
-  it("Should return the initial state", () => {
-    const expectedCommentsState = {
-      message: "",
-      loading: false,
-      comments: [],
-      commentsError: null
-    }
-    expect(commentsReducer(undefined, {})).toEqual(expectedCommentsState);
-  });
-  it(`Should handle the ${COMMENTS_REQUEST} case`, () => {
-    const action = {
-      type: COMMENTS_REQUEST,
-      payload: {
-        message: "Loading"
-      },
-    }
-    const expectedCommentsState = {
-      message: action.payload.message,
-      loading: true,
-      comments: [],
-      commentsError: null,
+  const mockComments = [];
+  beforeAll(() => {
+    for (let i = 0; i < 10; i++) {
+      mockComments.push(generateComment({userId: 1, postId: 1, commentId: i}));
     };
-    expect(commentsReducer(initialCommentsState, action)).toEqual(expectedCommentsState);
+  })
+  // general {commentsReducer} actions //
+  describe("General {commentsReducer} actions", () => {
+    // default no argument type //
+    describe(`type: ${undefined}`, () => {
+      it("Should return the initial state", () => {
+        const expectedState = {
+          statusCode: null,
+          message: "",
+          loading: false,
+          comments: [],
+          commentsError: null
+        };
+    
+        expect(commentsReducer(undefined, {})).toEqual(expectedState);
+      });
+    });
+    // END default no argument type //
+    // COMMENTS_REQUEST type //
+    describe(`type: ${COMMENTS_REQUEST}`, () => {
+      it(`Should handle the ${COMMENTS_REQUEST} case`, () => {
+        const payload = { message: "Loading", statusCode: null };
+        const expectedState = {
+          ...initialCommentsState,
+          statusCode: payload.statusCode,
+          message: payload.message,
+          loading: true,
+          comments: [],
+          commentsError: null,
+        };
+
+        const action = { type: COMMENTS_REQUEST, payload: payload };
+        const newState = commentsReducer(initialCommentsState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+
+      it(`Should set the {commentsError} to NULL if present from previous action`, () => {
+        // mock error state from previous error //
+        const errorState = {
+          ...initialCommentsState,
+          statusCode: 500,
+          message: "An error occured",
+          commentsError: new Error("Ooops...")
+        };
+        // payload and expected state //
+        const payload = { message: "Loading", statusCode: null };
+        const expectedState = {
+          ...errorState,
+          statusCode: null,
+          message: payload.message,
+          loading: true,
+          commentsError: null
+        };
+  
+        const action = { type: COMMENTS_REQUEST, payload: payload };
+        const newState = commentsReducer(errorState, action);
+  
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END COMMENTS_REQUEST type //
+    // COMMENTS_SUCCESS type //
+    describe(`type: ${COMMENTS_SUCCESS}`, () => {
+      it(`Should handle the ${COMMENTS_SUCCESS} case`, () => {
+        const payload = { message: "Success", comments: mockComments, statusCode: 200};
+        const expectedState = {
+          statusCode: payload.statusCode,
+          message: payload.message,
+          loading: false,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: COMMENTS_SUCCESS, payload: payload };
+        const newState = commentsReducer(initialCommentsState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+
+      it("Should set the {commentsError} to NULL if present from previous action", () => {
+        // mock error state from previous error //
+        const errorState = {
+          ...initialCommentsState,
+          statusCode: 500,
+          message: "An error occured",
+          commentsError: new Error("Ooops...")
+        };
+        // payload and expected state //
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...errorState,
+          statusCode: 200,
+          message: payload.message,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: COMMENTS_SUCCESS, payload: payload };
+        const newState = commentsReducer(errorState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END COMMENTS_SUCCESS type //
   });
-  it(`Should handle the ${COMMENTS_SUCCESS} case`, () => {
-    const action = {
-      type: COMMENTS_SUCCESS,
-      payload: {
-        message: "Success",
-        comments: [...fakeComments],
-      }
-    };
-    const expectedCommentsState = {
-      message: action.payload.message,
-      loading: false,
-      comments: [...action.payload.comments],
-      commentsError: null
-    };
-    expect(commentsReducer(initialCommentsState, action)).toEqual(expectedCommentsState);
-  });
+  // END general {commentsReducer} actions //
+
+  /*
   it(`Should handle the ${COMMENTS_ERROR} case`, () => {
     const error = new Error("Ooops...");
     const action = {
@@ -134,4 +205,5 @@ describe("{commentsReducer} tests", () => {
     };
     expect(commentsReducer(initialCommentsState, action)).toEqual(expectedCommentsState);
   });
+  */
 });

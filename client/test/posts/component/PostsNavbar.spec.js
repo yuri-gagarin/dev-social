@@ -1,8 +1,8 @@
 import React from "react";
-import PostsNavbar from "../../src/components/posts/post_navbar/PostsNavbar";
+import PostsNavbar from "../../../src/components/posts/post_navbar/PostsNavbar";
 import { shallow, mount } from "enzyme";
 import { Menu, Dropdown } from "semantic-ui-react";
-import { postSearchOptions } from "../../src/redux/searchOptions";
+import { postSearchOptions } from "../../../src/redux/searchOptions";
 
 describe("PostNavbar Tests", function() {
   const mockFetchPosts = (options) => {

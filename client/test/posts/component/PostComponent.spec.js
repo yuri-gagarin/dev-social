@@ -1,7 +1,7 @@
 import React from "react";
-import PostComponent from "../../src/components/posts/PostComponent";
+import PostComponent from "../../../src/components/posts/PostComponent";
 import {mount, shallow} from "enzyme";
-import {formatDate} from "../../src/helpers/rendering/displayHelpers";
+import {formatDate} from "../../../src/helpers/rendering/displayHelpers";
 import faker from "faker";
 
 describe("PostComponent tests", () => {
