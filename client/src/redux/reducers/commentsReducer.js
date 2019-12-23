@@ -58,6 +58,7 @@ const commentsReducer = (state = initialState, action) => {
     case LIKE_COMMENT: 
       return {
         ...state,
+        statusCode: action.payload.statusCode,
         loading: false,
         message: action.payload.message,
         comments: [...action.payload.comments],
@@ -66,6 +67,7 @@ const commentsReducer = (state = initialState, action) => {
     case REMOVE_COMMMENT_LIKE:
       return {
         ...state,
+        statusCode: action.payload.statusCode,
         loading: false,
         message: action.payload.message,
         comments: [...action.payload.comments],

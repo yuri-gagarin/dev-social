@@ -280,6 +280,98 @@ describe("{commentsReducer} tests", () => {
     // END DELETE_COMMENT type //
   });
   // END Comment CRUD reducer actions //
+  // Like, RemoveLike {commentReducer} actions //
+  describe("Comment Like, RemoveLike {commentReducer} actions", () => {
+    // LIKE_COMMENT type //
+    describe(`type: ${LIKE_COMMENT}`, () => {
+      it(`Should handle a ${LIKE_COMMENT} case`, () => {
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...initialCommentsState,
+          statusCode: payload.statusCode,
+          message: payload.message,
+          loading: false,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: LIKE_COMMENT, payload: payload };
+        const newState = commentsReducer(initialCommentsState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+
+      it(`Should set the {commentsError} to NULL if present from previous action`, () => {
+        // mock error state from previous error //
+        const errorState = {
+          ...initialCommentsState,
+          statusCode: 500,
+          message: "An error occured",
+          commentsError: new Error("Ooops...")
+        };
+        // payload and expected state //
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...errorState,
+          statusCode: 200,
+          message: payload.message,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: LIKE_COMMENT, payload: payload };
+        const newState = commentsReducer(errorState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END LIKE_COMMENT type //
+    // REMOVE_COMMENT_LIKE type //
+    describe(`type: ${REMOVE_COMMMENT_LIKE}`, () => {
+      it(`Should handle a ${REMOVE_COMMMENT_LIKE} case`, () => {
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...initialCommentsState,
+          statusCode: payload.statusCode,
+          message: payload.message,
+          loading: false,
+          comments: [...payload.comments],
+          commentsError: null
+        };
+
+        const action = { type: REMOVE_COMMMENT_LIKE, payload: payload };
+        const newState = commentsReducer(initialCommentsState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+
+      it(`Should set the {commentsError} to NULL if present from previous action`, () => {
+        // mock error state from previous error //
+        const errorState = {
+          ...initialCommentsState,
+          statusCode: 500,
+          message: "An error occured",
+          commentsError: new Error("Ooops...")
+        };
+        // payload and expected state //
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...errorState,
+          statusCode: 200,
+          message: payload.message,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: REMOVE_COMMMENT_LIKE, payload: payload };
+        const newState = commentsReducer(errorState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END REMOVE_COMMENT_LIKE type //
+  });
+  // END Like, RemoveLike {commentReducer} actions //
   /*
   it(`Should handle the ${LIKE_COMMENT} case`, () => {
     const action = {
