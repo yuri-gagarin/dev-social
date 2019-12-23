@@ -223,7 +223,7 @@ describe("postReducer tests", () => {
           statusCode: payload.statusCode,
           message: payload.message,
           loading: false,
-          posts: [...payload.posts],
+          posts: payload.posts,
           postsError: null
         };
 

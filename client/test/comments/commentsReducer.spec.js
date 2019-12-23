@@ -1,7 +1,7 @@
 import commentsReducer from "../../src/redux/reducers/commentsReducer";
 import store from '../../src/redux/store'
 import { FETCH_COMMENTS, COMMENTS_REQUEST, COMMENTS_SUCCESS, COMMENTS_ERROR, 
-         LIKE_COMMENT, REMOVE_COMMMENT_LIKE, DISLIKE_COMMENT, REMOVE_COMMENT_DISLIKE, CREATE_COMMENT, EDIT_COMMENT } from "../../src/redux/cases";
+         LIKE_COMMENT, REMOVE_COMMMENT_LIKE, DISLIKE_COMMENT, REMOVE_COMMENT_DISLIKE, CREATE_COMMENT, EDIT_COMMENT, DELETE_COMMENT } from "../../src/redux/cases";
 
 import { generateComment } from "../helpers/mockData";
     
@@ -234,6 +234,50 @@ describe("{commentsReducer} tests", () => {
       });
     });
     // END EDIT_COMMENT type //
+    // DELETE_COMMENT type //
+    describe(`type: ${DELETE_COMMENT}`, () => {
+      it(`Should handle a ${DELETE_COMMENT} case`, () => {
+        const payload = { statusCode: 200, message: "Deleted", comments: mockComments };
+        const expectedState = {
+          ...initialCommentsState,
+          statusCode: payload.statusCode,
+          message: payload.message,
+          loading: false,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: DELETE_COMMENT, payload: payload };
+        const newState = commentsReducer(initialCommentsState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+
+      it(`Should set the {commentsError} to NULL if present from previous action`, () => {
+        // mock error state from previous error //
+        const errorState = {
+          ...initialCommentsState,
+          statusCode: 500,
+          message: "An error occured",
+          commentsError: new Error("Ooops...")
+        };
+        // payload and expected state //
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...errorState,
+          statusCode: 200,
+          message: payload.message,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: DELETE_COMMENT, payload: payload };
+        const newState = commentsReducer(errorState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END DELETE_COMMENT type //
   });
   // END Comment CRUD reducer actions //
   /*
