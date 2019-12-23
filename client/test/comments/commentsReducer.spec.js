@@ -1,7 +1,7 @@
 import commentsReducer from "../../src/redux/reducers/commentsReducer";
 import store from '../../src/redux/store'
 import { FETCH_COMMENTS, COMMENTS_REQUEST, COMMENTS_SUCCESS, COMMENTS_ERROR, 
-         LIKE_COMMENT, REMOVE_COMMMENT_LIKE, DISLIKE_COMMENT, REMOVE_COMMENT_DISLIKE } from "../../src/redux/cases";
+         LIKE_COMMENT, REMOVE_COMMMENT_LIKE, DISLIKE_COMMENT, REMOVE_COMMENT_DISLIKE, CREATE_COMMENT, EDIT_COMMENT } from "../../src/redux/cases";
 
 import { generateComment } from "../helpers/mockData";
     
@@ -120,27 +120,123 @@ describe("{commentsReducer} tests", () => {
       });
     });
     // END COMMENTS_SUCCESS type //
+    // COMMENTS_ERROR type //
+    describe(`type: ${COMMENTS_ERROR}`, () => {
+      it(`Should handle the ${COMMENTS_ERROR} case`, () => {
+        const error = new Error("Ooops...");
+        const payload = { statusCode: 400, message: error.message, error: error };
+        const expectedState = {
+          ...initialCommentsState,
+          statusCode: payload.statusCode,
+          message: payload.message,
+          loading: false,
+          commentsError: error
+        };
+
+        const action = { type: COMMENTS_ERROR, payload: payload };
+        const newState = commentsReducer(initialCommentsState, action);
+        
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END COMMENTS_ERROR type //
   });
   // END general {commentsReducer} actions //
+  // Comment CRUD reducer actions //
+  describe("Comment CRUD {commentsReducer} actions", () => {
+    // CREATE_COMMENT type //
+    describe(`type: ${CREATE_COMMENT}`, () => {
+      it(`Should handle a ${CREATE_COMMENT} case`, () => {
+        const comment = generateComment({userId: 1, postId: 1, commentId: 1});
+        const payload = { statusCode: 200, message: "Created", comments: [comment]};
+        const expectedState = {
+          ...initialCommentsState,
+          statusCode: payload.statusCode,
+          message: payload.message,
+          loading: false,
+          comments: [comment],
+          commentsError: null
+        };
 
-  /*
-  it(`Should handle the ${COMMENTS_ERROR} case`, () => {
-    const error = new Error("Ooops...");
-    const action = {
-      type: COMMENTS_ERROR,
-      payload: {
-        message: error.message,
-        error: error,
-      }
-    };
-    const expectedCommentsState = {
-      message: error.message,
-      loading: false,
-      comments: [],
-      commentsError: {...error},
-    };
-    expect(commentsReducer(initialCommentsState, action)).toEqual(expectedCommentsState);
+        const action = { type: CREATE_COMMENT, payload: payload };
+        const newState = commentsReducer(initialCommentsState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+    
+      it(`Should set the {commentsError} to NULL if present from previous action`, () => {
+        // mock error state from previous error //
+        const errorState = {
+          ...initialCommentsState,
+          statusCode: 500,
+          message: "An error occured",
+          commentsError: new Error("Ooops...")
+        };
+        // payload and expected state //
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...errorState,
+          statusCode: 200,
+          message: payload.message,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: CREATE_COMMENT, payload: payload };
+        const newState = commentsReducer(errorState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END CREATE_COMMENT type //
+    // EDIT_COMMENT type //
+    describe(`type: ${EDIT_COMMENT}`, () => {
+      it(`Should handle an ${EDIT_COMMENT} case`, () => {
+        const comment = generateComment({userId: 1, commentId: 1, postId: 1});
+        const payload = { statusCode: 200, message: "Edited", comments: [comment] };
+        const expectedState = {
+          ...initialCommentsState,
+          statusCode: payload.statusCode,
+          message: payload.message,
+          loading: false,
+          comments: [comment],
+          commentsError: null
+        };
+
+        const action = { type: EDIT_COMMENT, payload: payload};
+        const newState = commentsReducer(initialCommentsState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+
+      it(`Should set the {commentsError} to NULL if present from previous action`, () => {
+        // mock error state from previous error //
+        const errorState = {
+          ...initialCommentsState,
+          statusCode: 500,
+          message: "An error occured",
+          commentsError: new Error("Ooops...")
+        };
+        // payload and expected state //
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...errorState,
+          statusCode: 200,
+          message: payload.message,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: EDIT_COMMENT, payload: payload };
+        const newState = commentsReducer(errorState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END EDIT_COMMENT type //
   });
+  // END Comment CRUD reducer actions //
+  /*
   it(`Should handle the ${LIKE_COMMENT} case`, () => {
     const action = {
       type: LIKE_COMMENT,
