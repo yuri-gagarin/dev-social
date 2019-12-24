@@ -14,7 +14,7 @@ const middleWares = [thunk];
 const testStore = configureMockStore(middleWares)(store.getState());
 
 
-describe("Comments API / Redux Actions Tests", () => {
+describe("Comments Redux Actions Tests", () => {
   const comments = [];
   beforeAll(() => {
     for (let i = 0; i < 5; i++) {
@@ -33,7 +33,7 @@ describe("Comments API / Redux Actions Tests", () => {
         //const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
         //const commentData = {};
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
 
         return testStore.dispatch(actions.createComment({}, [])).then(() => {
@@ -45,7 +45,7 @@ describe("Comments API / Redux Actions Tests", () => {
       it("Should throw an error and not allow an API call", () => {
         //const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
 
         return testStore.dispatch(actions.saveEditedComment({}, [])).then(() => {
@@ -59,7 +59,7 @@ describe("Comments API / Redux Actions Tests", () => {
         //const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
         const commentId = "afakeid";
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
         return testStore.dispatch(actions.deleteComment(commentId)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
@@ -99,8 +99,8 @@ describe("Comments API / Redux Actions Tests", () => {
           })
         })
         const expectedActions = [
-          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.CREATE_COMMENT, payload: {message: "Comment created", comments: [...newComments]} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.CREATE_COMMENT, payload: {message: "Comment created", comments: [...newComments], statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.createComment({text: text, author: author}, currentComments)).then(() => {
@@ -121,8 +121,8 @@ describe("Comments API / Redux Actions Tests", () => {
           });
         });
         const expectedActions = [
-          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} },
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} },
         ];
         return testStore.dispatch(actions.createComment({text: text, author: author}, currentComments)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
@@ -155,8 +155,8 @@ describe("Comments API / Redux Actions Tests", () => {
         });
 
         const expectedActions = [
-          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.EDIT_COMMENT, payload: {message: "Success", comments: [...newComments]}}
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.EDIT_COMMENT, payload: {message: "Success", comments: [...newComments], statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.saveEditedComment({text: text, _id: _id}, currentComments)).then(() => {  
@@ -177,8 +177,8 @@ describe("Comments API / Redux Actions Tests", () => {
           });
         });
         const expectedActions = [
-          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} },
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} },
         ];
         return testStore.dispatch(actions.saveEditedComment({_id: _id, text: text}, currentComments)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
@@ -192,7 +192,7 @@ describe("Comments API / Redux Actions Tests", () => {
       it(`Should successfully dispatch a ${types.DELETE_COMMENT} action`, () => {
         const currentComments = comments.map((comment) => Object.assign({}, comment));
         const mockDeletedComment = Object.assign({}, currentComments[0])
-        const _id = mockDeletedComment._id;
+        const _id = mockDeletedComment._id.toString();
         // expected comments after delete //
         const newComments = currentComments.slice(1);
         moxios.wait(() => {
@@ -206,19 +206,19 @@ describe("Comments API / Redux Actions Tests", () => {
           });
         });
         const expectedActions = [
-          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.DELETE_COMMENT, payload: {message: "Deleted", comments: newComments} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.DELETE_COMMENT, payload: {message: "Deleted", comments: newComments, statusCode: 200} }
         ];
         return testStore.dispatch(actions.deleteComment(_id, currentComments)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
           //console.log(testStore.getActions());
         })
       });
-      
+
       it(`Should successfulle handle an API error and dispatch a ${types.COMMENTS_ERROR} action`, () => {
         const currentComments = comments.map((comment) => Object.assign({}, comment));
         //error to be thrown // comments array should not be touched //
-        const _id = currentComments[0];
+        const _id = currentComments[0]._id.toString();
         const error = generalError("Server error");
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
@@ -228,8 +228,8 @@ describe("Comments API / Redux Actions Tests", () => {
           });
         });
         const expectedActions = [
-          { type: types.COMMENTS_REQUEST, payload: {message: "Loading"} },
-          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} },
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} },
         ];
         return testStore.dispatch(actions.deleteComment(_id, currentComments)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);

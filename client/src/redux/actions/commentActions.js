@@ -3,7 +3,7 @@ import { COMMENTS_SUCCESS, COMMENTS_REQUEST, CREATE_COMMENT, COMMENTS_ERROR, EDI
 import axios from "axios";
 import { isError } from "../../helpers/validators/dataValidators";
 import { JWT_TOKEN } from "../../helpers/constants/appConstants";
-import { loginError } from "../../helpers/commonErrors";
+import { loginError, generalError } from "../../helpers/commonErrors";
 
 export const commentsRequest = () => {
   return  {
@@ -98,7 +98,7 @@ export const createComment = ({text, author}, currentComments = []) => {
   };
   return function(dispatch) {
     // first check if a user is logged in - save an extra API call //
-    if(!token) {
+    if (!token) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(loginError));
       })
@@ -107,12 +107,14 @@ export const createComment = ({text, author}, currentComments = []) => {
     return axios(options)
       .then((response) => {
         const { message, newComment } = response.data;
+        const statusCode = response.status;
         const updatedComments = [...currentComments, newComment];
         return dispatch({
           type: CREATE_COMMENT,
           payload: {
             message: message,
             comments: updatedComments,
+            statusCode: statusCode
           }
         });
       })
@@ -133,15 +135,17 @@ export const saveEditedComment = ({_id, text}, currentComments = []) => {
   };
   return function(dispatch) {
     // first check if a user is logged in - save an extra API call //
-    if(!token) {
+    if (!token) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(loginError));
       })
     }
     dispatch(commentsRequest());
+    // API request //
     return axios(options)
       .then((response) => {
         const { updatedComment, message } = response.data;
+        const statusCode = response.status;
         const updatedComments = currentComments.map((comment) => {
           if(comment._id === updatedComment._id) {
             return updatedComment;
@@ -154,7 +158,8 @@ export const saveEditedComment = ({_id, text}, currentComments = []) => {
           type: EDIT_COMMENT,
           payload: {
             message: message,
-            comments: updatedComments
+            comments: updatedComments,
+            statusCode: statusCode
           }
         });
       })
@@ -171,15 +176,23 @@ export const deleteComment = (commentId, currentComments = []) => {
     method: "delete",
   }
   return function(dispatch) {
-    if(!token) {
+    // data checking to prevent a useless API call //
+    if (!token) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(loginError));
       });
     }
+    if (!commentId || (typeof commentId !== "string")) {
+      return Promise.resolve().then(() => {
+        return dispatch(commentsError(generalError("Wrong input")));
+      });
+    }
     dispatch(commentsRequest());
+    // API request //
     return axios(options)
       .then((response) => {
         const { deletedComment, message } = response.data;
+        const statusCode = response.status;
         const updatedComments = currentComments.filter((comment) => {
           return comment._id !== deletedComment._id;
         });
@@ -188,6 +201,7 @@ export const deleteComment = (commentId, currentComments = []) => {
           payload: {
             message: message,
             comments: updatedComments,
+            statusCode: statusCode
           }
         });
       })
