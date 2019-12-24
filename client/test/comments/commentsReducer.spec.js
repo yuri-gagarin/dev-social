@@ -359,6 +359,7 @@ describe("{commentsReducer} tests", () => {
           ...errorState,
           statusCode: 200,
           message: payload.message,
+          loading: false,
           comments: payload.comments,
           commentsError: null
         };
@@ -372,70 +373,98 @@ describe("{commentsReducer} tests", () => {
     // END REMOVE_COMMENT_LIKE type //
   });
   // END Like, RemoveLike {commentReducer} actions //
-  /*
-  it(`Should handle the ${LIKE_COMMENT} case`, () => {
-    const action = {
-      type: LIKE_COMMENT,
-      payload: {
-        message: "Success",
-        comments: [...fakeComments],
-      }
-    };
-    const expectedCommentsState = {
-      message: action.payload.message,
-      loading: false,
-      comments: [...action.payload.comments],
-      commentsError: null,
-    }
-    expect(commentsReducer(initialCommentsState, action)).toEqual(expectedCommentsState);
+  // DislikeComment RemoveCommentDislike {commentReducer} actions //
+  describe("DislikeComment, RemoveCommentDislike {commentsReducer} actions", () => {
+    // DISLIKE_COMMENT type //
+    describe(`type: ${DISLIKE_COMMENT}`, () => {
+      it(`Should handle a ${DISLIKE_COMMENT} case`, () => {
+        const payload = { message: "success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+        ...initialCommentsState,
+        statusCode: 200,
+        message: payload.message,
+        loading: false,
+        comments: payload.comments,
+        commentsError: null
+        };
+
+        const action = { type: DISLIKE_COMMENT, payload: payload };
+        const newState = commentsReducer(initialCommentsState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+
+      it(`Should set the {commentsError} to NULL if present from previous action`, () => {
+        // mock error state from previous error //
+        const errorState = {
+          ...initialCommentsState,
+          statusCode: 500,
+          message: "An error occured",
+          commentsError: new Error("Ooops...")
+        };
+        // payload and expected state //
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...errorState,
+          statusCode: 200,
+          message: payload.message,
+          loading: false,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: DISLIKE_COMMENT, payload: payload };
+        const newState = commentsReducer(errorState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END DISLIKE_COMMENT type //
+    // REMOVE_COMMENT_DISLIKE type //
+    describe(`type: ${REMOVE_COMMENT_DISLIKE}`, () => {
+      it(`Should handle a ${REMOVE_COMMENT_DISLIKE} type`, () => {
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...initialCommentsState,
+          statusCode: payload.statusCode,
+          message: payload.message,
+          loading: false,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: REMOVE_COMMENT_DISLIKE, payload: payload };
+        const newState = commentsReducer(initialCommentsState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+      
+      it(`Should set the {commentsError} to NULL if present from previous action`, () => {
+        // mock error state from previous error //
+        const errorState = {
+          ...initialCommentsState,
+          statusCode: 500,
+          message: "An error occured",
+          commentsError: new Error("Ooops...")
+        };
+        // payload and expected state //
+        const payload = { message: "Success", comments: mockComments, statusCode: 200 };
+        const expectedState = {
+          ...errorState,
+          statusCode: 200,
+          message: payload.message,
+          loading: false,
+          comments: payload.comments,
+          commentsError: null
+        };
+
+        const action = { type: REMOVE_COMMENT_DISLIKE, payload: payload };
+        const newState = commentsReducer(errorState, action);
+
+        expect(newState).toEqual(expectedState);
+      });
+    });
+    // END REMOVE_COMMENT_DISLIKE type //
   });
-  it(`Should handle the ${REMOVE_COMMMENT_LIKE} case`, () => {
-    const action = {
-      type: REMOVE_COMMMENT_LIKE,
-      payload: {
-        message: "Removed Like",
-        comments: [...fakeComments],
-      }
-    };
-    const expectedCommentsState = {
-      message: action.payload.message,
-      loading: false,
-      comments: [...action.payload.comments],
-      commentsError: null
-    };
-    expect(commentsReducer(initialCommentsState, action)).toEqual(expectedCommentsState);
-  })
-  it(`Should handle the ${DISLIKE_COMMENT} case`, () => {
-    const action = {
-      type: DISLIKE_COMMENT,
-      payload: {
-        message: "Disliked Comment",
-        comments:  [...fakeComments],
-      }
-    };
-    const expectedCommentsState = {
-      message: action.payload.message,
-      loading: false,
-      comments: [...action.payload.comments],
-      commentsError: null
-    };
-    expect(commentsReducer(initialCommentsState, action)).toEqual(expectedCommentsState);
-  });
-  it(`Should handle the ${REMOVE_COMMENT_DISLIKE} case`, () => {
-    const action = {
-      type: REMOVE_COMMENT_DISLIKE,
-      payload: {
-        message: "Removed comment dislike",
-        comments: [...fakeComments]
-      }
-    };
-    const expectedCommentsState = {
-      message: action.payload.message,
-      loading: false,
-      comments: [...action.payload.comments],
-      commentsError: null
-    };
-    expect(commentsReducer(initialCommentsState, action)).toEqual(expectedCommentsState);
-  });
-  */
+  // END DislikeComment RemoveCommentDislike {commentReducer} actions //
 });

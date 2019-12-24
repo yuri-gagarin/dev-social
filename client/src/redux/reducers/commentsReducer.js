@@ -76,6 +76,7 @@ const commentsReducer = (state = initialState, action) => {
     case DISLIKE_COMMENT:
       return {
         ...state,
+        statusCode: action.payload.statusCode,
         loading: false,
         message: action.payload.message,
         comments: [...action.payload.comments],
@@ -84,6 +85,7 @@ const commentsReducer = (state = initialState, action) => {
     case REMOVE_COMMENT_DISLIKE: 
       return {
         ...state,
+        statusCode: action.payload.statusCode,
         loading: false,
         message: action.payload.message,
         comments: [...action.payload.comments],
