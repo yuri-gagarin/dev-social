@@ -1,7 +1,7 @@
 import { LIKE_COMMENT, REMOVE_COMMMENT_LIKE, DISLIKE_COMMENT, REMOVE_COMMENT_DISLIKE } from "../cases";
 
 import { JWT_TOKEN } from "../../helpers/constants/appConstants";
-import { commentsError } from "./commentActions";
+import { commentsError, commentsRequest } from "./commentActions";
 import { loginError, generalError } from "../../helpers/commonErrors";
 import axios from "axios";
 
@@ -11,21 +11,24 @@ export const likeComment = (commentId, currentCommentsState = []) => {
   const options = {
     method: "post",
     url: "/api/comments/like_comment/" + commentId,
-    headers: {"Authorization": `Bearer ${token}`}
+    headers: {"Authorization": `${token}`}
   };
   return function(dispatch) {
     ///api actions
-    if(!token) {
+    if (!token) {
       return Promise.resolve()
         .then(() => {
           return dispatch(commentsError(loginError));
         });
     }
+    dispatch(commentsRequest());
+    // API request //
     return axios(options)
       .then((response) => {
-        let {message, updatedComment} = response.data;
-        let newCommentsState = currentCommentsState.map((comment) => {
-          if(comment._id === updatedComment._id) {
+        const { message, updatedComment } = response.data;
+        const statusCode = response.status;
+        const newCommentsState = currentCommentsState.map((comment) => {
+          if (comment._id === updatedComment._id) {
             return {
               ...comment, 
               likeCount: updatedComment.likeCount,
@@ -33,8 +36,7 @@ export const likeComment = (commentId, currentCommentsState = []) => {
               markLiked: true,
               markDisliked: false,
             }
-          }
-          else {
+          } else {
             return comment;
           }
         });
@@ -43,8 +45,9 @@ export const likeComment = (commentId, currentCommentsState = []) => {
           payload: {
             message: message,
             comments: newCommentsState,
+            statusCode: statusCode
           }
-        })
+        });
       })
       .catch((error) => {
         return dispatch(commentsError(error));
@@ -58,28 +61,31 @@ export const removeCommentLike = (commentId, currentCommentsState = []) => {
   const options = {
     method: "delete",
     url: "/api/comments/unlike_comment/" + commentId,
-    headers: {"Authorization": `Bearer ${token}`}
+    headers: {"Authorization": `${token}`}
   };
+
   return function(dispatch) {
-    if(!token) {
+    if (!token) {
       return Promise.resolve()
         .then(() => {
           return dispatch(commentsError(loginError));
         });
     }
+    dispatch(commentsRequest());
+    // API request //
     return axios(options)
       .then((response) => {
         const {message, updatedComment} = response.data;
-        let newCommentsState = currentCommentsState.map((comment) => {
-          if(comment._id === updatedComment._id) {
+        const statusCode = response.status;
+        const newCommentsState = currentCommentsState.map((comment) => {
+          if (comment._id === updatedComment._id) {
             return {
               ...comment,
               likeCount: updatedComment.likeCount,
               dislikeCount: updatedComment.dislikeCount,
               markLiked: false,
             };
-          }
-          else {
+          } else {
             return comment;
           }
         });
@@ -88,6 +94,7 @@ export const removeCommentLike = (commentId, currentCommentsState = []) => {
           payload: {
             message: message,
             comments: newCommentsState,
+            statusCode: statusCode
           }
         });
       })
@@ -97,7 +104,6 @@ export const removeCommentLike = (commentId, currentCommentsState = []) => {
   };
 };
 
-
 // CommentDislike actions //
 
 export const dislikeComment = (commentId, currentCommentsState = []) => {
@@ -105,26 +111,29 @@ export const dislikeComment = (commentId, currentCommentsState = []) => {
   const options = {
     method: "post",
     url: "/api/comments/dislike_comment/" + commentId,
-    headers: {"Authorization": `Bearer ${token}`},
+    headers: {"Authorization": `${token}`},
   };
   
   return function(dispatch) {
     // some data checking //
-    if(!token) {
+    if (!token) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(loginError));
       });
     }
-    if(!commentId) {
+    if (!commentId) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(generalError));
       });
     }
+    dispatch(commentsRequest());
+    // API request //
     return axios(options)
       .then((response) => {
-        let {updatedComment, message} = response.data;
-        let newCommentsState = currentCommentsState.map((comment) => {
-          if(comment._id === updatedComment._id) {
+        const { updatedComment, message } = response.data;
+        const statusCode = response.status;
+        const newCommentsState = currentCommentsState.map((comment) => {
+          if (comment._id === updatedComment._id) {
             return {
               ...comment,
               dislikeCount: updatedComment.dislikeCount,
@@ -132,8 +141,7 @@ export const dislikeComment = (commentId, currentCommentsState = []) => {
               markDisliked: true,
               markLiked: false,
             };
-          }
-          else {
+          } else {
             return comment;
           }
         });
@@ -142,6 +150,7 @@ export const dislikeComment = (commentId, currentCommentsState = []) => {
           payload: {
             message: message,
             comments: newCommentsState,
+            statusCode: statusCode
           }
         });
       })
@@ -162,29 +171,31 @@ export const removeCommentDislike = (commentId, currentCommentsState = []) => {
 
   return function(dispatch) {
     // some data checking //
-    if(!token) {
+    if (!token) {
       return Promise.resolve().then(() => {
         return dispatch(commentsError(loginError));
       });
     }
-    if(!commentId) {
+    if (!commentId) {
       return Promise.resolve().then(() => {
         return dispatch(generalError("Can't resolve comment..."));
       });
     }
+    dispatch(commentsRequest());
+    // API request //
     return axios(options) 
       .then((response) => {
-        const {message, updatedComment} = response.data;
-        let newCommentsState = currentCommentsState.map((comment) => {
-          if(comment._id === updatedComment._id) {
+        const { message, updatedComment } = response.data;
+        const statusCode = response.status;
+        const newCommentsState = currentCommentsState.map((comment) => {
+          if (comment._id === updatedComment._id) {
             return {
               ...comment,
               likeCount: updatedComment.likeCount,
               dislikeCount: updatedComment.dislikeCount,
               markDisliked: false,
             };
-          }
-          else {
+          } else {
             return comment;
           }
         });
@@ -193,6 +204,7 @@ export const removeCommentDislike = (commentId, currentCommentsState = []) => {
           payload: {
             message: message,
             comments: newCommentsState,
+            statusCode: statusCode
           }
         });
       })

@@ -185,7 +185,7 @@ describe("Comments API / Redux Actions Tests", () => {
         });
       });
       
-    })
+    });
     // END {savedEditedComment} action tests //
     // {deleteComment} action tests //
     describe("Action: {deleteComment}", () => {
@@ -214,6 +214,7 @@ describe("Comments API / Redux Actions Tests", () => {
           //console.log(testStore.getActions());
         })
       });
+      
       it(`Should successfulle handle an API error and dispatch a ${types.COMMENTS_ERROR} action`, () => {
         const currentComments = comments.map((comment) => Object.assign({}, comment));
         //error to be thrown // comments array should not be touched //
@@ -233,7 +234,6 @@ describe("Comments API / Redux Actions Tests", () => {
         return testStore.dispatch(actions.deleteComment(_id, currentComments)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
-
       });
     });
     // END {deleteComment} action tests //

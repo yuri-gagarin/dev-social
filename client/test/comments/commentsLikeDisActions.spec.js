@@ -35,7 +35,7 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
 
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
 
         return testStore.dispatch(actions.likeComment(commentId, currentCommentsState)).then(() => {
@@ -49,7 +49,7 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
 
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
 
         return testStore.dispatch(actions.removeCommentLike(commentId, currentCommentsState)).then(() => {
@@ -63,7 +63,7 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
 
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
 
         return testStore.dispatch(actions.dislikeComment(commentId, currentCommentsState)).then(() => {
@@ -77,7 +77,7 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         const currentCommentsState = comments.map((comment) => Object.assign({}, comment));
 
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError} }
+          { type: types.COMMENTS_ERROR, payload: {message: loginError.message, error: loginError, statusCode: 400} }
         ];
 
         return testStore.dispatch(actions.removeCommentDislike(commentId, currentCommentsState)).then(() => {
@@ -131,7 +131,8 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.LIKE_COMMENT, payload: {message: "Success", comments: newCommentsState} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.LIKE_COMMENT, payload: {message: "Success", comments: newCommentsState, statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.likeComment(commentId, currentCommentsState)).then(() => {
@@ -173,7 +174,8 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.LIKE_COMMENT, payload: {message: "Success", comments: newCommentsState } }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.LIKE_COMMENT, payload: {message: "Success", comments: newCommentsState, statusCode: 200 } }
         ];
 
         return testStore.dispatch(actions.likeComment(commentId, currentCommentsState)).then(() => {
@@ -189,16 +191,17 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
           request.reject({
-            status: 400,
+            status: 500,
             response: error
           });
         });
 
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} }
+          { type: types.COMMENTS_REQUEST, payload: { message: "Loading", statusCode: null} },
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} }
         ];
 
-        return testStore.dispatch(actions.removeCommentLike(commentId, currentCommentsState)).then(() => {
+        return testStore.dispatch(actions.likeComment(commentId, currentCommentsState)).then(() => {
           expect(testStore.getActions()).toEqual(expectedActions);
         });
       });
@@ -237,7 +240,8 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         });
       
         const expectedActions = [
-          { type: types.REMOVE_COMMMENT_LIKE, payload: {message: "Success", comments: newCommentsState} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.REMOVE_COMMMENT_LIKE, payload: {message: "Success", comments: newCommentsState, statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.removeCommentLike(commentId, currentCommentsState)).then(() => {
@@ -253,13 +257,14 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
           request.reject({
-            status: 400,
+            status: 500,
             response: error
           });
         });
 
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} }
         ];
 
         return testStore.dispatch(actions.removeCommentLike(commentId, currentCommentsState)).then(() => {
@@ -299,7 +304,8 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.DISLIKE_COMMENT, payload: {message: "Success", comments: newCommentsState} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.DISLIKE_COMMENT, payload: {message: "Success", comments: newCommentsState, statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.dislikeComment(commentId, currentCommentsState)).then(() => {
@@ -341,7 +347,8 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         });
 
         const expectedActions = [
-          { type: types.DISLIKE_COMMENT, payload: {message: "Success", comments: newCommentsState} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.DISLIKE_COMMENT, payload: {message: "Success", comments: newCommentsState, statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.dislikeComment(commentId, currentCommentsState)).then(() => {
@@ -357,13 +364,14 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
           request.reject({
-            status: 400,
+            status: 500,
             response: error
           });
         });
 
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} }
         ];
 
         return testStore.dispatch(actions.dislikeComment(commentId, currentCommentsState)).then(() => {
@@ -405,7 +413,8 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         });
       
         const expectedActions = [
-          { type: types.REMOVE_COMMENT_DISLIKE, payload: {message: "Success", comments: newCommentsState} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.REMOVE_COMMENT_DISLIKE, payload: {message: "Success", comments: newCommentsState, statusCode: 200} }
         ];
 
         return testStore.dispatch(actions.removeCommentDislike(commentId, currentCommentsState)).then(() => {
@@ -421,13 +430,14 @@ describe("Comments {Like} - {Dislike} Action tests", () => {
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
           request.reject({
-            status: 400,
+            status: 500,
             response: error
           });
         });
 
         const expectedActions = [
-          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error} }
+          { type: types.COMMENTS_REQUEST, payload: {message: "Loading", statusCode: null} },
+          { type: types.COMMENTS_ERROR, payload: {message: error.message, error: error, statusCode: 500} }
         ];
 
         return testStore.dispatch(actions.removeCommentDislike(commentId, currentCommentsState)).then(() => {

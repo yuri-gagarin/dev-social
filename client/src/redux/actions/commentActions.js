@@ -1,6 +1,5 @@
 import { COMMENTS_SUCCESS, COMMENTS_REQUEST, CREATE_COMMENT, COMMENTS_ERROR, EDIT_COMMENT, DELETE_COMMENT } from "../cases";
 
-//import {trimString} from "../../helpers/rendering/displayHelpers";
 import axios from "axios";
 import { isError } from "../../helpers/validators/dataValidators";
 import { JWT_TOKEN } from "../../helpers/constants/appConstants";
@@ -10,10 +9,11 @@ export const commentsRequest = () => {
   return  {
     type: COMMENTS_REQUEST,
     payload: {
-      message: "Loading"
+      message: "Loading",
+      statusCode: null
     },
   }
-}
+};
 export const commentsSuccess = ({message, comments} = {}) => {
   return {
     type: COMMENTS_SUCCESS,
@@ -23,21 +23,34 @@ export const commentsSuccess = ({message, comments} = {}) => {
     }
   };
 };
+
+/**
+ * Generates a COMMENTS_ERROR action
+ * @param {Object} err - an object presumed to be an Error
+ * @return {Object}  A Redux error action object
+ */
 export const commentsError = (err) => {
-  let error;
-  //some checking of the err object to make sure we are working with right data
-  if(isError(err)) error = err;
-  if(isError(err.response)) error = err.response;
-  if(isError(err.request)) error = err.request;
-  if(!error) error = new Error("Something went wrong");
+  let error, statusCode;
+  // some checking of the err object to make sure we are working with right data //
+  if (isError(err)) error = err;
+  if (isError(err.response)) error = err.response;
+  if (isError(err.request)) error = err.request;
+  if (!error) error = new Error("Something went wrong");
 
-  //console.log(err.response)
-
+  // check for a status code in possible response, otherwise error is probably on user end //
+  if (err.response && err.response.status) {
+    statusCode = err.response.status;
+  } else if (err.status) {
+    statusCode = err.status;
+  } else {
+    statusCode = 400;
+  }
   return {
     type: COMMENTS_ERROR,
     payload: {
       message: error.message,
       error: error,
+      statusCode: statusCode
     }
   };
 };
