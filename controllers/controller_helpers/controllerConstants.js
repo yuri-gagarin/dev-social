@@ -19,4 +19,25 @@ export const POST_QUERY_OPTIONS = {
     allTime: "all",
     none: "",
   },
+};
+
+export const COMMENT_CON_UPPER = 1.25;
+export const COMMENT_CON_LOWER = 0.75;
+export const COMMENT_LIM_DEFAULT = 10;
+
+export const COMMENT_QUERY_OPTIONS = {
+  filter: {
+    new: "new",
+    trending: "trending",
+    controversial: "controversial",
+    discussed: "discussed",
+  },
+  time: {
+    day: "day",
+    week: "week",
+    month: "month",
+    year: "year",
+    allTime: "all",
+    none: "",
+  },
 }

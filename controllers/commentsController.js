@@ -2,8 +2,31 @@ import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
 import commentValidator from "../helpers/validators/commentValidator.js";
 import getDateWithTime from "../helpers/getDateWithTime.js";
+import { convertTimeQuery } from "../helpers/timeHelpers.js";
+import { COMMENT_QUERY_OPTIONS } from "./controller_helpers/controllerConstants.js";
 
 export default {
+
+  // index (fetch comments) //
+  index: (req, res) => {
+    const { postId, from, toDate, filter, limit } = req.query;
+
+    const fromDate = convertTimeQuery(from, COMMENT_QUERY_OPTIONS);
+    const toDate = toDate || new Date();
+    filter = normalizeFilter(filter) // needs to be defined //
+    limit = setLimit(limit) // needs to be defined //
+
+    const params = {
+      postId: postId,
+      filter: filter,
+      fromDate: fromDate,
+      toDate: toDate,
+      limit: limit
+    };
+
+    executeCommentQuery(params) // needs to be defined //
+
+  },
 
   createComment: (req, res) => {
     const userId = req.user._id;

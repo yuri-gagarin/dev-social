@@ -1,15 +1,15 @@
 import chai, {expect} from "chai";
 import chaiHttp from "chai-http";
-import app from "../server.js";
-import seedDB from "./seeds/seedDB.js";
+import app from "../server";
+import seedDB from "./seeds/seedDB";
 
-import {rewind} from "../helpers/timeHelpers.js";
+import {rewind} from "../helpers/timeHelpers";
 import {POST_CON_UPPER, POST_CON_LOWER, POST_QUERY_OPTIONS,
         TREND_POST_COMMENT_MIN, TREND_POST_LIKE_MIN, 
         TREND_POST_LIKE_RATIO} from "../controllers/controller_helpers/controllerConstants";
 
-import {seedPosts, likePosts, createControversialPosts} from "./helpers/postHelpers.js";
-import User from "../models/User.js";
+import {seedPosts, likePosts, createControversialPosts} from "./helpers/postHelpers";
+import User from "../models/User";
 
 chai.use(chaiHttp);
 
