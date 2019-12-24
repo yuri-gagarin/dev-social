@@ -16,8 +16,14 @@ const DB = keys.mongoURI;
 //find them pesky console.log statements;
 detailedLog("warn", "error", "info");
 
+// database and options //
+const mongoOptions = {
+  useNewUrlParser: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true
+};
 mongoose
-  .connect(DB, {useNewUrlParser: true,  useFindAndModify: false})
+  .connect(DB, mongoOptions)
   .then((data) => {
     //console.log("Database connected");
     //console.log("Database name: " + data.connection.name);
@@ -42,10 +48,9 @@ app.use(router);
 app.use(express.static("public"));
 
 app.get("/", (req, res) => {
-  if(process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV !== "production") {
     res.sendFile(path.resolve(__dirname, "client", "src", "index.html"));
-  }
-  else {
+  } else {
     res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
   }
 });

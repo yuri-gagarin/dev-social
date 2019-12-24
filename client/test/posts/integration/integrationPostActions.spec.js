@@ -20,7 +20,7 @@ describe("postActions integration tests", () => {
       data: {
         email: userCredentials.email,
         password: userCredentials.password
-      },
+      }
     };
     return axios(options)
       .then((response) => {
@@ -50,8 +50,8 @@ describe("postActions integration tests", () => {
     describe("Action {fetchPosts}", () => {
       it("Should fetch posts and correctly set the {postsState}", () => {
         return store.dispatch(actions.fetchPosts()).then(() => {
-          
           const { loading, message, posts, postsError } = store.getState().postsState;
+
           expect(loading).toBe(false);
           expect(typeof message).toEqual("string");
           expect(Array.isArray(posts)).toBe(true);
@@ -67,6 +67,7 @@ describe("postActions integration tests", () => {
 
         return store.dispatch(actions.createPost(post, currentPosts)).then(() => {
           const { loading, message, posts, postsError} = store.getState().postsState;
+          
           expect(loading).toBe(false);
           expect(typeof message).toEqual("string");
           expect(Array.isArray(posts)).toBe(true);

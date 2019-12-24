@@ -60,7 +60,7 @@ export const fetchComments = (options = {}) => {
     postId: options.postId,
     from: options.from,
     toDate: options.toDate,
-    filter: options.filter || postSearchOptions.filter.new,
+    filter: options.filter || commentSearchOptions.filter.new,
     limit: options.limit || 10,
   };
 
