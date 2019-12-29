@@ -29,7 +29,9 @@ export const commentConstants = {
     COMMENT_CON_LOWER: 0.75,
     COMMENT_MIN_LIKES: 5,
     COMMENT_LIM_DEFAULT: 10,
-    POP_COMMENT_LIKE_RATIO: 0.75
+    POP_COMMENT_LIKE_RATIO: 0.75,
+    CONT_COMMENT_LIKE_MIN: 5,
+    CONT_COMMENT_DISLKIKE_MIN: 5
   },
 
   queryOptions: {
