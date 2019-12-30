@@ -40,6 +40,7 @@ export const commentConstants = {
       trending: "trending",
       controversial: "controversial",
       discussed: "discussed",
+      liked: "liked"
     },
     time: {
       day: "day",
